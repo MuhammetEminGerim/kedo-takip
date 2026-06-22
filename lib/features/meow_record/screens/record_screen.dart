@@ -311,7 +311,36 @@ class _RecordScreenState extends ConsumerState<RecordScreen> {
 
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 16.0),
-                  child: PastelCard(
+                  child: GestureDetector(
+                    onLongPress: () {
+                      showDialog(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                          backgroundColor: AppColors.playfulBackground,
+                          title: const Text('Delete Recording? 🗑️', style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText)),
+                          content: const Text('This will permanently delete this meow recording.', style: TextStyle(fontWeight: FontWeight.w700, color: AppColors.playfulText)),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(ctx),
+                              child: const Text('Cancel', style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText)),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                ref.read(meowRecordListProvider.notifier).deleteRecord(record);
+                                Navigator.pop(ctx);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.redAccent.shade100,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                              ),
+                              child: const Text('Delete', style: TextStyle(fontWeight: FontWeight.w900, color: Colors.white)),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                    child: PastelCard(
                     backgroundColor: Colors.white,
                     child: Row(
                       children: [
@@ -319,13 +348,15 @@ class _RecordScreenState extends ConsumerState<RecordScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // Fake audio waveform
+                              // Audio waveform visualization
                               Row(
                                 children: List.generate(15, (i) {
+                                  // Use record id hash for pseudo-random but consistent heights
+                                  final seed = (record.id.hashCode + i * 7) % 20 + 8;
                                   return Container(
                                     margin: const EdgeInsets.only(right: 4),
                                     width: 4,
-                                    height: (i % 3 == 0) ? 20 : ((i % 2 == 0) ? 10 : 30),
+                                    height: seed.toDouble(),
                                     decoration: BoxDecoration(
                                       color: chipColor.withOpacity(0.5),
                                       borderRadius: BorderRadius.circular(2),
@@ -374,6 +405,7 @@ class _RecordScreenState extends ConsumerState<RecordScreen> {
                           ),
                         ),
                       ],
+                    ),
                     ),
                   ),
                 );
