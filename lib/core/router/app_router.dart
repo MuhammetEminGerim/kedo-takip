@@ -19,14 +19,40 @@ final routerProvider = Provider<GoRouter>((ref) {
     routes: [
       GoRoute(
         path: '/cat-form',
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final cat = state.extra as Cat?;
-          return CatFormScreen(catToEdit: cat);
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: CatFormScreen(catToEdit: cat),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(
+                opacity: CurveTween(curve: Curves.easeInOut).animate(animation),
+                child: SlideTransition(
+                  position: Tween<Offset>(begin: const Offset(0, 0.05), end: Offset.zero).animate(CurveTween(curve: Curves.easeOut).animate(animation)),
+                  child: child,
+                ),
+              );
+            },
+          );
         },
       ),
       GoRoute(
         path: '/settings',
-        builder: (context, state) => const SettingsScreen(),
+        pageBuilder: (context, state) {
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: const SettingsScreen(),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(
+                opacity: CurveTween(curve: Curves.easeInOut).animate(animation),
+                child: SlideTransition(
+                  position: Tween<Offset>(begin: const Offset(0, 0.05), end: Offset.zero).animate(CurveTween(curve: Curves.easeOut).animate(animation)),
+                  child: child,
+                ),
+              );
+            },
+          );
+        },
       ),
       ShellRoute(
         builder: (context, state, child) {
