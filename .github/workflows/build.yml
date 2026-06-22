@@ -24,7 +24,6 @@ jobs:
       - name: Set Up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.16.x' # Or use channel: 'stable'
           channel: 'stable'
           cache: true
 
