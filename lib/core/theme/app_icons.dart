@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 
 class AppIcons {
-  // Helper to build a tinted icon from asset
+  // Helper to build icon from asset — no color tinting (icons have white bg)
   static Widget _build(String assetName, Color? color, double size) {
     return Image.asset(
       'assets/icons/$assetName',
       width: size,
       height: size,
-      color: color ?? const Color(0xFF594236),
-      colorBlendMode: BlendMode.srcIn,
       errorBuilder: (context, error, stackTrace) => Icon(
         Icons.broken_image_outlined,
         size: size,
