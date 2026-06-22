@@ -74,12 +74,12 @@ class ScaffoldWithBottomNavBar extends ConsumerWidget {
           child,
           // Floating Pill Nav Bar
           Positioned(
-            left: 20,
-            right: 20,
+            left: 12,
+            right: 12,
             bottom: 24,
             child: Container(
               height: 85,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
               decoration: BoxDecoration(
                 color: const Color(0xFFFFF6ED), // Match the cream background of the mockup nav
                 borderRadius: BorderRadius.circular(42),
@@ -120,6 +120,7 @@ class ScaffoldWithBottomNavBar extends ConsumerWidget {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           height: double.infinity,
+          margin: const EdgeInsets.symmetric(horizontal: 4),
           decoration: BoxDecoration(
             color: isSelected ? selectedColor : Colors.transparent,
             borderRadius: BorderRadius.circular(35),
