@@ -1,8 +1,8 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../shared/providers/cat_provider.dart';
 import '../../meow_record/providers/meow_record_provider.dart';
@@ -28,7 +28,7 @@ class DashboardScreen extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.settings_rounded, color: AppColors.playfulText),
-            onPressed: () {},
+            onPressed: () => context.push('/settings'),
           ),
         ],
       ),
@@ -78,35 +78,132 @@ class DashboardScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Cat Selector (horizontal scroll)
+          if (cats.length > 1) ...[
+            SizedBox(
+              height: 90,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: cats.length + 1, // +1 for add button
+                itemBuilder: (context, index) {
+                  if (index == cats.length) {
+                    // Add cat button
+                    return GestureDetector(
+                      onTap: () => context.push('/cat-form'),
+                      child: Container(
+                        margin: const EdgeInsets.only(right: 12),
+                        child: Column(
+                          children: [
+                            Container(
+                              width: 60,
+                              height: 60,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: AppColors.playfulSurface,
+                                border: Border.all(color: AppColors.playfulText.withOpacity(0.15), width: 2, style: BorderStyle.solid),
+                              ),
+                              child: Icon(Icons.add_rounded, size: 28, color: AppColors.playfulText.withOpacity(0.4)),
+                            ),
+                            const SizedBox(height: 6),
+                            Text('Add', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AppColors.playfulText.withOpacity(0.4))),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+                  final cat = cats[index];
+                  final isSelected = selectedCat?.id == cat.id;
+                  return GestureDetector(
+                    onTap: () => ref.read(selectedCatProvider.notifier).setCat(cat),
+                    onLongPress: () => context.push('/cat-form', extra: cat),
+                    child: Container(
+                      margin: const EdgeInsets.only(right: 12),
+                      child: Column(
+                        children: [
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            width: isSelected ? 64 : 56,
+                            height: isSelected ? 64 : 56,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: AppColors.playfulSurface,
+                              border: Border.all(
+                                color: isSelected ? AppColors.playfulPrimary : AppColors.playfulText.withOpacity(0.1),
+                                width: isSelected ? 3 : 2,
+                              ),
+                              boxShadow: isSelected
+                                  ? [BoxShadow(color: AppColors.playfulPrimary.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 2))]
+                                  : [],
+                              image: cat.photoPath != null && cat.photoPath!.isNotEmpty
+                                  ? DecorationImage(image: FileImage(File(cat.photoPath!)), fit: BoxFit.cover)
+                                  : const DecorationImage(image: AssetImage('assets/images/cat_avatar.png'), fit: BoxFit.cover),
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            cat.name,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: isSelected ? FontWeight.w900 : FontWeight.w700,
+                              color: isSelected ? AppColors.playfulPrimary : AppColors.playfulText.withOpacity(0.6),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+
           // Kawaii Cat Profile Header
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(
-                width: 90,
-                height: 90,
-                decoration: BoxDecoration(
-                  color: AppColors.playfulSurface,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 4),
-                  boxShadow: [
-                    BoxShadow(color: AppColors.playfulPrimary.withOpacity(0.2), blurRadius: 10, offset: const Offset(0, 4))
-                  ],
-                  image: const DecorationImage(
-                    image: AssetImage('assets/images/cat_avatar.png'),
-                    fit: BoxFit.cover,
+              GestureDetector(
+                onTap: () => context.push('/cat-form', extra: selectedCat),
+                child: Container(
+                  width: 90,
+                  height: 90,
+                  decoration: BoxDecoration(
+                    color: AppColors.playfulSurface,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 4),
+                    boxShadow: [
+                      BoxShadow(color: AppColors.playfulPrimary.withOpacity(0.2), blurRadius: 10, offset: const Offset(0, 4))
+                    ],
+                    image: selectedCat.photoPath != null && selectedCat.photoPath!.isNotEmpty
+                        ? DecorationImage(image: FileImage(File(selectedCat.photoPath!)), fit: BoxFit.cover)
+                        : const DecorationImage(image: AssetImage('assets/images/cat_avatar.png'), fit: BoxFit.cover),
                   ),
                 ),
               ),
               const SizedBox(width: 16),
-              Text(
-                selectedCat.name,
-                style: const TextStyle(
-                  fontFamily: 'Nunito',
-                  fontWeight: FontWeight.w900,
-                  fontSize: 42,
-                  color: AppColors.playfulText,
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    selectedCat.name,
+                    style: const TextStyle(
+                      fontFamily: 'Nunito',
+                      fontWeight: FontWeight.w900,
+                      fontSize: 36,
+                      color: AppColors.playfulText,
+                    ),
+                  ),
+                  if (selectedCat.breed != null && selectedCat.breed!.isNotEmpty)
+                    Text(
+                      selectedCat.breed!,
+                      style: TextStyle(
+                        fontFamily: 'Nunito',
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14,
+                        color: AppColors.playfulText.withOpacity(0.6),
+                      ),
+                    ),
+                ],
               ),
               const SizedBox(width: 8),
               const Icon(Icons.pets, color: AppColors.playfulSecondary, size: 28),
@@ -212,7 +309,7 @@ class DashboardScreen extends ConsumerWidget {
       clipBehavior: Clip.none,
       children: [
         PastelCard(
-          backgroundColor: Colors.white, // In mockup cards are white with colored inner parts
+          backgroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           child: Row(
             children: [

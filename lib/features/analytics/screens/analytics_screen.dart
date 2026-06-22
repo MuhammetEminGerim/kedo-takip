@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:intl/intl.dart';
 
 import '../../meow_record/providers/meow_record_provider.dart';
 import '../../care_tracking/providers/care_log_provider.dart';
+import '../../../shared/providers/cat_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../shared/widgets/pastel_card.dart';
 
@@ -21,6 +23,41 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
   Widget build(BuildContext context) {
     final meowRecords = ref.watch(meowRecordListProvider);
     final careLogs = ref.watch(careLogListProvider);
+    final selectedCat = ref.watch(selectedCatProvider);
+    final catName = selectedCat?.name ?? 'Your cat';
+
+    // Calculate time range
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    int daysBack = _selectedTab == 'Week' ? 7 : _selectedTab == 'Month' ? 30 : 365;
+    final startDate = today.subtract(Duration(days: daysBack - 1));
+
+    // Filter records by time range
+    final filteredMeows = meowRecords.where((m) => m.timestamp.isAfter(startDate)).toList();
+    final filteredLogs = careLogs.where((l) => l.timestamp.isAfter(startDate)).toList();
+
+    // Calculate real stats
+    final totalMeows = filteredMeows.length;
+    final totalMeals = filteredLogs.where((l) => l.type == 'food').length;
+    final streak = _calculateStreak(meowRecords, careLogs);
+
+    // Build daily meow counts for chart
+    final chartDays = _selectedTab == 'Week' ? 7 : _selectedTab == 'Month' ? 7 : 7; // Always show 7 bars
+    final chartData = _buildChartData(meowRecords, chartDays);
+
+    // Get today's food logs for timeline
+    final todayFoodLogs = careLogs
+        .where((l) => l.type == 'food' && l.timestamp.day == now.day && l.timestamp.month == now.month && l.timestamp.year == now.year)
+        .toList()
+      ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+
+    // Get mood logs for trend
+    final moodLogs = careLogs.where((l) => l.type == 'mood').toList()
+      ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
+    final recentMoods = moodLogs.take(7).toList();
+
+    // Generate insight
+    final insight = _generateInsight(catName, filteredMeows, filteredLogs);
 
     return Scaffold(
       appBar: AppBar(
@@ -86,57 +123,80 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
               // Bar Chart
               SizedBox(
                 height: 200,
-                child: BarChart(
-                  BarChartData(
-                    alignment: BarChartAlignment.spaceAround,
-                    maxY: 10,
-                    barTouchData: BarTouchData(enabled: false),
-                    titlesData: FlTitlesData(
-                      show: true,
-                      bottomTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          getTitlesWidget: (value, meta) {
-                            const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-                            if (value < 0 || value >= days.length) return const SizedBox.shrink();
-                            return Padding(
-                              padding: const EdgeInsets.only(top: 8.0),
-                              child: Text(days[value.toInt()], style: TextStyle(color: AppColors.playfulText.withOpacity(0.6), fontWeight: FontWeight.w900, fontSize: 12)),
+                child: filteredMeows.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.bar_chart_outlined, size: 48, color: AppColors.playfulText.withOpacity(0.2)),
+                            const SizedBox(height: 8),
+                            Text('No meow data yet', style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText.withOpacity(0.4))),
+                          ],
+                        ),
+                      )
+                    : BarChart(
+                        BarChartData(
+                          alignment: BarChartAlignment.spaceAround,
+                          maxY: _getMaxY(chartData),
+                          barTouchData: BarTouchData(
+                            enabled: true,
+                            touchTooltipData: BarTouchTooltipData(
+                              getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                                return BarTooltipItem(
+                                  '${rod.toY.toInt()} meows',
+                                  const TextStyle(fontWeight: FontWeight.w900, color: Colors.white, fontSize: 12),
+                                );
+                              },
+                            ),
+                          ),
+                          titlesData: FlTitlesData(
+                            show: true,
+                            bottomTitles: AxisTitles(
+                              sideTitles: SideTitles(
+                                showTitles: true,
+                                getTitlesWidget: (value, meta) {
+                                  if (value < 0 || value >= chartData.length) return const SizedBox.shrink();
+                                  return Padding(
+                                    padding: const EdgeInsets.only(top: 8.0),
+                                    child: Text(
+                                      chartData[value.toInt()]['label'] as String,
+                                      style: TextStyle(color: AppColors.playfulText.withOpacity(0.6), fontWeight: FontWeight.w900, fontSize: 12),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                            leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                            topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                            rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                          ),
+                          gridData: FlGridData(
+                            show: true,
+                            drawVerticalLine: false,
+                            horizontalInterval: 2,
+                            getDrawingHorizontalLine: (value) => FlLine(color: AppColors.playfulText.withOpacity(0.05), strokeWidth: 2),
+                          ),
+                          borderData: FlBorderData(show: false),
+                          barGroups: List.generate(chartData.length, (index) {
+                            final val = (chartData[index]['count'] as int).toDouble();
+                            return BarChartGroupData(
+                              x: index,
+                              barRods: [
+                                BarChartRodData(
+                                  toY: val,
+                                  gradient: LinearGradient(
+                                    colors: [AppColors.playfulPrimary.withOpacity(0.5), AppColors.playfulAccentPeach],
+                                    begin: Alignment.bottomCenter,
+                                    end: Alignment.topCenter,
+                                  ),
+                                  width: 24,
+                                  borderRadius: BorderRadius.circular(6),
+                                )
+                              ],
                             );
-                          },
+                          }),
                         ),
                       ),
-                      leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                      topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                      rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    ),
-                    gridData: FlGridData(
-                      show: true,
-                      drawVerticalLine: false,
-                      horizontalInterval: 2,
-                      getDrawingHorizontalLine: (value) => FlLine(color: AppColors.playfulText.withOpacity(0.05), strokeWidth: 2),
-                    ),
-                    borderData: FlBorderData(show: false),
-                    barGroups: List.generate(7, (index) {
-                      final val = (index % 3 == 0) ? 6.0 : (index % 2 == 0) ? 4.0 : 8.0;
-                      return BarChartGroupData(
-                        x: index,
-                        barRods: [
-                          BarChartRodData(
-                            toY: val,
-                            gradient: LinearGradient(
-                              colors: [AppColors.playfulPrimary.withOpacity(0.5), AppColors.playfulAccentPeach],
-                              begin: Alignment.bottomCenter,
-                              end: Alignment.topCenter,
-                            ),
-                            width: 24,
-                            borderRadius: BorderRadius.circular(6),
-                          )
-                        ],
-                      );
-                    }),
-                  ),
-                ),
               ),
 
               const SizedBox(height: 24),
@@ -156,9 +216,9 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Pamuk meows most before meals!', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14)),
+                          Text(insight['title']!, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 14)),
                           const SizedBox(height: 4),
-                          Text('Evening activity up 30% this week', style: TextStyle(color: AppColors.playfulText.withOpacity(0.8), fontSize: 12, fontWeight: FontWeight.bold)),
+                          Text(insight['subtitle']!, style: TextStyle(color: AppColors.playfulText.withOpacity(0.8), fontSize: 12, fontWeight: FontWeight.bold)),
                         ],
                       ),
                     ),
@@ -170,24 +230,13 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
 
               Text('Feeding pattern', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
               const SizedBox(height: 16),
-              _buildTimeline(),
+              _buildFeedingTimeline(todayFoodLogs),
 
               const SizedBox(height: 32),
               
               Text('Mood trends', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
               const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _buildMoodCircle(Icons.sentiment_very_satisfied_outlined, AppColors.playfulPrimary),
-                  _buildMoodCircle(Icons.sentiment_satisfied_outlined, AppColors.playfulPrimary),
-                  _buildMoodCircle(Icons.sentiment_satisfied_outlined, AppColors.playfulSecondary),
-                  _buildMoodCircle(Icons.sentiment_neutral_outlined, AppColors.playfulSecondary),
-                  _buildMoodCircle(Icons.sentiment_neutral_outlined, AppColors.playfulSecondary),
-                  _buildMoodCircle(Icons.sentiment_dissatisfied_outlined, AppColors.playfulTertiary),
-                  _buildMoodCircle(Icons.sentiment_very_dissatisfied_outlined, AppColors.playfulTertiary),
-                ],
-              ),
+              _buildMoodTrend(recentMoods),
 
               const SizedBox(height: 32),
 
@@ -195,11 +244,11 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
               const SizedBox(height: 16),
               Row(
                 children: [
-                  Expanded(child: _buildStatBox('47', 'recordings', Icons.mic_none_outlined)),
+                  Expanded(child: _buildStatBox('$totalMeows', 'recordings', Icons.mic_none_outlined)),
                   const SizedBox(width: 12),
-                  Expanded(child: _buildStatBox('21', 'meals', Icons.restaurant_outlined)),
+                  Expanded(child: _buildStatBox('$totalMeals', 'meals', Icons.restaurant_outlined)),
                   const SizedBox(width: 12),
-                  Expanded(child: _buildStatBox('7', 'day streak', Icons.local_fire_department_outlined)),
+                  Expanded(child: _buildStatBox('$streak', 'day streak', Icons.local_fire_department_outlined)),
                 ],
               ),
               const SizedBox(height: 100),
@@ -210,7 +259,111 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
     );
   }
 
-  Widget _buildTimeline() {
+  List<Map<String, dynamic>> _buildChartData(List meowRecords, int displayDays) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+    if (_selectedTab == 'Week') {
+      // Last 7 days
+      return List.generate(7, (i) {
+        final day = today.subtract(Duration(days: 6 - i));
+        final count = meowRecords.where((m) {
+          final d = m.timestamp;
+          return d.year == day.year && d.month == day.month && d.day == day.day;
+        }).length;
+        return {'label': dayLabels[day.weekday - 1], 'count': count};
+      });
+    } else if (_selectedTab == 'Month') {
+      // Last 4 weeks, grouped by week
+      return List.generate(4, (i) {
+        final weekEnd = today.subtract(Duration(days: (3 - i) * 7));
+        final weekStart = weekEnd.subtract(const Duration(days: 6));
+        final count = meowRecords.where((m) {
+          return m.timestamp.isAfter(weekStart.subtract(const Duration(days: 1))) && m.timestamp.isBefore(weekEnd.add(const Duration(days: 1)));
+        }).length;
+        return {'label': 'W${i + 1}', 'count': count};
+      });
+    } else {
+      // All time - group by last 6 months
+      return List.generate(6, (i) {
+        final month = DateTime(now.year, now.month - (5 - i), 1);
+        final nextMonth = DateTime(month.year, month.month + 1, 1);
+        final count = meowRecords.where((m) {
+          return m.timestamp.isAfter(month.subtract(const Duration(days: 1))) && m.timestamp.isBefore(nextMonth);
+        }).length;
+        final monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        return {'label': monthNames[month.month - 1], 'count': count};
+      });
+    }
+  }
+
+  double _getMaxY(List<Map<String, dynamic>> data) {
+    if (data.isEmpty) return 10;
+    final maxVal = data.map((d) => d['count'] as int).reduce((a, b) => a > b ? a : b);
+    return maxVal == 0 ? 5 : (maxVal + 2).toDouble();
+  }
+
+  int _calculateStreak(List meowRecords, List careLogs) {
+    final now = DateTime.now();
+    int streak = 0;
+    for (int i = 0; i < 365; i++) {
+      final day = DateTime(now.year, now.month, now.day - i);
+      final hasMeow = meowRecords.any((m) => m.timestamp.year == day.year && m.timestamp.month == day.month && m.timestamp.day == day.day);
+      final hasLog = careLogs.any((l) => l.timestamp.year == day.year && l.timestamp.month == day.month && l.timestamp.day == day.day);
+      if (hasMeow || hasLog) {
+        streak++;
+      } else {
+        break;
+      }
+    }
+    return streak;
+  }
+
+  Map<String, String> _generateInsight(String catName, List filteredMeows, List filteredLogs) {
+    if (filteredMeows.isEmpty && filteredLogs.isEmpty) {
+      return {
+        'title': 'Start recording to see insights!',
+        'subtitle': 'Record meows and log care activities',
+      };
+    }
+
+    // Determine most active time of day
+    final hourCounts = <int, int>{};
+    for (final m in filteredMeows) {
+      final hour = m.timestamp.hour;
+      hourCounts[hour] = (hourCounts[hour] ?? 0) + 1;
+    }
+
+    if (hourCounts.isNotEmpty) {
+      final peakHour = hourCounts.entries.reduce((a, b) => a.value > b.value ? a : b).key;
+      final timeOfDay = peakHour < 12 ? 'morning' : peakHour < 17 ? 'afternoon' : 'evening';
+      final mealCount = filteredLogs.where((l) => l.type == 'food').length;
+      
+      return {
+        'title': '$catName meows most in the $timeOfDay!',
+        'subtitle': '$mealCount meals logged this period',
+      };
+    }
+
+    final mealCount = filteredLogs.where((l) => l.type == 'food').length;
+    return {
+      'title': '$catName had $mealCount meals this period',
+      'subtitle': 'Keep logging to discover patterns!',
+    };
+  }
+
+  Widget _buildFeedingTimeline(List todayFoodLogs) {
+    if (todayFoodLogs.isEmpty) {
+      return PastelCard(
+        backgroundColor: Colors.white,
+        padding: const EdgeInsets.all(20),
+        child: Center(
+          child: Text('No meals logged today', style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText.withOpacity(0.4))),
+        ),
+      );
+    }
+
     return SizedBox(
       height: 60,
       child: Stack(
@@ -219,11 +372,10 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
           Container(height: 4, color: AppColors.playfulPrimary.withOpacity(0.2)),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _buildTimelinePoint('8am', AppColors.playfulPrimary),
-              _buildTimelinePoint('1pm', AppColors.playfulAccentPeach),
-              _buildTimelinePoint('7pm', AppColors.playfulSecondary),
-            ],
+            children: todayFoodLogs.take(5).map((log) {
+              final time = DateFormat.jm().format(log.timestamp);
+              return _buildTimelinePoint(time, AppColors.playfulPrimary);
+            }).toList(),
           ),
         ],
       ),
@@ -241,8 +393,45 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
           child: const Center(child: Icon(Icons.restaurant_outlined, size: 20, color: AppColors.playfulText)),
         ),
         const SizedBox(height: 4),
-        Text(time, style: TextStyle(color: AppColors.playfulText.withOpacity(0.6), fontWeight: FontWeight.w900, fontSize: 12)),
+        Text(time, style: TextStyle(color: AppColors.playfulText.withOpacity(0.6), fontWeight: FontWeight.w900, fontSize: 10)),
       ],
+    );
+  }
+
+  Widget _buildMoodTrend(List recentMoods) {
+    if (recentMoods.isEmpty) {
+      return PastelCard(
+        backgroundColor: Colors.white,
+        padding: const EdgeInsets.all(20),
+        child: Center(
+          child: Text('No mood data yet', style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText.withOpacity(0.4))),
+        ),
+      );
+    }
+
+    final moodIcons = {
+      'very_happy': Icons.sentiment_very_satisfied_outlined,
+      'happy': Icons.sentiment_satisfied_outlined,
+      'neutral': Icons.sentiment_neutral_outlined,
+      'sad': Icons.sentiment_dissatisfied_outlined,
+      'angry': Icons.sentiment_very_dissatisfied_outlined,
+    };
+
+    final moodColors = {
+      'very_happy': AppColors.playfulSecondary,
+      'happy': AppColors.playfulSecondary,
+      'neutral': AppColors.playfulAccentPeach,
+      'sad': AppColors.playfulTertiary,
+      'angry': AppColors.playfulPrimary,
+    };
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: recentMoods.map((log) {
+        final icon = moodIcons[log.value] ?? Icons.sentiment_neutral_outlined;
+        final color = moodColors[log.value] ?? AppColors.playfulSecondary;
+        return _buildMoodCircle(icon, color);
+      }).toList(),
     );
   }
 

@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 // Placeholder imports for screens
 import '../../features/dashboard/screens/dashboard_screen.dart';
 import '../../features/meow_record/screens/record_screen.dart';
 import '../../features/care_tracking/screens/care_screen.dart';
 import '../../features/analytics/screens/analytics_screen.dart';
-import '../../features/learn/screens/learn_screen.dart';
+import '../../features/training/screens/training_screen.dart';
 import '../../features/cat_profile/screens/cat_form_screen.dart';
-import '../theme/app_theme.dart';
+import '../../features/settings/screens/settings_screen.dart';
 import '../theme/app_icons.dart';
 import '../../shared/models/cat.dart';
 
@@ -24,6 +23,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           final cat = state.extra as Cat?;
           return CatFormScreen(catToEdit: cat);
         },
+      ),
+      GoRoute(
+        path: '/settings',
+        builder: (context, state) => const SettingsScreen(),
       ),
       ShellRoute(
         builder: (context, state, child) {
@@ -48,7 +51,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: '/training',
-            builder: (context, state) => const LearnScreen(),
+            builder: (context, state) => const TrainingScreen(),
           ),
         ],
       ),

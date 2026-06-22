@@ -1,9 +1,15 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
+
 import '../../../shared/models/cat.dart';
 import '../../../shared/providers/cat_provider.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../shared/widgets/pastel_card.dart';
 
 class CatFormScreen extends ConsumerStatefulWidget {
   final Cat? catToEdit;
@@ -22,6 +28,7 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
   DateTime? _selectedDate;
   String _gender = 'Female';
   bool _isNeutered = false;
+  String? _photoPath;
 
   @override
   void initState() {
@@ -30,6 +37,7 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
     _breedController = TextEditingController(text: widget.catToEdit?.breed ?? '');
     _weightController = TextEditingController(text: widget.catToEdit?.weight?.toString() ?? '');
     _selectedDate = widget.catToEdit?.birthDate;
+    _photoPath = widget.catToEdit?.photoPath;
     if (widget.catToEdit != null) {
       _gender = widget.catToEdit!.gender;
       _isNeutered = widget.catToEdit!.isNeutered;
@@ -44,12 +52,110 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
     super.dispose();
   }
 
+  Future<void> _pickPhoto() async {
+    final picker = ImagePicker();
+    
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        padding: const EdgeInsets.all(24),
+        decoration: const BoxDecoration(
+          color: AppColors.playfulBackground,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.playfulText.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 24),
+            const Text('Choose Photo', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 20, color: AppColors.playfulText)),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildPhotoOption(
+                  icon: Icons.camera_alt_rounded,
+                  label: 'Camera',
+                  color: AppColors.playfulPrimary,
+                  onTap: () => Navigator.pop(ctx, ImageSource.camera),
+                ),
+                _buildPhotoOption(
+                  icon: Icons.photo_library_rounded,
+                  label: 'Gallery',
+                  color: AppColors.playfulSecondary,
+                  onTap: () => Navigator.pop(ctx, ImageSource.gallery),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+
+    if (source == null) return;
+
+    final picked = await picker.pickImage(source: source, maxWidth: 512, maxHeight: 512, imageQuality: 80);
+    if (picked == null) return;
+
+    // Copy to app directory for persistence
+    final appDir = await getApplicationDocumentsDirectory();
+    final fileName = 'cat_photo_${DateTime.now().millisecondsSinceEpoch}.jpg';
+    final savedFile = await File(picked.path).copy('${appDir.path}/$fileName');
+
+    setState(() {
+      _photoPath = savedFile.path;
+    });
+  }
+
+  Widget _buildPhotoOption({required IconData icon, required String label, required Color color, required VoidCallback onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            width: 70,
+            height: 70,
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.3),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, size: 32, color: AppColors.playfulText),
+          ),
+          const SizedBox(height: 8),
+          Text(label, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: AppColors.playfulText)),
+        ],
+      ),
+    );
+  }
+
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: _selectedDate ?? DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime.now(),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: AppColors.playfulPrimary,
+              onPrimary: Colors.white,
+              surface: AppColors.playfulBackground,
+              onSurface: AppColors.playfulText,
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
     if (picked != null && picked != _selectedDate) {
       setState(() {
@@ -62,7 +168,12 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
     if (_formKey.currentState!.validate()) {
       if (_selectedDate == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select a birth date')),
+          SnackBar(
+            content: const Text('Please select a birth date 📅', style: TextStyle(fontWeight: FontWeight.w900)),
+            backgroundColor: AppColors.playfulPrimary,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          ),
         );
         return;
       }
@@ -78,6 +189,7 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
           gender: _gender,
           isNeutered: _isNeutered,
           weight: weight,
+          photoPath: _photoPath,
         );
       } else {
         // Update existing
@@ -87,7 +199,8 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
           ..birthDate = _selectedDate!
           ..gender = _gender
           ..isNeutered = _isNeutered
-          ..weight = weight;
+          ..weight = weight
+          ..photoPath = _photoPath;
         ref.read(catListProvider.notifier).updateCat(cat);
       }
 
@@ -95,13 +208,72 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
     }
   }
 
+  void _deleteCat() {
+    if (widget.catToEdit == null) return;
+    
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        backgroundColor: AppColors.playfulBackground,
+        title: const Text('Delete Cat? 😿', style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText)),
+        content: Text(
+          'Are you sure you want to remove ${widget.catToEdit!.name}? This action cannot be undone.',
+          style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.playfulText),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel', style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              ref.read(catListProvider.notifier).deleteCat(widget.catToEdit!);
+              Navigator.pop(ctx);
+              context.go('/');
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent.shade100,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            ),
+            child: const Text('Delete', style: TextStyle(fontWeight: FontWeight.w900, color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isEditing = widget.catToEdit != null;
 
     return Scaffold(
+      backgroundColor: AppColors.playfulBackground,
       appBar: AppBar(
-        title: Text(isEditing ? 'Edit Cat' : 'Add New Cat'),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              isEditing ? 'Edit Cat ' : 'Add Cat ',
+              style: const TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText, fontSize: 24),
+            ),
+            const Text('🐱', style: TextStyle(fontSize: 24)),
+          ],
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded, color: AppColors.playfulText),
+          onPressed: () => context.pop(),
+        ),
+        actions: [
+          if (isEditing)
+            IconButton(
+              icon: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent),
+              onPressed: _deleteCat,
+            ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -110,90 +282,274 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Photo placeholder
+              // Photo
               Center(
-                child: Container(
-                  width: 120,
-                  height: 120,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.pets,
-                    size: 50,
-                    color: Theme.of(context).colorScheme.primary,
+                child: GestureDetector(
+                  onTap: _pickPhoto,
+                  child: Stack(
+                    children: [
+                      Container(
+                        width: 130,
+                        height: 130,
+                        decoration: BoxDecoration(
+                          color: AppColors.playfulPrimary.withOpacity(0.2),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 4),
+                          boxShadow: [
+                            BoxShadow(color: AppColors.playfulPrimary.withOpacity(0.2), blurRadius: 10, offset: const Offset(0, 4)),
+                          ],
+                          image: _photoPath != null
+                              ? DecorationImage(image: FileImage(File(_photoPath!)), fit: BoxFit.cover)
+                              : const DecorationImage(image: AssetImage('assets/images/cat_avatar.png'), fit: BoxFit.cover),
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: AppColors.playfulPrimary,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 3),
+                          ),
+                          child: const Icon(Icons.camera_alt_rounded, size: 20, color: Colors.white),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
+              const SizedBox(height: 8),
+              const Center(
+                child: Text('Tap to change photo', style: TextStyle(color: AppColors.playfulText, fontWeight: FontWeight.w700, fontSize: 12)),
+              ),
               const SizedBox(height: 32),
-              
-              TextFormField(
+
+              // Name Field
+              _buildKawaiiTextField(
                 controller: _nameController,
-                decoration: const InputDecoration(labelText: 'Name'),
+                label: 'Name',
+                icon: Icons.pets_rounded,
                 validator: (value) => value!.isEmpty ? 'Please enter a name' : null,
               ),
               const SizedBox(height: 16),
-              
-              TextFormField(
+
+              // Breed Field
+              _buildKawaiiTextField(
                 controller: _breedController,
-                decoration: const InputDecoration(labelText: 'Breed'),
+                label: 'Breed',
+                icon: Icons.category_rounded,
                 validator: (value) => value!.isEmpty ? 'Please enter a breed' : null,
               ),
               const SizedBox(height: 16),
-              
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                title: const Text('Birth Date'),
-                subtitle: Text(_selectedDate == null 
-                  ? 'Select Date' 
-                  : DateFormat.yMMMd().format(_selectedDate!)),
-                trailing: const Icon(Icons.calendar_today),
+
+              // Birth Date
+              GestureDetector(
                 onTap: () => _selectDate(context),
+                child: PastelCard(
+                  backgroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: AppColors.playfulTertiary.withOpacity(0.3),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(Icons.calendar_today_rounded, color: AppColors.playfulText, size: 20),
+                      ),
+                      const SizedBox(width: 16),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('Birth Date', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: AppColors.playfulText)),
+                          const SizedBox(height: 2),
+                          Text(
+                            _selectedDate == null ? 'Select Date' : DateFormat.yMMMd().format(_selectedDate!),
+                            style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 16,
+                              color: _selectedDate == null ? AppColors.playfulText.withOpacity(0.4) : AppColors.playfulText,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Spacer(),
+                      Icon(Icons.arrow_forward_ios_rounded, size: 16, color: AppColors.playfulText.withOpacity(0.4)),
+                    ],
+                  ),
+                ),
               ),
               const SizedBox(height: 16),
-              
-              DropdownButtonFormField<String>(
-                value: _gender,
-                decoration: const InputDecoration(labelText: 'Gender'),
-                items: ['Female', 'Male'].map((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                onChanged: (newValue) {
-                  setState(() {
-                    _gender = newValue!;
-                  });
-                },
+
+              // Gender
+              PastelCard(
+                backgroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: AppColors.playfulSecondary.withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        _gender == 'Female' ? Icons.female_rounded : Icons.male_rounded,
+                        color: AppColors.playfulText,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    const Text('Gender', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: AppColors.playfulText)),
+                    const Spacer(),
+                    _buildGenderChip('Female', '♀'),
+                    const SizedBox(width: 8),
+                    _buildGenderChip('Male', '♂'),
+                  ],
+                ),
               ),
               const SizedBox(height: 16),
-              
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: const Text('Neutered/Spayed'),
-                value: _isNeutered,
-                onChanged: (val) {
-                  setState(() {
-                    _isNeutered = val;
-                  });
-                },
+
+              // Neutered
+              PastelCard(
+                backgroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: AppColors.playfulAccentPeach.withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(Icons.healing_rounded, color: AppColors.playfulText, size: 20),
+                    ),
+                    const SizedBox(width: 16),
+                    const Expanded(
+                      child: Text('Neutered/Spayed', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: AppColors.playfulText)),
+                    ),
+                    Switch(
+                      value: _isNeutered,
+                      onChanged: (val) => setState(() => _isNeutered = val),
+                      activeColor: AppColors.playfulPrimary,
+                      activeTrackColor: AppColors.playfulPrimary.withOpacity(0.3),
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(height: 16),
-              
-              TextFormField(
+
+              // Weight
+              _buildKawaiiTextField(
                 controller: _weightController,
-                decoration: const InputDecoration(labelText: 'Weight (kg)', suffixText: 'kg'),
+                label: 'Weight (kg)',
+                icon: Icons.monitor_weight_rounded,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                suffixText: 'kg',
               ),
               const SizedBox(height: 32),
-              
-              ElevatedButton(
-                onPressed: _saveCat,
-                child: Text(isEditing ? 'Save Changes' : 'Add Cat'),
+
+              // Save Button
+              GestureDetector(
+                onTap: _saveCat,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 18),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [AppColors.playfulPrimary, AppColors.playfulAccentPeach],
+                    ),
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: [
+                      BoxShadow(color: AppColors.playfulPrimary.withOpacity(0.4), blurRadius: 12, offset: const Offset(0, 4)),
+                    ],
+                  ),
+                  child: Center(
+                    child: Text(
+                      isEditing ? 'Save Changes 💾' : 'Add Cat 🐾',
+                      style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: Colors.white),
+                    ),
+                  ),
+                ),
               ),
+              const SizedBox(height: 24),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildKawaiiTextField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    String? Function(String?)? validator,
+    TextInputType? keyboardType,
+    String? suffixText,
+  }) {
+    return PastelCard(
+      backgroundColor: Colors.white,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: AppColors.playfulPrimary.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: AppColors.playfulText, size: 20),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: TextFormField(
+              controller: controller,
+              validator: validator,
+              keyboardType: keyboardType,
+              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: AppColors.playfulText),
+              decoration: InputDecoration(
+                labelText: label,
+                labelStyle: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: AppColors.playfulText.withOpacity(0.5)),
+                suffixText: suffixText,
+                suffixStyle: const TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText),
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                errorBorder: InputBorder.none,
+                focusedErrorBorder: InputBorder.none,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGenderChip(String value, String symbol) {
+    final isSelected = _gender == value;
+    return GestureDetector(
+      onTap: () => setState(() => _gender = value),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.playfulPrimary : AppColors.playfulSurface,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected ? AppColors.playfulPrimary : AppColors.playfulText.withOpacity(0.1),
+            width: 2,
+          ),
+        ),
+        child: Text(
+          '$symbol $value',
+          style: TextStyle(
+            fontWeight: FontWeight.w900,
+            fontSize: 14,
+            color: isSelected ? Colors.white : AppColors.playfulText,
           ),
         ),
       ),
