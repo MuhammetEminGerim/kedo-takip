@@ -198,6 +198,7 @@ class DashboardScreen extends ConsumerWidget {
               return 'Status: Clean\nChecked: ${DateFormat.jm().format(todayLogs.last.timestamp)}';
             },
           ),
+          const SizedBox(height: 120), // Padding to ensure content is visible above floating nav bar
         ],
       ),
     );
