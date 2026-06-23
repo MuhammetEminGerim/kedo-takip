@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:audioplayers/audioplayers.dart';
 
-import '../providers/audio_record_provider.dart';
 import '../providers/meow_record_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../shared/widgets/pastel_card.dart';
@@ -16,52 +14,51 @@ class RecordScreen extends ConsumerStatefulWidget {
   ConsumerState<RecordScreen> createState() => _RecordScreenState();
 }
 
-class _RecordScreenState extends ConsumerState<RecordScreen> {
+class _RecordScreenState extends ConsumerState<RecordScreen> with SingleTickerProviderStateMixin {
   String? _selectedContext;
+  int? _selectedIntensity;
+  late AnimationController _pulseController;
 
   List<Map<String, dynamic>> get _contexts => [
-    {'text': AppStrings.get('before_meal'), 'icon': Icons.restaurant_outlined, 'color': AppColors.playfulPrimary},
-    {'text': AppStrings.get('after_play'), 'icon': Icons.videogame_asset_outlined, 'color': AppColors.playfulSecondary},
-    {'text': AppStrings.get('night_time'), 'icon': Icons.nightlight_outlined, 'color': AppColors.playfulTertiary},
-    {'text': AppStrings.get('at_door'), 'icon': Icons.door_front_door_outlined, 'color': AppColors.playfulAccentPeach},
-    {'text': AppStrings.get('alone'), 'icon': Icons.pets_outlined, 'color': AppColors.playfulAccentBlue},
-    {'text': AppStrings.get('other'), 'icon': Icons.edit_note_outlined, 'color': Colors.grey.shade300},
+    {'text': AppStrings.get('before_meal'), 'icon': Icons.restaurant_outlined, 'emoji': '🍽️', 'color': AppColors.playfulPrimary},
+    {'text': AppStrings.get('after_play'), 'icon': Icons.videogame_asset_outlined, 'emoji': '🎮', 'color': AppColors.playfulSecondary},
+    {'text': AppStrings.get('night_time'), 'icon': Icons.nightlight_outlined, 'emoji': '🌙', 'color': AppColors.playfulTertiary},
+    {'text': AppStrings.get('at_door'), 'icon': Icons.door_front_door_outlined, 'emoji': '🚪', 'color': AppColors.playfulAccentPeach},
+    {'text': AppStrings.get('alone'), 'icon': Icons.pets_outlined, 'emoji': '🐱', 'color': AppColors.playfulAccentBlue},
+    {'text': AppStrings.get('other'), 'icon': Icons.edit_note_outlined, 'emoji': '📝', 'color': Colors.grey.shade400},
   ];
 
-  final AudioPlayer _audioPlayer = AudioPlayer();
-  String? _currentlyPlayingId;
-
-  @override
-  void dispose() {
-    _audioPlayer.dispose();
-    super.dispose();
-  }
+  final List<Map<String, dynamic>> _intensities = [
+    {'emoji': '😺', 'label': 'Hafif', 'value': 1},
+    {'emoji': '😸', 'label': 'Normal', 'value': 2},
+    {'emoji': '😻', 'label': 'Yoğun', 'value': 3},
+    {'emoji': '🙀', 'label': 'Çok Yoğun', 'value': 4},
+  ];
 
   @override
   void initState() {
     super.initState();
-    _audioPlayer.onPlayerComplete.listen((_) {
-      if (mounted) {
-        setState(() {
-          _currentlyPlayingId = null;
-        });
-      }
-    });
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final recordState = ref.watch(audioRecordProvider);
-    final isRecording = recordState.state == RecordState.recording;
-    final hasRecorded = recordState.lastRecordedPath != null && !isRecording;
-
     return Scaffold(
       appBar: AppBar(
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text('${AppStrings.get('record_meow')} ', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900, color: AppColors.playfulPrimary)),
-            const Icon(Icons.mic_none_outlined, color: AppColors.playfulPrimary, size: 28),
+            const Text('🐾', style: TextStyle(fontSize: 24)),
           ],
         ),
         backgroundColor: Colors.transparent,
@@ -70,356 +67,342 @@ class _RecordScreenState extends ConsumerState<RecordScreen> {
       ),
       extendBodyBehindAppBar: true,
       body: SafeArea(
-        child: Column(
+        child: ListView(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
           children: [
-            Expanded(
-              flex: 3,
-              child: _buildRecordArea(context, recordState, isRecording, hasRecorded),
-            ),
-            if (hasRecorded) _buildSaveArea(context, recordState),
-            if (!hasRecorded) _buildTagsArea(),
-            Expanded(
-              flex: 2,
-              child: _buildRecentRecords(),
-            ),
+            // Big Meow Button
+            _buildMeowButton(),
+            const SizedBox(height: 24),
+
+            // Context selector
+            Text(AppStrings.get('context'), style: const TextStyle(fontFamily: 'Nunito', fontWeight: FontWeight.w900, fontSize: 18, color: AppColors.playfulText)),
+            const SizedBox(height: 12),
+            _buildContextGrid(),
+            const SizedBox(height: 24),
+
+            // Intensity selector
+            Text(AppStrings.get('intensity'), style: const TextStyle(fontFamily: 'Nunito', fontWeight: FontWeight.w900, fontSize: 18, color: AppColors.playfulText)),
+            const SizedBox(height: 12),
+            _buildIntensityRow(),
+            const SizedBox(height: 32),
+
+            // Recent logs
+            Text(AppStrings.get('recent_recordings'), style: const TextStyle(fontFamily: 'Nunito', fontWeight: FontWeight.w900, fontSize: 18, color: AppColors.playfulText)),
+            const SizedBox(height: 12),
+            _buildRecentLogs(),
+            const SizedBox(height: 100),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildRecordArea(BuildContext context, AudioRecordState state, bool isRecording, bool hasRecorded) {
+  Widget _buildMeowButton() {
     return Center(
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Stack(
-              alignment: Alignment.center,
+      child: GestureDetector(
+        onTap: _logMeow,
+        child: AnimatedBuilder(
+          animation: _pulseController,
+          builder: (context, child) {
+            final scale = 1.0 + (_pulseController.value * 0.05);
+            return Transform.scale(
+              scale: scale,
+              child: child,
+            );
+          },
+          child: Container(
+            width: 180,
+            height: 180,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: const LinearGradient(
+                colors: [AppColors.playfulPrimary, AppColors.playfulSecondary],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.playfulPrimary.withOpacity(0.4),
+                  blurRadius: 24,
+                  spreadRadius: 4,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Inner Ring
-                Container(
-                  width: 200,
-                  height: 200,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.playfulPrimary.withOpacity(0.3), width: 8),
-                  ),
-                ),
-                // Outer Ring
-                Container(
-                  width: 260,
-                  height: 260,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.playfulPrimary.withOpacity(0.15), width: 4),
-                  ),
-                ),
-                // Paw prints
-                const Positioned(top: 20, left: 40, child: Icon(Icons.pets, size: 28, color: AppColors.playfulPrimary)),
-                const Positioned(top: 20, right: 40, child: Icon(Icons.pets, size: 28, color: AppColors.playfulPrimary)),
-                const Positioned(bottom: 20, left: 40, child: Icon(Icons.pets, size: 28, color: AppColors.playfulPrimary)),
-                const Positioned(bottom: 20, right: 40, child: Icon(Icons.pets, size: 28, color: AppColors.playfulPrimary)),
-
-                // The Button
-                GestureDetector(
-                  onTap: () {
-                    if (isRecording) {
-                      ref.read(audioRecordProvider.notifier).stopRecording();
-                    } else if (!hasRecorded) {
-                      ref.read(audioRecordProvider.notifier).startRecording();
-                    }
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    width: isRecording ? 160 : 140,
-                    height: isRecording ? 160 : 140,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: hasRecorded ? Colors.grey.shade300 : AppColors.playfulPrimary,
-                      boxShadow: [
-                        BoxShadow(
-                          color: (hasRecorded ? Colors.grey.shade400 : AppColors.playfulPrimary).withOpacity(0.4),
-                          blurRadius: isRecording ? 30 : 15,
-                          spreadRadius: isRecording ? 10 : 0,
-                        )
-                      ],
-                    ),
-                    child: Center(
-                      child: Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white.withOpacity(0.2),
-                        ),
-                        child: Icon(
-                          isRecording ? Icons.stop_rounded : (hasRecorded ? Icons.check_rounded : Icons.mic_none_outlined),
-                          size: 60,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
+                const Text('🐱', style: TextStyle(fontSize: 48)),
+                const SizedBox(height: 4),
+                Text(
+                  AppStrings.get('meow_button'),
+                  style: const TextStyle(
+                    fontFamily: 'Nunito',
+                    fontWeight: FontWeight.w900,
+                    fontSize: 18,
+                    color: Colors.white,
+                    letterSpacing: 1.2,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 32),
-            Text(
-              _formatDuration(state.recordDuration),
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.w900,
-                    color: AppColors.playfulPrimary,
-                  ),
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildTagsArea() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
-      child: Wrap(
-        spacing: 12,
-        runSpacing: 12,
-        alignment: WrapAlignment.center,
-        children: _contexts.map((ctx) {
-          final isSelected = _selectedContext == ctx['text'];
-          final color = ctx['color'] as Color;
-          return GestureDetector(
-            onTap: () {
-              setState(() {
-                _selectedContext = isSelected ? null : ctx['text'] as String;
-              });
-            },
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              decoration: BoxDecoration(
-                color: color.withOpacity(isSelected ? 1.0 : 0.6),
-                borderRadius: BorderRadius.circular(24),
+  Widget _buildContextGrid() {
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      children: _contexts.map((ctx) {
+        final isSelected = _selectedContext == ctx['text'];
+        final color = ctx['color'] as Color;
+        return GestureDetector(
+          onTap: () {
+            setState(() {
+              _selectedContext = isSelected ? null : ctx['text'] as String;
+            });
+          },
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: isSelected ? color : color.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: isSelected ? color : Colors.transparent,
+                width: 2,
               ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(ctx['icon'] as IconData, size: 20, color: isSelected ? Colors.white : AppColors.playfulText),
-                  const SizedBox(width: 8),
-                  Text(
-                    ctx['text'] as String,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w900,
-                      color: isSelected ? Colors.white : AppColors.playfulText,
-                    ),
-                  ),
-                ],
-              ),
+              boxShadow: isSelected
+                  ? [BoxShadow(color: color.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 3))]
+                  : [],
             ),
-          );
-        }).toList(),
-      ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(ctx['emoji'] as String, style: const TextStyle(fontSize: 18)),
+                const SizedBox(width: 6),
+                Text(
+                  ctx['text'] as String,
+                  style: TextStyle(
+                    fontFamily: 'Nunito',
+                    fontWeight: FontWeight.w900,
+                    fontSize: 13,
+                    color: isSelected ? Colors.white : AppColors.playfulText,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 
-  Widget _buildSaveArea(BuildContext context, AudioRecordState state) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _buildTagsArea(),
-          const SizedBox(height: 24),
-          Row(
-            children: [
-              Expanded(
-                child: TextButton(
-                  onPressed: () {
-                    ref.read(audioRecordProvider.notifier).reset();
-                    setState(() {
-                      _selectedContext = null;
-                    });
-                  },
-                  child: Text(AppStrings.get('discard'), style: const TextStyle(fontWeight: FontWeight.w900, color: Colors.grey, fontSize: 16)),
-                ),
+  Widget _buildIntensityRow() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: _intensities.map((item) {
+        final isSelected = _selectedIntensity == item['value'];
+        return GestureDetector(
+          onTap: () {
+            setState(() {
+              _selectedIntensity = isSelected ? null : item['value'] as int;
+            });
+          },
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: isSelected ? AppColors.playfulPrimary.withOpacity(0.2) : Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: isSelected ? AppColors.playfulPrimary : Colors.grey.shade200,
+                width: 2,
               ),
-              Expanded(
-                flex: 2,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.playfulPrimary,
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+            ),
+            child: Column(
+              children: [
+                Text(item['emoji'] as String, style: const TextStyle(fontSize: 28)),
+                const SizedBox(height: 2),
+                Text(
+                  item['label'] as String,
+                  style: TextStyle(
+                    fontFamily: 'Nunito',
+                    fontWeight: FontWeight.w900,
+                    fontSize: 11,
+                    color: isSelected ? AppColors.playfulPrimary : AppColors.playfulText.withOpacity(0.6),
                   ),
-                  onPressed: _selectedContext == null
-                      ? null
-                      : () async {
-                          await ref.read(meowRecordListProvider.notifier).addRecord(
-                                filePath: state.lastRecordedPath!,
-                                durationSeconds: state.recordDuration,
-                                contextTag: _selectedContext!,
-                              );
-                          ref.read(audioRecordProvider.notifier).reset();
-                          setState(() {
-                            _selectedContext = null;
-                          });
-                          if (mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppStrings.get('saved'))));
-                          }
-                        },
-                  child: Text(AppStrings.get('save_record'), style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+                ),
+              ],
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildRecentLogs() {
+    final records = ref.watch(meowRecordListProvider);
+    
+    if (records.isEmpty) {
+      return PastelCard(
+        backgroundColor: Colors.white,
+        padding: const EdgeInsets.all(32),
+        child: Center(
+          child: Column(
+            children: [
+              const Text('😿', style: TextStyle(fontSize: 40)),
+              const SizedBox(height: 8),
+              Text(
+                AppStrings.get('no_recordings_yet'),
+                style: TextStyle(
+                  fontFamily: 'Nunito',
+                  fontWeight: FontWeight.w900,
+                  color: AppColors.playfulText.withOpacity(0.4),
                 ),
               ),
             ],
-          )
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRecentRecords() {
-    final records = ref.watch(meowRecordListProvider);
+          ),
+        ),
+      );
+    }
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Text(AppStrings.get('recent_recordings'), style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900, fontSize: 20, color: AppColors.playfulText)),
-        ),
-        const SizedBox(height: 12),
-        if (records.isEmpty)
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0),
-            child: Text(AppStrings.get('no_recordings_yet'), style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.playfulText.withOpacity(0.6))),
-          )
-        else
-          Expanded(
-            child: ListView.builder(
-              itemCount: records.length,
-              padding: const EdgeInsets.only(left: 24.0, right: 24.0, bottom: 100.0), // Padding for floating nav bar
-              itemBuilder: (context, index) {
-                final record = records[index];
-                final isPlaying = _currentlyPlayingId == record.id;
-                
-                // Find color for context
-                Color chipColor = AppColors.playfulPrimary;
-                for (var ctx in _contexts) {
-                  if (ctx['text'] == record.contextTag) {
-                    chipColor = ctx['color'] as Color;
-                  }
-                }
+      children: records.take(10).map((record) {
+        // Find context color
+        Color chipColor = AppColors.playfulPrimary;
+        String emoji = '🐱';
+        for (var ctx in _contexts) {
+          if (ctx['text'] == record.contextTag) {
+            chipColor = ctx['color'] as Color;
+            emoji = ctx['emoji'] as String;
+          }
+        }
 
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 16.0),
-                  child: GestureDetector(
-                    onLongPress: () {
-                      showDialog(
-                        context: context,
-                        builder: (ctx) => AlertDialog(
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-                          backgroundColor: AppColors.playfulBackground,
-                          title: Text(AppStrings.get('delete_recording'), style: const TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText)),
-                          content: Text(AppStrings.get('delete_recording_confirm'), style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.playfulText)),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(ctx),
-                              child: Text(AppStrings.get('cancel'), style: const TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText)),
-                            ),
-                            ElevatedButton(
-                              onPressed: () {
-                                ref.read(meowRecordListProvider.notifier).deleteRecord(record);
-                                Navigator.pop(ctx);
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.redAccent.shade100,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                              ),
-                              child: Text(AppStrings.get('delete'), style: const TextStyle(fontWeight: FontWeight.w900, color: Colors.white)),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                    child: PastelCard(
-                    backgroundColor: Colors.white,
-                    child: Row(
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: Dismissible(
+            key: Key(record.id),
+            direction: DismissDirection.endToStart,
+            background: Container(
+              padding: const EdgeInsets.only(right: 20),
+              decoration: BoxDecoration(
+                color: Colors.red.shade300,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              alignment: Alignment.centerRight,
+              child: const Icon(Icons.delete_outline_rounded, color: Colors.white, size: 24),
+            ),
+            confirmDismiss: (_) async {
+              return await showDialog<bool>(
+                context: context,
+                builder: (c) => AlertDialog(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                  backgroundColor: AppColors.playfulBackground,
+                  title: Text(AppStrings.get('delete_recording'), style: const TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText)),
+                  content: Text(AppStrings.get('delete_recording_confirm'), style: const TextStyle(fontWeight: FontWeight.w700)),
+                  actions: [
+                    TextButton(onPressed: () => Navigator.pop(c, false), child: Text(AppStrings.get('cancel'), style: const TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText))),
+                    ElevatedButton(
+                      onPressed: () => Navigator.pop(c, true),
+                      style: ElevatedButton.styleFrom(backgroundColor: Colors.red.shade300, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
+                      child: Text(AppStrings.get('delete'), style: const TextStyle(fontWeight: FontWeight.w900, color: Colors.white)),
+                    ),
+                  ],
+                ),
+              ) ?? false;
+            },
+            onDismissed: (_) {
+              ref.read(meowRecordListProvider.notifier).deleteRecord(record);
+            },
+            child: PastelCard(
+              backgroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              child: Row(
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: chipColor.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Center(child: Text(emoji, style: const TextStyle(fontSize: 22))),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Audio waveform visualization
-                              Row(
-                                children: List.generate(15, (i) {
-                                  // Use record id hash for pseudo-random but consistent heights
-                                  final seed = (record.id.hashCode + i * 7) % 20 + 8;
-                                  return Container(
-                                    margin: const EdgeInsets.only(right: 4),
-                                    width: 4,
-                                    height: seed.toDouble(),
-                                    decoration: BoxDecoration(
-                                      color: chipColor.withOpacity(0.5),
-                                      borderRadius: BorderRadius.circular(2),
-                                    ),
-                                  );
-                                }),
-                              ),
-                              const SizedBox(height: 12),
-                              Row(
-                                children: [
-                                  Text(DateFormat('h:mm a').format(record.timestamp), style: TextStyle(color: AppColors.playfulText.withOpacity(0.5), fontSize: 12, fontWeight: FontWeight.bold)),
-                                  const SizedBox(width: 12),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                    decoration: BoxDecoration(
-                                      color: chipColor.withOpacity(0.3),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Text(record.contextTag, style: TextStyle(color: AppColors.playfulText, fontWeight: FontWeight.w900, fontSize: 11)),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
+                        Text(
+                          record.contextTag,
+                          style: const TextStyle(fontFamily: 'Nunito', fontWeight: FontWeight.w900, fontSize: 15, color: AppColors.playfulText),
                         ),
-                        Text(_formatDuration(record.durationSeconds), style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: AppColors.playfulText)),
-                        const SizedBox(width: 12),
-                        GestureDetector(
-                          onTap: () async {
-                            if (isPlaying) {
-                              await _audioPlayer.stop();
-                              setState(() => _currentlyPlayingId = null);
-                            } else {
-                              await _audioPlayer.play(DeviceFileSource(record.filePath));
-                              setState(() => _currentlyPlayingId = record.id);
-                            }
-                          },
-                          child: Container(
-                            width: 50,
-                            height: 50,
-                            decoration: BoxDecoration(
-                              color: AppColors.playfulSecondary,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(isPlaying ? Icons.stop_rounded : Icons.play_arrow_rounded, color: Colors.white, size: 30),
-                          ),
+                        Text(
+                          DateFormat('d MMM, HH:mm').format(record.timestamp),
+                          style: TextStyle(fontFamily: 'Nunito', fontWeight: FontWeight.w700, fontSize: 12, color: AppColors.playfulText.withOpacity(0.5)),
                         ),
                       ],
                     ),
-                    ),
                   ),
-                );
-              },
+                  if (record.durationSeconds > 0)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: chipColor.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        _intensityEmoji(record.durationSeconds),
+                        style: const TextStyle(fontSize: 18),
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
-      ],
+        );
+      }).toList(),
     );
   }
 
-  String _formatDuration(int seconds) {
-    final m = seconds ~/ 60;
-    final s = seconds % 60;
-    return '${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
+  String _intensityEmoji(int val) {
+    if (val <= 1) return '😺';
+    if (val == 2) return '😸';
+    if (val == 3) return '😻';
+    return '🙀';
+  }
+
+  void _logMeow() {
+    final context = _selectedContext ?? AppStrings.get('other');
+    final intensity = _selectedIntensity ?? 2;
+    
+    ref.read(meowRecordListProvider.notifier).addRecord(
+      filePath: '',
+      durationSeconds: intensity,
+      contextTag: context,
+    );
+
+    // Quick feedback animation
+    ScaffoldMessenger.of(this.context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Text('🐱 ', style: TextStyle(fontSize: 20)),
+            Text(
+              '${AppStrings.get('meow_logged')}!',
+              style: const TextStyle(fontFamily: 'Nunito', fontWeight: FontWeight.w900),
+            ),
+          ],
+        ),
+        backgroundColor: AppColors.playfulPrimary,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        duration: const Duration(seconds: 1),
+      ),
+    );
   }
 }

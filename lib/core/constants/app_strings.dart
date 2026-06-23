@@ -71,6 +71,10 @@ class AppStrings {
 
     // ── Record Screen ─────────────────────────────
     'record_meow': 'Miyav Kaydet',
+    'meow_button': 'MİYAV!',
+    'meow_logged': 'Miyav kaydedildi',
+    'intensity': 'Yoğunluk',
+    'context': 'Durum',
     'recording': 'Kaydediliyor...',
     'listening': 'Dinleniyor...',
     'start_recording': 'Kaydı başlat',
@@ -299,6 +303,10 @@ class AppStrings {
 
     // ── Record Screen ─────────────────────────────
     'record_meow': 'Record Meow',
+    'meow_button': 'MEOW!',
+    'meow_logged': 'Meow logged',
+    'intensity': 'Intensity',
+    'context': 'Context',
     'recording': 'Recording...',
     'listening': 'Listening...',
     'start_recording': 'Start recording',

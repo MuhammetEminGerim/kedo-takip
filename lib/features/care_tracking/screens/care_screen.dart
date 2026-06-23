@@ -478,21 +478,21 @@ class CareScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 20),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: moods.map((m) {
               final isSelected = lastLog?.value == m['val'];
               return GestureDetector(
                 onTap: () => _addLog(ref, 'mood', m['val'] as String),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
                     color: isSelected ? Colors.white : Colors.transparent,
                     shape: BoxShape.circle,
-                    border: isSelected ? Border.all(color: AppColors.playfulTertiary, width: 3) : Border.all(color: Colors.transparent, width: 3),
+                    border: isSelected ? Border.all(color: AppColors.playfulTertiary, width: 2.5) : Border.all(color: Colors.transparent, width: 2.5),
                     boxShadow: isSelected ? [BoxShadow(color: AppColors.playfulTertiary.withOpacity(0.3), blurRadius: 8)] : [],
                   ),
-                  child: Text(m['emoji'] as String, style: const TextStyle(fontSize: 32)),
+                  child: Text(m['emoji'] as String, style: const TextStyle(fontSize: 26)),
                 ),
               );
             }).toList(),
