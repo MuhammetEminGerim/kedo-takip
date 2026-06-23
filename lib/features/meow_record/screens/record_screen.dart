@@ -6,7 +6,6 @@ import 'package:audioplayers/audioplayers.dart';
 import '../providers/audio_record_provider.dart';
 import '../providers/meow_record_provider.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_icons.dart';
 import '../../../shared/widgets/pastel_card.dart';
 
 class RecordScreen extends ConsumerStatefulWidget {
@@ -20,12 +19,12 @@ class _RecordScreenState extends ConsumerState<RecordScreen> {
   String? _selectedContext;
 
   final List<Map<String, dynamic>> _contexts = [
-    {'text': 'Before meal', 'iconBuilder': ({Color? c, double s = 20}) => AppIcons.tagBeforeMeal(color: c, size: s), 'color': AppColors.playfulPrimary},
-    {'text': 'After play', 'iconBuilder': ({Color? c, double s = 20}) => AppIcons.tagAfterPlay(color: c, size: s), 'color': AppColors.playfulSecondary},
-    {'text': 'Night time', 'iconBuilder': ({Color? c, double s = 20}) => AppIcons.tagNight(color: c, size: s), 'color': AppColors.playfulTertiary},
-    {'text': 'At door', 'iconBuilder': ({Color? c, double s = 20}) => AppIcons.tagAtDoor(color: c, size: s), 'color': AppColors.playfulAccentPeach},
-    {'text': 'Alone', 'iconBuilder': ({Color? c, double s = 20}) => AppIcons.tagAlone(color: c, size: s), 'color': AppColors.playfulAccentBlue},
-    {'text': 'Other', 'iconBuilder': ({Color? c, double s = 20}) => AppIcons.tagOther(color: c, size: s), 'color': Colors.grey.shade300},
+    {'text': 'Before meal', 'icon': Icons.restaurant_outlined, 'color': AppColors.playfulPrimary},
+    {'text': 'After play', 'icon': Icons.videogame_asset_outlined, 'color': AppColors.playfulSecondary},
+    {'text': 'Night time', 'icon': Icons.nightlight_outlined, 'color': AppColors.playfulTertiary},
+    {'text': 'At door', 'icon': Icons.door_front_door_outlined, 'color': AppColors.playfulAccentPeach},
+    {'text': 'Alone', 'icon': Icons.pets_outlined, 'color': AppColors.playfulAccentBlue},
+    {'text': 'Other', 'icon': Icons.edit_note_outlined, 'color': Colors.grey.shade300},
   ];
 
   final AudioPlayer _audioPlayer = AudioPlayer();
@@ -203,7 +202,7 @@ class _RecordScreenState extends ConsumerState<RecordScreen> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  (ctx['iconBuilder'] as Function)(c: isSelected ? Colors.white : AppColors.playfulText, s: 20.0),
+                  Icon(ctx['icon'] as IconData, size: 20, color: isSelected ? Colors.white : AppColors.playfulText),
                   const SizedBox(width: 8),
                   Text(
                     ctx['text'] as String,
