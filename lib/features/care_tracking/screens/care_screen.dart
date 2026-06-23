@@ -131,8 +131,6 @@ class CareScreen extends ConsumerWidget {
                 historyKey: 'litter',
               ),
               const SizedBox(height: 16),
-              _buildMoodCard(context, ref, _getLastLog(logs, 'mood')),
-              const SizedBox(height: 16),
               _buildWeightCard(context, ref, selectedCat, _getAllLogs(logs, 'weight')),
               const SizedBox(height: 100), // padding for bottom nav
             ],
@@ -445,62 +443,7 @@ class CareScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildMoodCard(BuildContext context, WidgetRef ref, CareLog? lastLog) {
-    final moods = [
-      {'val': 'very_happy', 'emoji': '😻'},
-      {'val': 'happy', 'emoji': '😺'},
-      {'val': 'neutral', 'emoji': '😐'},
-      {'val': 'sad', 'emoji': '😿'},
-      {'val': 'angry', 'emoji': '🙀'},
-    ];
-    
-    return PastelCard(
-      backgroundColor: AppColors.playfulTertiary.withOpacity(0.4),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppColors.playfulTertiary.withOpacity(0.6),
-                  shape: BoxShape.circle,
-                ),
-                child: const Text('😸', style: TextStyle(fontSize: 28)),
-              ),
-              const SizedBox(width: 20),
-              Expanded(
-                child: Text(AppStrings.get('mood'), style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 22, color: AppColors.playfulText, letterSpacing: 1.1)),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: moods.map((m) {
-              final isSelected = lastLog?.value == m['val'];
-              return GestureDetector(
-                onTap: () => _addLog(ref, 'mood', m['val'] as String),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: isSelected ? Colors.white : Colors.transparent,
-                    shape: BoxShape.circle,
-                    border: isSelected ? Border.all(color: AppColors.playfulTertiary, width: 2.5) : Border.all(color: Colors.transparent, width: 2.5),
-                    boxShadow: isSelected ? [BoxShadow(color: AppColors.playfulTertiary.withOpacity(0.3), blurRadius: 8)] : [],
-                  ),
-                  child: Text(m['emoji'] as String, style: const TextStyle(fontSize: 26)),
-                ),
-              );
-            }).toList(),
-          )
-        ],
-      ),
-    );
-  }
+
 
   String _getTimeAgo(DateTime date) {
     final diff = DateTime.now().difference(date);

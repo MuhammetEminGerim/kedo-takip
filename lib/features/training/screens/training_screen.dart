@@ -570,21 +570,21 @@ class _TrainingScreenState extends ConsumerState<TrainingScreen> {
                 AppStrings.get('night_crying'),
                 Icons.nights_stay_outlined,
                 AppColors.playfulTertiary,
-                _nightCryingTips,
+                AppStrings.get('night_crying_tips').split('|'),
               ),
               const SizedBox(height: 12),
               _buildGuideCard(
                 AppStrings.get('scratching'),
                 Icons.pets_outlined,
                 AppColors.playfulPrimary,
-                _scratchingTips,
+                AppStrings.get('scratching_tips').split('|'),
               ),
               const SizedBox(height: 12),
               _buildGuideCard(
                 AppStrings.get('biting'),
                 Icons.mood_bad_outlined,
                 AppColors.playfulAccentPeach,
-                _bitingTips,
+                AppStrings.get('biting_tips').split('|'),
               ),
               const SizedBox(height: 100),
             ],
@@ -745,29 +745,4 @@ class _TrainingScreenState extends ConsumerState<TrainingScreen> {
     );
   }
 
-  // ─── Guide Content ───
-
-  static const List<String> _nightCryingTips = [
-    'Cats are naturally crepuscular — most active at dawn and dusk. Night crying is often normal behavior, not a sign of distress.',
-    'Play with your cat for 15-20 minutes before bedtime using a feather wand or laser pointer to tire them out and reduce nighttime restlessness.',
-    'Feed a small meal right before bed. A full tummy helps cats feel sleepy and less likely to cry for food during the night.',
-    'Keep a consistent routine. Cats thrive on predictability — same feeding times, play times, and sleep times each day reduces anxiety.',
-    'Never respond to crying by getting up or giving attention. This teaches them crying works. Wait for silence, then reward calm behavior.',
-  ];
-
-  static const List<String> _scratchingTips = [
-    'Scratching is essential for cats — it removes dead nail sheaths, stretches muscles, and marks territory. Never punish scratching, redirect it instead.',
-    'Place scratching posts near areas your cat already scratches. Cats prefer to scratch right after waking, so put one near their sleeping spot.',
-    'Try different materials: sisal rope, cardboard, carpet, and wood. Each cat has a texture preference. Offer both vertical and horizontal options.',
-    'Use catnip spray or silvervine on the scratching post to make it irresistible. Gently guide their paws across it a few times to demonstrate.',
-    'Protect furniture temporarily with double-sided tape or aluminum foil while training. Cats dislike these textures and will choose the scratching post instead.',
-  ];
-
-  static const List<String> _bitingTips = [
-    'Never use your hands or feet as toys. This teaches cats that human body parts are acceptable targets for biting and roughhousing.',
-    'When your cat bites during play, immediately freeze and say "ouch" calmly. Withdraw your hand slowly — pulling away triggers prey instinct.',
-    'Redirect biting energy toward interactive toys like feather wands, kick toys, or puzzle feeders. Mental and physical stimulation reduces aggressive play.',
-    'Watch for overstimulation signs: tail twitching, ears flattening, skin rippling. Stop petting before they reach the bite threshold.',
-    'If a cat bites hard, stand up and walk away. End all interaction for 1-2 minutes. This teaches them that biting ends the fun immediately.',
-  ];
 }

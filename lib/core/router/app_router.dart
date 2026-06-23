@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // Placeholder imports for screens
 import '../../features/dashboard/screens/dashboard_screen.dart';
-import '../../features/meow_record/screens/record_screen.dart';
+import '../../features/health/screens/health_screen.dart';
 import '../../features/care_tracking/screens/care_screen.dart';
 import '../../features/analytics/screens/analytics_screen.dart';
 import '../../features/training/screens/training_screen.dart';
@@ -65,8 +65,8 @@ final routerProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => const DashboardScreen(),
           ),
           GoRoute(
-            path: '/record',
-            builder: (context, state) => const RecordScreen(),
+            path: '/health',
+            builder: (context, state) => const HealthScreen(),
           ),
           GoRoute(
             path: '/care',
@@ -125,7 +125,7 @@ class ScaffoldWithBottomNavBar extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _buildNavItem(context, 0, currentIndex, AppIcons.navHome, AppStrings.get('nav_home')),
-                  _buildNavItem(context, 1, currentIndex, AppIcons.navRecord, AppStrings.get('nav_record')),
+                  _buildNavItem(context, 1, currentIndex, AppIcons.navHealth, AppStrings.get('nav_health')),
                   _buildNavItem(context, 2, currentIndex, AppIcons.navCare, AppStrings.get('nav_care')),
                   _buildNavItem(context, 3, currentIndex, AppIcons.navStats, AppStrings.get('nav_stats')),
                   _buildNavItem(context, 4, currentIndex, AppIcons.navLearn, AppStrings.get('nav_learn')),
@@ -180,7 +180,7 @@ class ScaffoldWithBottomNavBar extends ConsumerWidget {
 
   static int _calculateSelectedIndex(BuildContext context) {
     final String location = GoRouterState.of(context).uri.path;
-    if (location.startsWith('/record')) return 1;
+    if (location.startsWith('/health')) return 1;
     if (location.startsWith('/care')) return 2;
     if (location.startsWith('/analytics')) return 3;
     if (location.startsWith('/training')) return 4;
@@ -193,7 +193,7 @@ class ScaffoldWithBottomNavBar extends ConsumerWidget {
         context.go('/');
         break;
       case 1:
-        context.go('/record');
+        context.go('/health');
         break;
       case 2:
         context.go('/care');

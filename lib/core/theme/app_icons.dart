@@ -17,7 +17,7 @@ class AppIcons {
   static Widget meow({Color? color, double size = 32}) => _build(FluentIcons.animal_cat_24_filled, color, size);
   
   static Widget navHome({Color? color, double size = 28}) => _build(FluentIcons.home_24_filled, color, size);
-  static Widget navRecord({Color? color, double size = 28}) => _build(FluentIcons.mic_24_filled, color, size);
+  static Widget navHealth({Color? color, double size = 28}) => _build(FluentIcons.stethoscope_24_filled, color, size);
   static Widget navCare({Color? color, double size = 28}) => _build(FluentIcons.heart_pulse_24_filled, color, size);
   static Widget navStats({Color? color, double size = 28}) => _build(FluentIcons.data_bar_vertical_24_filled, color, size);
   static Widget navLearn({Color? color, double size = 28}) => _build(FluentIcons.book_24_filled, color, size);

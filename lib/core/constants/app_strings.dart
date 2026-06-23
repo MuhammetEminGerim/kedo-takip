@@ -36,7 +36,7 @@ class AppStrings {
   static const Map<String, String> _tr = {
     // ── Navigation ────────────────────────────────
     'nav_home': 'Ana Sayfa',
-    'nav_record': 'Kayıt',
+    'nav_health': 'Sağlık',
     'nav_care': 'Bakım',
     'nav_stats': 'İstatistik',
     'nav_learn': 'Öğren',
@@ -94,6 +94,31 @@ class AppStrings {
     'no_recordings_yet': 'Henüz miyav kaydı yok.',
     'delete_recording': 'Kaydı Sil? 🗑️',
     'delete_recording_confirm': 'Bu miyav kaydı kalıcı olarak silinecek.',
+
+    // ── Health Screen ─────────────────────────────
+    'health_title': 'Sağlık',
+    'tab_vaccines': 'Aşılar',
+    'tab_appointments': 'Randevular',
+    'tab_medications': 'İlaçlar',
+    'add_vaccine': 'Aşı Ekle',
+    'add_appointment': 'Randevu Ekle',
+    'add_medication': 'İlaç Ekle',
+    'vaccine_name': 'Aşı Adı',
+    'date_administered': 'Yapılma Tarihi',
+    'next_due_date': 'Sonraki Aşı Tarihi',
+    'appointment_title': 'Randevu Konusu',
+    'appointment_date': 'Tarih & Saat',
+    'clinic_name': 'Klinik Adı',
+    'medication_name': 'İlaç Adı',
+    'dosage': 'Dozaj',
+    'start_date': 'Başlangıç',
+    'end_date': 'Bitiş (Opsiyonel)',
+    'frequency': 'Sıklık (Örn: Günde 2 kez)',
+    'notes': 'Notlar',
+    'no_vaccines': 'Henüz aşı kaydı yok.',
+    'no_appointments': 'Gelecek randevu yok.',
+    'no_medications': 'Aktif ilaç kullanımı yok.',
+    'delete_confirm': 'Silmek istediğine emin misin?',
 
     // ── Care Screen ───────────────────────────────
     'care': 'Bakım',
@@ -260,6 +285,9 @@ class AppStrings {
     'search': 'Ara',
     'no_results': 'Sonuç bulunamadı',
     'app_name': 'PawLog',
+    'night_crying_tips': 'Kediler doğaları gereği alacakaranlıkta aktiftir. Gece ağlaması genellikle normal bir davranıştır.|Gece huzursuzluğunu azaltmak için yatmadan önce 15-20 dakika kedi oltasıyla oynatarak yorun.|Yatmadan hemen önce küçük bir öğün verin. Tok bir karın kedilerin uykulu hissetmesine yardımcı olur.|Tutarlı bir rutin oluşturun. Kediler öngörülebilirliği sever — her gün aynı saatler kaygıyı azaltır.|Ağlamasına ilgi göstererek yanıt vermeyin. Bu, onlara ağlamanın işe yaradığını öğretir. Sessizliği ödüllendirin.',
+    'scratching_tips': 'Tırmalama kediler için temel bir ihtiyaçtır. Asla cezalandırmayın, bunun yerine yönlendirin.|Tırmalama tahtalarını halihazırda tırmaladığı alanların yakınına yerleştirin. Kediler uyandıktan hemen sonra tırmalamayı tercih eder.|Farklı malzemeler deneyin: sisal ip, karton, halı. Hem dikey hem yatay seçenekler sunun.|Tahtayı daha çekici hale getirmek için kedi otu (catnip) spreyi kullanın. Patilerini hafifçe sürterek gösterin.|Eğitim sırasında mobilyaları çift taraflı bant veya alüminyum folyo ile geçici olarak koruyun.',
+    'biting_tips': 'Ellerinizi veya ayaklarınızı asla oyuncak olarak kullanmayın. Bu, insan vücut parçalarının hedeflenebilir olduğunu öğretir.|Kediniz oyun sırasında ısırdığında hemen donakalın ve sakince "Ah" deyin. Elinizi yavaşça geri çekin.|Isırma enerjisini interaktif oyuncaklara yönlendirin. Zihinsel ve fiziksel uyarım agresif oyunu azaltır.|Aşırı uyarılma belirtilerini izleyin: kuyruk sallama, kulakların düzleşmesi, derinin dalgalanması. Isırmadan önce sevmeyi bırakın.|Kedi sert ısırırsa, ayağa kalkıp uzaklaşın. Etkileşimi 1-2 dakika sonlandırın.',
   };
 
   // ════════════════════════════════════════════════
@@ -268,7 +296,7 @@ class AppStrings {
   static const Map<String, String> _en = {
     // ── Navigation ────────────────────────────────
     'nav_home': 'Home',
-    'nav_record': 'Record',
+    'nav_health': 'Health',
     'nav_care': 'Care',
     'nav_stats': 'Stats',
     'nav_learn': 'Learn',
@@ -326,6 +354,31 @@ class AppStrings {
     'no_recordings_yet': 'No meows recorded yet.',
     'delete_recording': 'Delete Recording? 🗑️',
     'delete_recording_confirm': 'This will permanently delete this meow recording.',
+
+    // ── Health Screen ─────────────────────────────
+    'health_title': 'Health',
+    'tab_vaccines': 'Vaccines',
+    'tab_appointments': 'Appointments',
+    'tab_medications': 'Meds',
+    'add_vaccine': 'Add Vaccine',
+    'add_appointment': 'Add Appt',
+    'add_medication': 'Add Med',
+    'vaccine_name': 'Vaccine Name',
+    'date_administered': 'Administered Date',
+    'next_due_date': 'Next Due Date',
+    'appointment_title': 'Appointment Reason',
+    'appointment_date': 'Date & Time',
+    'clinic_name': 'Clinic Name',
+    'medication_name': 'Medication Name',
+    'dosage': 'Dosage',
+    'start_date': 'Start Date',
+    'end_date': 'End Date (Optional)',
+    'frequency': 'Frequency (e.g. Twice a day)',
+    'notes': 'Notes',
+    'no_vaccines': 'No vaccines recorded yet.',
+    'no_appointments': 'No upcoming appointments.',
+    'no_medications': 'No active medications.',
+    'delete_confirm': 'Are you sure you want to delete this?',
 
     // ── Care Screen ───────────────────────────────
     'care': 'Care',
@@ -492,5 +545,8 @@ class AppStrings {
     'search': 'Search',
     'no_results': 'No results found',
     'app_name': 'PawLog',
+    'night_crying_tips': 'Cats are naturally crepuscular — most active at dawn and dusk. Night crying is often normal behavior.|Play with your cat for 15-20 minutes before bedtime using a feather wand to tire them out.|Feed a small meal right before bed. A full tummy helps cats feel sleepy.|Keep a consistent routine. Cats thrive on predictability — same times each day reduces anxiety.|Never respond to crying by giving attention. This teaches them crying works. Wait for silence.',
+    'scratching_tips': 'Scratching is essential for cats. Never punish scratching, redirect it instead.|Place scratching posts near areas your cat already scratches. Put one near their sleeping spot.|Try different materials: sisal rope, cardboard, carpet. Offer both vertical and horizontal options.|Use catnip spray or silvervine on the scratching post to make it irresistible.|Protect furniture temporarily with double-sided tape or aluminum foil while training.',
+    'biting_tips': 'Never use your hands or feet as toys. This teaches cats that human body parts are acceptable targets.|When your cat bites during play, immediately freeze and say "ouch" calmly. Withdraw your hand slowly.|Redirect biting energy toward interactive toys. Mental and physical stimulation reduces aggressive play.|Watch for overstimulation signs: tail twitching, ears flattening. Stop petting before they bite.|If a cat bites hard, stand up and walk away. End all interaction for 1-2 minutes.',
   };
 }

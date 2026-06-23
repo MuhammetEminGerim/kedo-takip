@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../shared/providers/cat_provider.dart';
-import '../../meow_record/providers/meow_record_provider.dart';
 import '../../care_tracking/providers/care_log_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
@@ -229,12 +228,6 @@ class DashboardScreen extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               PastelActionButton(
-                title: AppStrings.get('record_action'),
-                icon: AppIcons.mic(),
-                color: AppColors.playfulPrimary,
-                onTap: () => context.go('/record'),
-              ),
-              PastelActionButton(
                 title: AppStrings.get('fed_action'),
                 icon: AppIcons.bowl(),
                 color: AppColors.playfulSecondary,
@@ -261,21 +254,6 @@ class DashboardScreen extends ConsumerWidget {
           Text(AppStrings.get('today_summary'), style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900, fontSize: 22, color: AppColors.playfulText)),
           const SizedBox(height: 16),
           
-          _buildKawaiiSummaryCard(
-            context,
-            ref,
-            color: AppColors.playfulPrimary.withOpacity(0.4),
-            icon: AppIcons.meow(),
-            title: AppStrings.get('meows'),
-            valueBuilder: () {
-              final meows = ref.watch(meowRecordListProvider);
-              final today = DateTime.now();
-              final todayMeows = meows.where((m) => m.timestamp.day == today.day).toList();
-              if (todayMeows.isEmpty) return AppStrings.get('no_meows_yet');
-              return '${todayMeows.length} ${AppStrings.get('meows_recorded')}\n${AppStrings.get('last')} ${DateFormat.jm().format(todayMeows.last.timestamp)}';
-            },
-          ),
-          const SizedBox(height: 16),
           _buildKawaiiSummaryCard(
             context,
             ref,

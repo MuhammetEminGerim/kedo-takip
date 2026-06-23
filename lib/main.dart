@@ -5,11 +5,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'shared/models/cat.dart';
-import 'shared/models/meow_record.dart';
 import 'shared/models/care_log.dart';
+import 'shared/models/vaccine.dart';
+import 'shared/models/appointment.dart';
+import 'shared/models/medication.dart';
 import 'shared/providers/cat_provider.dart';
-import 'features/meow_record/providers/meow_record_provider.dart';
 import 'features/care_tracking/providers/care_log_provider.dart';
+import 'features/health/providers/health_provider.dart';
 import 'features/onboarding/screens/onboarding_screen.dart';
 
 void main() async {
@@ -17,12 +19,16 @@ void main() async {
   
   await Hive.initFlutter();
   Hive.registerAdapter(CatAdapter());
-  Hive.registerAdapter(MeowRecordAdapter());
   Hive.registerAdapter(CareLogAdapter());
+  Hive.registerAdapter(VaccineAdapter());
+  Hive.registerAdapter(AppointmentAdapter());
+  Hive.registerAdapter(MedicationAdapter());
 
   final catBox = await Hive.openBox<Cat>('cats');
-  final meowRecordBox = await Hive.openBox<MeowRecord>('meow_records');
   final careLogBox = await Hive.openBox<CareLog>('care_logs');
+  final vaccineBox = await Hive.openBox<Vaccine>('vaccines');
+  final appointmentBox = await Hive.openBox<Appointment>('appointments');
+  final medicationBox = await Hive.openBox<Medication>('medications');
 
   // Check if onboarding is complete
   final prefs = await SharedPreferences.getInstance();
@@ -32,8 +38,10 @@ void main() async {
     ProviderScope(
       overrides: [
         catBoxProvider.overrideWithValue(catBox),
-        meowRecordBoxProvider.overrideWithValue(meowRecordBox),
         careLogBoxProvider.overrideWithValue(careLogBox),
+        vaccineBoxProvider.overrideWithValue(vaccineBox),
+        appointmentBoxProvider.overrideWithValue(appointmentBox),
+        medicationBoxProvider.overrideWithValue(medicationBox),
       ],
       child: PawLogApp(showOnboarding: !onboardingComplete),
     ),
