@@ -7,6 +7,7 @@ import '../providers/audio_record_provider.dart';
 import '../providers/meow_record_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../shared/widgets/pastel_card.dart';
+import '../../../core/constants/app_strings.dart';
 
 class RecordScreen extends ConsumerStatefulWidget {
   const RecordScreen({super.key});
@@ -18,13 +19,13 @@ class RecordScreen extends ConsumerStatefulWidget {
 class _RecordScreenState extends ConsumerState<RecordScreen> {
   String? _selectedContext;
 
-  final List<Map<String, dynamic>> _contexts = [
-    {'text': 'Before meal', 'icon': Icons.restaurant_outlined, 'color': AppColors.playfulPrimary},
-    {'text': 'After play', 'icon': Icons.videogame_asset_outlined, 'color': AppColors.playfulSecondary},
-    {'text': 'Night time', 'icon': Icons.nightlight_outlined, 'color': AppColors.playfulTertiary},
-    {'text': 'At door', 'icon': Icons.door_front_door_outlined, 'color': AppColors.playfulAccentPeach},
-    {'text': 'Alone', 'icon': Icons.pets_outlined, 'color': AppColors.playfulAccentBlue},
-    {'text': 'Other', 'icon': Icons.edit_note_outlined, 'color': Colors.grey.shade300},
+  List<Map<String, dynamic>> get _contexts => [
+    {'text': AppStrings.get('before_meal'), 'icon': Icons.restaurant_outlined, 'color': AppColors.playfulPrimary},
+    {'text': AppStrings.get('after_play'), 'icon': Icons.videogame_asset_outlined, 'color': AppColors.playfulSecondary},
+    {'text': AppStrings.get('night_time'), 'icon': Icons.nightlight_outlined, 'color': AppColors.playfulTertiary},
+    {'text': AppStrings.get('at_door'), 'icon': Icons.door_front_door_outlined, 'color': AppColors.playfulAccentPeach},
+    {'text': AppStrings.get('alone'), 'icon': Icons.pets_outlined, 'color': AppColors.playfulAccentBlue},
+    {'text': AppStrings.get('other'), 'icon': Icons.edit_note_outlined, 'color': Colors.grey.shade300},
   ];
 
   final AudioPlayer _audioPlayer = AudioPlayer();
@@ -59,7 +60,7 @@ class _RecordScreenState extends ConsumerState<RecordScreen> {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Record Meow ', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900, color: AppColors.playfulPrimary)),
+            Text('${AppStrings.get('record_meow')} ', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900, color: AppColors.playfulPrimary)),
             const Icon(Icons.mic_none_outlined, color: AppColors.playfulPrimary, size: 28),
           ],
         ),
@@ -238,7 +239,7 @@ class _RecordScreenState extends ConsumerState<RecordScreen> {
                       _selectedContext = null;
                     });
                   },
-                  child: const Text('Discard', style: TextStyle(fontWeight: FontWeight.w900, color: Colors.grey, fontSize: 16)),
+                  child: Text(AppStrings.get('discard'), style: const TextStyle(fontWeight: FontWeight.w900, color: Colors.grey, fontSize: 16)),
                 ),
               ),
               Expanded(
@@ -263,10 +264,10 @@ class _RecordScreenState extends ConsumerState<RecordScreen> {
                             _selectedContext = null;
                           });
                           if (mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Saved! 🐾')));
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppStrings.get('saved'))));
                           }
                         },
-                  child: const Text('Save Record', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+                  child: Text(AppStrings.get('save_record'), style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
                 ),
               ),
             ],
@@ -284,13 +285,13 @@ class _RecordScreenState extends ConsumerState<RecordScreen> {
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Text('Recent recordings', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900, fontSize: 20, color: AppColors.playfulText)),
+          child: Text(AppStrings.get('recent_recordings'), style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900, fontSize: 20, color: AppColors.playfulText)),
         ),
         const SizedBox(height: 12),
         if (records.isEmpty)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0),
-            child: Text('No meows recorded yet.', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.playfulText.withOpacity(0.6))),
+            child: Text(AppStrings.get('no_recordings_yet'), style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.playfulText.withOpacity(0.6))),
           )
         else
           Expanded(
@@ -318,12 +319,12 @@ class _RecordScreenState extends ConsumerState<RecordScreen> {
                         builder: (ctx) => AlertDialog(
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
                           backgroundColor: AppColors.playfulBackground,
-                          title: const Text('Delete Recording? 🗑️', style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText)),
-                          content: const Text('This will permanently delete this meow recording.', style: TextStyle(fontWeight: FontWeight.w700, color: AppColors.playfulText)),
+                          title: Text(AppStrings.get('delete_recording'), style: const TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText)),
+                          content: Text(AppStrings.get('delete_recording_confirm'), style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.playfulText)),
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.pop(ctx),
-                              child: const Text('Cancel', style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText)),
+                              child: Text(AppStrings.get('cancel'), style: const TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText)),
                             ),
                             ElevatedButton(
                               onPressed: () {
@@ -334,7 +335,7 @@ class _RecordScreenState extends ConsumerState<RecordScreen> {
                                 backgroundColor: Colors.redAccent.shade100,
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                               ),
-                              child: const Text('Delete', style: TextStyle(fontWeight: FontWeight.w900, color: Colors.white)),
+                              child: Text(AppStrings.get('delete'), style: const TextStyle(fontWeight: FontWeight.w900, color: Colors.white)),
                             ),
                           ],
                         ),

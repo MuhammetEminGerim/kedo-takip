@@ -10,6 +10,7 @@ import '../../features/analytics/screens/analytics_screen.dart';
 import '../../features/training/screens/training_screen.dart';
 import '../../features/cat_profile/screens/cat_form_screen.dart';
 import '../../features/settings/screens/settings_screen.dart';
+import '../constants/app_strings.dart';
 import '../theme/app_icons.dart';
 import '../../shared/models/cat.dart';
 
@@ -123,11 +124,11 @@ class ScaffoldWithBottomNavBar extends ConsumerWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildNavItem(context, 0, currentIndex, AppIcons.navHome, 'Home'),
-                  _buildNavItem(context, 1, currentIndex, AppIcons.navRecord, 'Record'),
-                  _buildNavItem(context, 2, currentIndex, AppIcons.navCare, 'Care'),
-                  _buildNavItem(context, 3, currentIndex, AppIcons.navStats, 'Stats'),
-                  _buildNavItem(context, 4, currentIndex, AppIcons.navLearn, 'Learn'),
+                  _buildNavItem(context, 0, currentIndex, AppIcons.navHome, AppStrings.get('nav_home')),
+                  _buildNavItem(context, 1, currentIndex, AppIcons.navRecord, AppStrings.get('nav_record')),
+                  _buildNavItem(context, 2, currentIndex, AppIcons.navCare, AppStrings.get('nav_care')),
+                  _buildNavItem(context, 3, currentIndex, AppIcons.navStats, AppStrings.get('nav_stats')),
+                  _buildNavItem(context, 4, currentIndex, AppIcons.navLearn, AppStrings.get('nav_learn')),
                 ],
               ),
             ),

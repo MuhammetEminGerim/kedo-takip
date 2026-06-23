@@ -8,6 +8,7 @@ import '../../care_tracking/providers/care_log_provider.dart';
 import '../../../shared/providers/cat_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../shared/widgets/pastel_card.dart';
+import '../../../core/constants/app_strings.dart';
 
 class AnalyticsScreen extends ConsumerStatefulWidget {
   const AnalyticsScreen({super.key});
@@ -19,12 +20,24 @@ class AnalyticsScreen extends ConsumerStatefulWidget {
 class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
   String _selectedTab = 'Week';
 
+  // Map internal tab keys to localized display labels
+  static const List<String> _tabKeys = ['Week', 'Month', 'All'];
+
+  String _localizedTab(String key) {
+    switch (key) {
+      case 'Week': return AppStrings.get('week');
+      case 'Month': return AppStrings.get('month');
+      case 'All': return AppStrings.get('all');
+      default: return key;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final meowRecords = ref.watch(meowRecordListProvider);
     final careLogs = ref.watch(careLogListProvider);
     final selectedCat = ref.watch(selectedCatProvider);
-    final catName = selectedCat?.name ?? 'Your cat';
+    final catName = selectedCat?.name ?? AppStrings.get('your_cat');
 
     // Calculate time range
     final now = DateTime.now();
@@ -64,7 +77,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Insights ', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900, color: AppColors.playfulText)),
+            Text('${AppStrings.get('insights')} ', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900, color: AppColors.playfulText)),
             const Icon(Icons.bar_chart_outlined, color: AppColors.playfulText, size: 28),
           ],
         ),
@@ -90,7 +103,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                 ),
                 padding: const EdgeInsets.all(4),
                 child: Row(
-                  children: ['Week', 'Month', 'All'].map((tab) {
+                  children: _tabKeys.map((tab) {
                     final isSelected = _selectedTab == tab;
                     return Expanded(
                       child: GestureDetector(
@@ -104,7 +117,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                           ),
                           child: Center(
                             child: Text(
-                              tab,
+                              _localizedTab(tab),
                               style: TextStyle(
                                 fontWeight: FontWeight.w900,
                                 color: isSelected ? Colors.white : AppColors.playfulText.withOpacity(0.6),
@@ -130,7 +143,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                           children: [
                             Icon(Icons.bar_chart_outlined, size: 48, color: AppColors.playfulText.withOpacity(0.2)),
                             const SizedBox(height: 8),
-                            Text('No meow data yet', style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText.withOpacity(0.4))),
+                            Text(AppStrings.get('no_meow_data_yet'), style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText.withOpacity(0.4))),
                           ],
                         ),
                       )
@@ -143,7 +156,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                             touchTooltipData: BarTouchTooltipData(
                               getTooltipItem: (group, groupIndex, rod, rodIndex) {
                                 return BarTooltipItem(
-                                  '${rod.toY.toInt()} meows',
+                                  '${rod.toY.toInt()} ${AppStrings.get('meows_tooltip')}',
                                   const TextStyle(fontWeight: FontWeight.w900, color: Colors.white, fontSize: 12),
                                 );
                               },
@@ -228,27 +241,27 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
 
               const SizedBox(height: 32),
 
-              Text('Feeding pattern', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
+              Text(AppStrings.get('feeding_pattern'), style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
               const SizedBox(height: 16),
               _buildFeedingTimeline(todayFoodLogs),
 
               const SizedBox(height: 32),
               
-              Text('Mood trends', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
+              Text(AppStrings.get('mood_trends'), style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
               const SizedBox(height: 16),
               _buildMoodTrend(recentMoods),
 
               const SizedBox(height: 32),
 
-              Text('Stats', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
+              Text(AppStrings.get('stats'), style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
               const SizedBox(height: 16),
               Row(
                 children: [
-                  Expanded(child: _buildStatBox('$totalMeows', 'recordings', Icons.mic_none_outlined)),
+                  Expanded(child: _buildStatBox('$totalMeows', AppStrings.get('recordings'), Icons.mic_none_outlined)),
                   const SizedBox(width: 12),
-                  Expanded(child: _buildStatBox('$totalMeals', 'meals', Icons.restaurant_outlined)),
+                  Expanded(child: _buildStatBox('$totalMeals', AppStrings.get('meals'), Icons.restaurant_outlined)),
                   const SizedBox(width: 12),
-                  Expanded(child: _buildStatBox('$streak', 'day streak', Icons.local_fire_department_outlined)),
+                  Expanded(child: _buildStatBox('$streak', AppStrings.get('day_streak'), Icons.local_fire_department_outlined)),
                 ],
               ),
               const SizedBox(height: 100),
@@ -323,8 +336,8 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
   Map<String, String> _generateInsight(String catName, List filteredMeows, List filteredLogs) {
     if (filteredMeows.isEmpty && filteredLogs.isEmpty) {
       return {
-        'title': 'Start recording to see insights!',
-        'subtitle': 'Record meows and log care activities',
+        'title': AppStrings.get('start_recording_insight'),
+        'subtitle': AppStrings.get('record_meows_and_log'),
       };
     }
 
@@ -340,16 +353,28 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
       final timeOfDay = peakHour < 12 ? 'morning' : peakHour < 17 ? 'afternoon' : 'evening';
       final mealCount = filteredLogs.where((l) => l.type == 'food').length;
       
+      String timeInsight;
+      switch (timeOfDay) {
+        case 'morning':
+          timeInsight = AppStrings.get('meows_most_morning');
+          break;
+        case 'afternoon':
+          timeInsight = AppStrings.get('meows_most_afternoon');
+          break;
+        default:
+          timeInsight = AppStrings.get('meows_most_evening');
+      }
+
       return {
-        'title': '$catName meows most in the $timeOfDay!',
-        'subtitle': '$mealCount meals logged this period',
+        'title': '$catName $timeInsight',
+        'subtitle': '$mealCount ${AppStrings.get('meals_logged_period')}',
       };
     }
 
     final mealCount = filteredLogs.where((l) => l.type == 'food').length;
     return {
-      'title': '$catName had $mealCount meals this period',
-      'subtitle': 'Keep logging to discover patterns!',
+      'title': '$catName ${AppStrings.get('had_meals_period')}'.replaceFirst(AppStrings.get('had_meals_period'), '$mealCount ${AppStrings.get('had_meals_period')}'),
+      'subtitle': AppStrings.get('keep_logging_patterns'),
     };
   }
 
@@ -359,7 +384,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
         backgroundColor: Colors.white,
         padding: const EdgeInsets.all(20),
         child: Center(
-          child: Text('No meals logged today', style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText.withOpacity(0.4))),
+          child: Text(AppStrings.get('no_meals_logged_today'), style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText.withOpacity(0.4))),
         ),
       );
     }
@@ -404,7 +429,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
         backgroundColor: Colors.white,
         padding: const EdgeInsets.all(20),
         child: Center(
-          child: Text('No mood data yet', style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText.withOpacity(0.4))),
+          child: Text(AppStrings.get('no_mood_data_yet'), style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText.withOpacity(0.4))),
         ),
       );
     }

@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../../../core/constants/app_strings.dart';
 import '../../../shared/models/cat.dart';
 import '../../../shared/providers/cat_provider.dart';
 import '../../../core/theme/app_colors.dart';
@@ -76,20 +77,20 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            const Text('Choose Photo', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 20, color: AppColors.playfulText)),
+            Text(AppStrings.get('choose_photo'), style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 20, color: AppColors.playfulText)),
             const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 _buildPhotoOption(
                   icon: Icons.camera_alt_rounded,
-                  label: 'Camera',
+                  label: AppStrings.get('camera'),
                   color: AppColors.playfulPrimary,
                   onTap: () => Navigator.pop(ctx, ImageSource.camera),
                 ),
                 _buildPhotoOption(
                   icon: Icons.photo_library_rounded,
-                  label: 'Gallery',
+                  label: AppStrings.get('gallery'),
                   color: AppColors.playfulSecondary,
                   onTap: () => Navigator.pop(ctx, ImageSource.gallery),
                 ),
@@ -169,7 +170,7 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
       if (_selectedDate == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Please select a birth date 📅', style: TextStyle(fontWeight: FontWeight.w900)),
+            content: Text(AppStrings.get('please_select_birth_date'), style: const TextStyle(fontWeight: FontWeight.w900)),
             backgroundColor: AppColors.playfulPrimary,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -216,15 +217,15 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         backgroundColor: AppColors.playfulBackground,
-        title: const Text('Delete Cat? 😿', style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText)),
+        title: Text(AppStrings.get('delete_cat'), style: const TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText)),
         content: Text(
-          'Are you sure you want to remove ${widget.catToEdit!.name}? This action cannot be undone.',
+          '${widget.catToEdit!.name} ${AppStrings.get('are_you_sure_remove')}',
           style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.playfulText),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel', style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText)),
+            child: Text(AppStrings.get('cancel'), style: const TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText)),
           ),
           ElevatedButton(
             onPressed: () {
@@ -236,7 +237,7 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
               backgroundColor: Colors.redAccent.shade100,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             ),
-            child: const Text('Delete', style: TextStyle(fontWeight: FontWeight.w900, color: Colors.white)),
+            child: Text(AppStrings.get('delete'), style: const TextStyle(fontWeight: FontWeight.w900, color: Colors.white)),
           ),
         ],
       ),
@@ -254,7 +255,7 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              isEditing ? 'Edit Cat ' : 'Add Cat ',
+              isEditing ? '${AppStrings.get('edit_cat')} ' : '${AppStrings.get('add_cat')} ',
               style: const TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText, fontSize: 24),
             ),
             const Text('🐱', style: TextStyle(fontSize: 24)),
@@ -322,26 +323,26 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
                 ),
               ),
               const SizedBox(height: 8),
-              const Center(
-                child: Text('Tap to change photo', style: TextStyle(color: AppColors.playfulText, fontWeight: FontWeight.w700, fontSize: 12)),
+              Center(
+                child: Text(AppStrings.get('tap_to_change_photo'), style: const TextStyle(color: AppColors.playfulText, fontWeight: FontWeight.w700, fontSize: 12)),
               ),
               const SizedBox(height: 32),
 
               // Name Field
               _buildKawaiiTextField(
                 controller: _nameController,
-                label: 'Name',
+                label: AppStrings.get('name'),
                 icon: Icons.pets_rounded,
-                validator: (value) => value!.isEmpty ? 'Please enter a name' : null,
+                validator: (value) => value!.isEmpty ? AppStrings.get('please_enter_name') : null,
               ),
               const SizedBox(height: 16),
 
               // Breed Field
               _buildKawaiiTextField(
                 controller: _breedController,
-                label: 'Breed',
+                label: AppStrings.get('breed'),
                 icon: Icons.category_rounded,
-                validator: (value) => value!.isEmpty ? 'Please enter a breed' : null,
+                validator: (value) => value!.isEmpty ? AppStrings.get('please_enter_breed') : null,
               ),
               const SizedBox(height: 16),
 
@@ -365,10 +366,10 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Birth Date', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: AppColors.playfulText)),
+                          Text(AppStrings.get('birth_date'), style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: AppColors.playfulText)),
                           const SizedBox(height: 2),
                           Text(
-                            _selectedDate == null ? 'Select Date' : DateFormat.yMMMd().format(_selectedDate!),
+                            _selectedDate == null ? AppStrings.get('select_date') : DateFormat.yMMMd().format(_selectedDate!),
                             style: TextStyle(
                               fontWeight: FontWeight.w700,
                               fontSize: 16,
@@ -404,11 +405,11 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
                       ),
                     ),
                     const SizedBox(width: 16),
-                    const Text('Gender', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: AppColors.playfulText)),
+                    Text(AppStrings.get('gender'), style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: AppColors.playfulText)),
                     const Spacer(),
-                    _buildGenderChip('Female', '♀'),
+                    _buildGenderChip('Female', '♀', AppStrings.get('female')),
                     const SizedBox(width: 8),
-                    _buildGenderChip('Male', '♂'),
+                    _buildGenderChip('Male', '♂', AppStrings.get('male')),
                   ],
                 ),
               ),
@@ -429,8 +430,8 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
                       child: const Icon(Icons.healing_rounded, color: AppColors.playfulText, size: 20),
                     ),
                     const SizedBox(width: 16),
-                    const Expanded(
-                      child: Text('Neutered/Spayed', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: AppColors.playfulText)),
+                    Expanded(
+                      child: Text(AppStrings.get('neutered_spayed'), style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: AppColors.playfulText)),
                     ),
                     Switch(
                       value: _isNeutered,
@@ -446,10 +447,10 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
               // Weight
               _buildKawaiiTextField(
                 controller: _weightController,
-                label: 'Weight (kg)',
+                label: AppStrings.get('weight_kg'),
                 icon: Icons.monitor_weight_rounded,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                suffixText: 'kg',
+                suffixText: AppStrings.get('kg'),
               ),
               const SizedBox(height: 32),
 
@@ -469,7 +470,7 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
                   ),
                   child: Center(
                     child: Text(
-                      isEditing ? 'Save Changes 💾' : 'Add Cat 🐾',
+                      isEditing ? AppStrings.get('save_changes') : AppStrings.get('add_cat_button'),
                       style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: Colors.white),
                     ),
                   ),
@@ -529,7 +530,7 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
     );
   }
 
-  Widget _buildGenderChip(String value, String symbol) {
+  Widget _buildGenderChip(String value, String symbol, String displayLabel) {
     final isSelected = _gender == value;
     return GestureDetector(
       onTap: () => setState(() => _gender = value),
@@ -545,7 +546,7 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
           ),
         ),
         child: Text(
-          '$symbol $value',
+          '$symbol $displayLabel',
           style: TextStyle(
             fontWeight: FontWeight.w900,
             fontSize: 14,

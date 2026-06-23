@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../core/constants/app_strings.dart';
 import '../../../core/theme/app_colors.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -16,27 +17,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
-  final List<_OnboardingPage> _pages = [
-    _OnboardingPage(
-      emoji: '🐱',
-      title: "PawLog'a\nHoş Geldin!",
-      subtitle: 'Kedinin tüm ihtiyaçlarını\ntek uygulamadan takip et',
-      color: AppColors.playfulPrimary,
-    ),
-    _OnboardingPage(
-      emoji: '🎙️',
-      title: 'Miyavlarını\nKaydet',
-      subtitle: 'Kedinin seslerini kaydet ve\ngünlük aktivitelerini izle',
-      color: AppColors.playfulSecondary,
-    ),
-    _OnboardingPage(
-      emoji: '💊',
-      title: 'Bakımını\nTakip Et',
-      subtitle: 'Yemek, su, kum ve kilo\ntakibini kolayca yap',
-      color: AppColors.playfulTertiary,
-    ),
-  ];
-
   @override
   void dispose() {
     _pageController.dispose();
@@ -51,6 +31,27 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final pages = [
+      _OnboardingPage(
+        emoji: '🐱',
+        title: AppStrings.get('onboarding_title_1'),
+        subtitle: AppStrings.get('onboarding_subtitle_1'),
+        color: AppColors.playfulPrimary,
+      ),
+      _OnboardingPage(
+        emoji: '🎙️',
+        title: AppStrings.get('onboarding_title_2'),
+        subtitle: AppStrings.get('onboarding_subtitle_2'),
+        color: AppColors.playfulSecondary,
+      ),
+      _OnboardingPage(
+        emoji: '💊',
+        title: AppStrings.get('onboarding_title_3'),
+        subtitle: AppStrings.get('onboarding_subtitle_3'),
+        color: AppColors.playfulTertiary,
+      ),
+    ];
+
     return Scaffold(
       backgroundColor: AppColors.playfulBackground,
       body: SafeArea(
@@ -64,7 +65,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 child: GestureDetector(
                   onTap: _completeOnboarding,
                   child: Text(
-                    'Skip',
+                    AppStrings.get('skip'),
                     style: TextStyle(
                       fontWeight: FontWeight.w900,
                       fontSize: 16,
@@ -79,10 +80,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             Expanded(
               child: PageView.builder(
                 controller: _pageController,
-                itemCount: _pages.length,
+                itemCount: pages.length,
                 onPageChanged: (index) => setState(() => _currentPage = index),
                 itemBuilder: (context, index) {
-                  final page = _pages[index];
+                  final page = pages[index];
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 40),
                     child: Column(
@@ -139,7 +140,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(
-                      _pages.length,
+                      pages.length,
                       (index) => AnimatedContainer(
                         duration: const Duration(milliseconds: 300),
                         margin: const EdgeInsets.symmetric(horizontal: 4),
@@ -159,7 +160,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   // Action button
                   GestureDetector(
                     onTap: () {
-                      if (_currentPage < _pages.length - 1) {
+                      if (_currentPage < pages.length - 1) {
                         _pageController.nextPage(
                           duration: const Duration(milliseconds: 400),
                           curve: Curves.easeInOut,
@@ -175,14 +176,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
-                            _pages[_currentPage].color,
+                            pages[_currentPage].color,
                             AppColors.playfulAccentPeach,
                           ],
                         ),
                         borderRadius: BorderRadius.circular(24),
                         boxShadow: [
                           BoxShadow(
-                            color: _pages[_currentPage].color.withOpacity(0.4),
+                            color: pages[_currentPage].color.withOpacity(0.4),
                             blurRadius: 12,
                             offset: const Offset(0, 4),
                           ),
@@ -190,7 +191,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ),
                       child: Center(
                         child: Text(
-                          _currentPage < _pages.length - 1 ? 'Next →' : 'Başla! 🐾',
+                          _currentPage < pages.length - 1 ? AppStrings.get('next') : AppStrings.get('get_started'),
                           style: const TextStyle(
                             fontWeight: FontWeight.w900,
                             fontSize: 18,

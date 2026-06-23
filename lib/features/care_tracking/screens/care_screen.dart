@@ -8,6 +8,7 @@ import '../../../shared/providers/cat_provider.dart';
 import '../../../shared/models/care_log.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../shared/widgets/pastel_card.dart';
+import '../../../core/constants/app_strings.dart';
 
 class CareScreen extends ConsumerWidget {
   const CareScreen({super.key});
@@ -25,7 +26,7 @@ class CareScreen extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('Care Log ', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900, color: AppColors.playfulText, fontSize: 26)),
+                Text('${AppStrings.get('care_log')} ', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900, color: AppColors.playfulText, fontSize: 26)),
                 const Icon(Icons.pets, color: AppColors.playfulText, size: 24),
               ],
             ),
@@ -94,37 +95,40 @@ class CareScreen extends ConsumerWidget {
               _buildCareCard(
                 context: context,
                 ref: ref,
-                title: 'Food',
+                title: AppStrings.get('food'),
                 emoji: '🥣',
                 bgColor: AppColors.playfulPrimary,
                 lastLog: _getLastLog(logs, 'food'),
                 allLogs: _getAllLogs(logs, 'food'),
                 statusText: _getFoodStatus(logs),
-                onAdd: () => _addLog(ref, 'food', 'Fed'),
+                onAdd: () => _addLog(ref, 'food', AppStrings.get('fed')),
+                historyKey: 'food',
               ),
               const SizedBox(height: 16),
               _buildCareCard(
                 context: context,
                 ref: ref,
-                title: 'Water',
+                title: AppStrings.get('water'),
                 emoji: '💧',
                 bgColor: AppColors.playfulAccentBlue,
                 lastLog: _getLastLog(logs, 'water'),
                 allLogs: _getAllLogs(logs, 'water'),
                 statusText: _getWaterStatus(logs),
-                onAdd: () => _addLog(ref, 'water', 'Refilled'),
+                onAdd: () => _addLog(ref, 'water', AppStrings.get('refilled')),
+                historyKey: 'water',
               ),
               const SizedBox(height: 16),
               _buildCareCard(
                 context: context,
                 ref: ref,
-                title: 'Litter',
+                title: AppStrings.get('litter'),
                 emoji: '🚽',
                 bgColor: AppColors.playfulSecondary,
                 lastLog: _getLastLog(logs, 'litter'),
                 allLogs: _getAllLogs(logs, 'litter'),
                 statusText: _getLitterStatus(logs),
-                onAdd: () => _addLog(ref, 'litter', 'Cleaned'),
+                onAdd: () => _addLog(ref, 'litter', AppStrings.get('cleaned')),
+                historyKey: 'litter',
               ),
               const SizedBox(height: 16),
               _buildMoodCard(context, ref, _getLastLog(logs, 'mood')),
@@ -155,27 +159,30 @@ class CareScreen extends ConsumerWidget {
 
   String _getFoodStatus(List<CareLog> logs) {
     final last = _getLastLog(logs, 'food');
-    if (last == null) return 'No meals yet';
-    return 'Last fed: ${_getTimeAgo(last.timestamp)}';
+    if (last == null) return AppStrings.get('no_meals_yet');
+    return '${AppStrings.get('last_fed')} ${_getTimeAgo(last.timestamp)}';
   }
 
   String _getWaterStatus(List<CareLog> logs) {
     final last = _getLastLog(logs, 'water');
-    if (last == null) return 'Not refilled yet';
-    return 'Last refilled: ${_getTimeAgo(last.timestamp)}';
+    if (last == null) return AppStrings.get('not_refilled_yet');
+    return '${AppStrings.get('last_refilled')} ${_getTimeAgo(last.timestamp)}';
   }
 
   String _getLitterStatus(List<CareLog> logs) {
     final last = _getLastLog(logs, 'litter');
-    if (last == null) return 'Not cleaned today';
-    return 'Last cleaned: ${_getTimeAgo(last.timestamp)}';
+    if (last == null) return AppStrings.get('not_cleaned_today');
+    return '${AppStrings.get('last_cleaned')} ${_getTimeAgo(last.timestamp)}';
   }
 
   void _addLog(WidgetRef ref, String type, String value) {
     ref.read(careLogListProvider.notifier).addLog(type: type, value: value);
   }
 
-  void _showCareHistory(BuildContext context, String title, String emoji, List<CareLog> allLogs) {
+  void _showCareHistory(BuildContext context, WidgetRef ref, String historyKey, String emoji, List<CareLog> allLogs) {
+    final historyTitle = AppStrings.get('${historyKey}_history');
+    final noLogsText = AppStrings.get('no_${historyKey}_logs_yet');
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -199,12 +206,12 @@ class CareScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 16),
-            Text('$emoji $title History', style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 20, color: AppColors.playfulText)),
+            Text('$emoji $historyTitle', style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 20, color: AppColors.playfulText)),
             const SizedBox(height: 16),
             if (allLogs.isEmpty)
               Padding(
                 padding: const EdgeInsets.all(32),
-                child: Text('No $title logs yet', style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText.withOpacity(0.4))),
+                child: Text(noLogsText, style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText.withOpacity(0.4))),
               )
             else
               Flexible(
@@ -213,31 +220,67 @@ class CareScreen extends ConsumerWidget {
                   itemCount: allLogs.length > 20 ? 20 : allLogs.length,
                   itemBuilder: (ctx, index) {
                     final log = allLogs[index];
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
+                    return Dismissible(
+                      key: Key(log.id),
+                      direction: DismissDirection.endToStart,
+                      background: Container(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        padding: const EdgeInsets.only(right: 20),
+                        decoration: BoxDecoration(
+                          color: Colors.red.shade300,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        alignment: Alignment.centerRight,
+                        child: const Icon(Icons.delete_outline_rounded, color: Colors.white, size: 24),
                       ),
-                      child: Row(
-                        children: [
-                          Text(emoji, style: const TextStyle(fontSize: 24)),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(log.value ?? '', style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: AppColors.playfulText)),
-                                Text(
-                                  DateFormat('MMM d, yyyy • h:mm a').format(log.timestamp),
-                                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12, color: AppColors.playfulText.withOpacity(0.6)),
-                                ),
-                              ],
-                            ),
+                      confirmDismiss: (_) async {
+                        return await showDialog<bool>(
+                          context: context,
+                          builder: (c) => AlertDialog(
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                            backgroundColor: AppColors.playfulBackground,
+                            title: Text(AppStrings.get('delete_log'), style: const TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText)),
+                            content: Text(AppStrings.get('cannot_be_undone'), style: const TextStyle(fontWeight: FontWeight.w700)),
+                            actions: [
+                              TextButton(onPressed: () => Navigator.pop(c, false), child: Text(AppStrings.get('cancel'), style: const TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText))),
+                              ElevatedButton(
+                                onPressed: () => Navigator.pop(c, true),
+                                style: ElevatedButton.styleFrom(backgroundColor: Colors.red.shade300, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
+                                child: Text(AppStrings.get('delete'), style: const TextStyle(fontWeight: FontWeight.w900, color: Colors.white)),
+                              ),
+                            ],
                           ),
-                          Text(_getTimeAgo(log.timestamp), style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: AppColors.playfulText.withOpacity(0.4))),
-                        ],
+                        ) ?? false;
+                      },
+                      onDismissed: (_) {
+                        ref.read(careLogListProvider.notifier).deleteLog(log);
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Row(
+                          children: [
+                            Text(emoji, style: const TextStyle(fontSize: 24)),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(log.value ?? '', style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: AppColors.playfulText)),
+                                  Text(
+                                    DateFormat('MMM d, yyyy • h:mm a').format(log.timestamp),
+                                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12, color: AppColors.playfulText.withOpacity(0.6)),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Text(_getTimeAgo(log.timestamp), style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: AppColors.playfulText.withOpacity(0.4))),
+                          ],
+                        ),
                       ),
                     );
                   },
@@ -259,9 +302,10 @@ class CareScreen extends ConsumerWidget {
     required List<CareLog> allLogs,
     required String statusText,
     required VoidCallback onAdd,
+    required String historyKey,
   }) {
     return GestureDetector(
-      onTap: () => _showCareHistory(context, title, emoji, allLogs),
+      onTap: () => _showCareHistory(context, ref, historyKey, emoji, allLogs),
       child: PastelCard(
         backgroundColor: bgColor.withOpacity(0.4),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
@@ -309,7 +353,7 @@ class CareScreen extends ConsumerWidget {
     final currentWeight = selectedCat?.weight?.toString() ?? '--';
 
     return GestureDetector(
-      onTap: () => _showCareHistory(context, 'Weight', '⚖️', weightLogs),
+      onTap: () => _showCareHistory(context, ref, 'weight', '⚖️', weightLogs),
       child: PastelCard(
         backgroundColor: AppColors.playfulAccentPeach.withOpacity(0.4),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
@@ -328,9 +372,9 @@ class CareScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Weight', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 22, color: AppColors.playfulText, letterSpacing: 1.1)),
+                  Text(AppStrings.get('weight'), style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 22, color: AppColors.playfulText, letterSpacing: 1.1)),
                   const SizedBox(height: 4),
-                  Text('$currentWeight kg', style: TextStyle(color: AppColors.playfulText.withOpacity(0.9), fontSize: 14, fontWeight: FontWeight.w800)),
+                  Text('$currentWeight ${AppStrings.get('kg')}', style: TextStyle(color: AppColors.playfulText.withOpacity(0.9), fontSize: 14, fontWeight: FontWeight.w800)),
                 ],
               ),
             ),
@@ -361,14 +405,14 @@ class CareScreen extends ConsumerWidget {
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         backgroundColor: AppColors.playfulBackground,
-        title: const Text('Update Weight ⚖️', style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText)),
+        title: Text(AppStrings.get('update_weight'), style: const TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText)),
         content: TextField(
           controller: controller,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
           style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 20, color: AppColors.playfulText),
           decoration: InputDecoration(
             hintText: selectedCat?.weight?.toString() ?? '0.0',
-            suffixText: 'kg',
+            suffixText: AppStrings.get('kg'),
             suffixStyle: const TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText),
             filled: true,
             fillColor: Colors.white,
@@ -378,7 +422,7 @@ class CareScreen extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel', style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText)),
+            child: Text(AppStrings.get('cancel'), style: const TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText)),
           ),
           ElevatedButton(
             onPressed: () {
@@ -386,7 +430,7 @@ class CareScreen extends ConsumerWidget {
               if (weight != null && selectedCat != null) {
                 selectedCat.weight = weight;
                 ref.read(catListProvider.notifier).updateCat(selectedCat);
-                ref.read(careLogListProvider.notifier).addLog(type: 'weight', value: '${weight}kg');
+                ref.read(careLogListProvider.notifier).addLog(type: 'weight', value: '${weight}${AppStrings.get('kg')}');
                 Navigator.pop(ctx);
               }
             },
@@ -394,7 +438,7 @@ class CareScreen extends ConsumerWidget {
               backgroundColor: AppColors.playfulPrimary,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             ),
-            child: const Text('Save', style: TextStyle(fontWeight: FontWeight.w900, color: Colors.white)),
+            child: Text(AppStrings.get('save'), style: const TextStyle(fontWeight: FontWeight.w900, color: Colors.white)),
           ),
         ],
       ),
@@ -427,8 +471,8 @@ class CareScreen extends ConsumerWidget {
                 child: const Text('😸', style: TextStyle(fontSize: 28)),
               ),
               const SizedBox(width: 20),
-              const Expanded(
-                child: Text('Mood', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 22, color: AppColors.playfulText, letterSpacing: 1.1)),
+              Expanded(
+                child: Text(AppStrings.get('mood'), style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 22, color: AppColors.playfulText, letterSpacing: 1.1)),
               ),
             ],
           ),
@@ -460,9 +504,9 @@ class CareScreen extends ConsumerWidget {
 
   String _getTimeAgo(DateTime date) {
     final diff = DateTime.now().difference(date);
-    if (diff.inDays > 0) return '${diff.inDays}d ago';
-    if (diff.inHours > 0) return '${diff.inHours}h ago';
-    if (diff.inMinutes > 0) return '${diff.inMinutes}m ago';
-    return 'just now';
+    if (diff.inDays > 0) return '${diff.inDays}${AppStrings.get('d_ago')}';
+    if (diff.inHours > 0) return '${diff.inHours}${AppStrings.get('h_ago')}';
+    if (diff.inMinutes > 0) return '${diff.inMinutes}${AppStrings.get('m_ago')}';
+    return AppStrings.get('just_now');
   }
 }

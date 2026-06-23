@@ -11,6 +11,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../shared/widgets/pastel_card.dart';
 import '../../../shared/widgets/pastel_action_button.dart';
+import '../../../core/constants/app_strings.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -49,20 +50,20 @@ class DashboardScreen extends ConsumerWidget {
             const Icon(Icons.pets, size: 80, color: AppColors.playfulPrimary),
             const SizedBox(height: 24),
             Text(
-              'Welcome to PawLog!',
+              AppStrings.get('welcome'),
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Add your furry friend to get started.',
+            Text(
+              AppStrings.get('add_furry_friend'),
               textAlign: TextAlign.center,
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 32),
             ElevatedButton.icon(
               onPressed: () => context.push('/cat-form'),
               icon: const Icon(Icons.add_rounded),
-              label: const Text('Add Cat', style: TextStyle(fontWeight: FontWeight.w900)),
+              label: Text(AppStrings.get('add_cat'), style: const TextStyle(fontWeight: FontWeight.w900)),
             ),
           ],
         ),
@@ -105,7 +106,7 @@ class DashboardScreen extends ConsumerWidget {
                               child: Icon(Icons.add_rounded, size: 28, color: AppColors.playfulText.withOpacity(0.4)),
                             ),
                             const SizedBox(height: 6),
-                            Text('Add', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AppColors.playfulText.withOpacity(0.4))),
+                            Text(AppStrings.get('add'), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AppColors.playfulText.withOpacity(0.4))),
                           ],
                         ),
                       ),
@@ -203,6 +204,15 @@ class DashboardScreen extends ConsumerWidget {
                         color: AppColors.playfulText.withOpacity(0.6),
                       ),
                     ),
+                  Text(
+                    _calculateAge(selectedCat.birthDate),
+                    style: TextStyle(
+                      fontFamily: 'Nunito',
+                      fontWeight: FontWeight.w700,
+                      fontSize: 12,
+                      color: AppColors.playfulText.withOpacity(0.4),
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(width: 8),
@@ -213,34 +223,34 @@ class DashboardScreen extends ConsumerWidget {
           const SizedBox(height: 40),
           
           // Quick Actions
-          Text('Quick Actions', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900, fontSize: 22, color: AppColors.playfulText)),
+          Text(AppStrings.get('quick_actions'), style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900, fontSize: 22, color: AppColors.playfulText)),
           const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               PastelActionButton(
-                title: 'Record',
+                title: AppStrings.get('record_action'),
                 icon: AppIcons.mic(),
                 color: AppColors.playfulPrimary,
                 onTap: () => context.go('/record'),
               ),
               PastelActionButton(
-                title: 'Fed',
+                title: AppStrings.get('fed_action'),
                 icon: AppIcons.bowl(),
                 color: AppColors.playfulSecondary,
-                onTap: () => _addCareLog(ref, 'food', 'Fed'),
+                onTap: () => _addCareLog(ref, 'food', AppStrings.get('fed')),
               ),
               PastelActionButton(
-                title: 'Litter',
+                title: AppStrings.get('litter_action'),
                 icon: AppIcons.litter(),
                 color: AppColors.playfulTertiary,
-                onTap: () => _addCareLog(ref, 'litter', 'Cleaned'),
+                onTap: () => _addCareLog(ref, 'litter', AppStrings.get('cleaned')),
               ),
               PastelActionButton(
-                title: 'Water',
+                title: AppStrings.get('water_action'),
                 icon: AppIcons.water(),
                 color: AppColors.playfulAccentBlue,
-                onTap: () => _addCareLog(ref, 'water', 'Refilled'),
+                onTap: () => _addCareLog(ref, 'water', AppStrings.get('refilled')),
               ),
             ],
           ),
@@ -248,7 +258,7 @@ class DashboardScreen extends ConsumerWidget {
           const SizedBox(height: 24),
           
           // Today Summary with Peeking Cats
-          Text('Today Summary', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900, fontSize: 22, color: AppColors.playfulText)),
+          Text(AppStrings.get('today_summary'), style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900, fontSize: 22, color: AppColors.playfulText)),
           const SizedBox(height: 16),
           
           _buildKawaiiSummaryCard(
@@ -256,13 +266,13 @@ class DashboardScreen extends ConsumerWidget {
             ref,
             color: AppColors.playfulPrimary.withOpacity(0.4),
             icon: AppIcons.meow(),
-            title: 'MEOWS',
+            title: AppStrings.get('meows'),
             valueBuilder: () {
               final meows = ref.watch(meowRecordListProvider);
               final today = DateTime.now();
               final todayMeows = meows.where((m) => m.timestamp.day == today.day).toList();
-              if (todayMeows.isEmpty) return 'No meows yet';
-              return '${todayMeows.length} Meows Recorded\nLast: ${DateFormat.jm().format(todayMeows.last.timestamp)}';
+              if (todayMeows.isEmpty) return AppStrings.get('no_meows_yet');
+              return '${todayMeows.length} ${AppStrings.get('meows_recorded')}\n${AppStrings.get('last')} ${DateFormat.jm().format(todayMeows.last.timestamp)}';
             },
           ),
           const SizedBox(height: 16),
@@ -271,13 +281,13 @@ class DashboardScreen extends ConsumerWidget {
             ref,
             color: AppColors.playfulSecondary.withOpacity(0.5),
             icon: AppIcons.bowl(),
-            title: 'MEALS',
+            title: AppStrings.get('meals_label'),
             valueBuilder: () {
               final logs = ref.watch(careLogListProvider);
               final today = DateTime.now();
               final todayLogs = logs.where((m) => m.type == 'food' && m.timestamp.day == today.day).toList();
-              if (todayLogs.isEmpty) return 'No meals fed yet';
-              return '${todayLogs.length} Meals Fed\nLast: ${DateFormat.jm().format(todayLogs.last.timestamp)}';
+              if (todayLogs.isEmpty) return AppStrings.get('no_meals_fed_yet');
+              return '${todayLogs.length} ${AppStrings.get('meals_fed')}\n${AppStrings.get('last')} ${DateFormat.jm().format(todayLogs.last.timestamp)}';
             },
           ),
           const SizedBox(height: 16),
@@ -286,13 +296,13 @@ class DashboardScreen extends ConsumerWidget {
             ref,
             color: AppColors.playfulTertiary.withOpacity(0.5),
             icon: AppIcons.litter(),
-            title: 'LITTER',
+            title: AppStrings.get('litter_label'),
             valueBuilder: () {
               final logs = ref.watch(careLogListProvider);
               final today = DateTime.now();
               final todayLogs = logs.where((m) => m.type == 'litter' && m.timestamp.day == today.day).toList();
-              if (todayLogs.isEmpty) return 'Not cleaned today';
-              return 'Status: Clean\nChecked: ${DateFormat.jm().format(todayLogs.last.timestamp)}';
+              if (todayLogs.isEmpty) return AppStrings.get('not_cleaned_today');
+              return '${AppStrings.get('status_clean')}\n${AppStrings.get('checked')} ${DateFormat.jm().format(todayLogs.last.timestamp)}';
             },
           ),
           const SizedBox(height: 120), // Padding to ensure content is visible above floating nav bar
@@ -347,8 +357,8 @@ class DashboardScreen extends ConsumerWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 4, offset: const Offset(0, 2))],
-              image: const DecorationImage(
-                image: AssetImage('assets/images/cat_avatar.png'),
+              image: DecorationImage(
+                image: _getCatImage(ref),
                 fit: BoxFit.cover,
               ),
             ),
@@ -356,6 +366,35 @@ class DashboardScreen extends ConsumerWidget {
         ),
       ],
     );
+  }
+
+  ImageProvider _getCatImage(WidgetRef ref) {
+    final cat = ref.read(selectedCatProvider);
+    if (cat != null && cat.photoPath != null && cat.photoPath!.isNotEmpty) {
+      return FileImage(File(cat.photoPath!));
+    }
+    return const AssetImage('assets/images/cat_avatar.png');
+  }
+
+  String _calculateAge(DateTime birthDate) {
+    final now = DateTime.now();
+    int years = now.year - birthDate.year;
+    int months = now.month - birthDate.month;
+    if (months < 0) {
+      years--;
+      months += 12;
+    }
+    if (now.day < birthDate.day) {
+      months--;
+      if (months < 0) {
+        years--;
+        months += 12;
+      }
+    }
+    if (years > 0 && months > 0) return '$years ${AppStrings.get('yrs')} $months ${AppStrings.get('mo')}';
+    if (years > 0) return '$years ${AppStrings.get('years_old')}';
+    if (months > 0) return '$months ${AppStrings.get('months_old')}';
+    return AppStrings.get('newborn');
   }
 
   void _addCareLog(WidgetRef ref, String type, String value) {
