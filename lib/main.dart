@@ -9,7 +9,9 @@ import 'shared/models/care_log.dart';
 import 'shared/models/vaccine.dart';
 import 'shared/models/appointment.dart';
 import 'shared/models/medication.dart';
+import 'shared/models/stamp.dart';
 import 'shared/providers/cat_provider.dart';
+import 'features/stamps/providers/stamp_provider.dart';
 import 'features/care_tracking/providers/care_log_provider.dart';
 import 'features/health/providers/health_provider.dart';
 import 'features/onboarding/screens/onboarding_screen.dart';
@@ -23,12 +25,14 @@ void main() async {
   Hive.registerAdapter(VaccineAdapter());
   Hive.registerAdapter(AppointmentAdapter());
   Hive.registerAdapter(MedicationAdapter());
+  Hive.registerAdapter(StampAdapter());
 
   final catBox = await Hive.openBox<Cat>('cats');
   final careLogBox = await Hive.openBox<CareLog>('care_logs');
   final vaccineBox = await Hive.openBox<Vaccine>('vaccines');
   final appointmentBox = await Hive.openBox<Appointment>('appointments');
   final medicationBox = await Hive.openBox<Medication>('medications');
+  final stampBox = await Hive.openBox<Stamp>('stamps');
 
   // Check if onboarding is complete
   final prefs = await SharedPreferences.getInstance();
@@ -42,6 +46,7 @@ void main() async {
         vaccineBoxProvider.overrideWithValue(vaccineBox),
         appointmentBoxProvider.overrideWithValue(appointmentBox),
         medicationBoxProvider.overrideWithValue(medicationBox),
+        stampBoxProvider.overrideWithValue(stampBox),
       ],
       child: PawLogApp(showOnboarding: !onboardingComplete),
     ),

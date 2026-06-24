@@ -8,6 +8,7 @@ import '../../features/health/screens/health_screen.dart';
 import '../../features/care_tracking/screens/care_screen.dart';
 import '../../features/analytics/screens/analytics_screen.dart';
 import '../../features/training/screens/training_screen.dart';
+import '../../features/stamps/screens/stamp_album_screen.dart';
 import '../../features/cat_profile/screens/cat_form_screen.dart';
 import '../../features/settings/screens/settings_screen.dart';
 import '../constants/app_strings.dart';
@@ -79,6 +80,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/training',
             builder: (context, state) => const TrainingScreen(),
+          ),
+          GoRoute(
+            path: '/stamps',
+            builder: (context, state) => const StampAlbumScreen(),
           ),
         ],
       ),

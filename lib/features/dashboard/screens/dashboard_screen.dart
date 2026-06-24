@@ -79,7 +79,7 @@ class DashboardScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Cat Selector (horizontal scroll)
-          if (cats.length > 1) ...[
+          if (cats.isNotEmpty) ...[
             SizedBox(
               height: 90,
               child: ListView.builder(
@@ -283,6 +283,54 @@ class DashboardScreen extends ConsumerWidget {
               return '${AppStrings.get('status_clean')}\n${AppStrings.get('checked')} ${DateFormat.jm().format(todayLogs.last.timestamp)}';
             },
           ),
+          const SizedBox(height: 16),
+          
+          // Stamp Album Action
+          GestureDetector(
+            onTap: () => context.push('/stamps'),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+              decoration: BoxDecoration(
+                color: AppColors.playfulAccentPeach.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: AppColors.playfulAccentPeach.withOpacity(0.5), width: 2),
+                boxShadow: [
+                  BoxShadow(color: AppColors.playfulAccentPeach.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4))
+                ],
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: const BoxDecoration(
+                      color: AppColors.playfulAccentPeach,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.photo_album_outlined, color: Colors.white, size: 28),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          AppStrings.get('stamp_album'),
+                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.playfulText),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Anılarını biriktir', // Can be localized later
+                          style: TextStyle(fontSize: 14, color: AppColors.playfulText.withOpacity(0.6)),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Icon(Icons.arrow_forward_ios, color: AppColors.playfulAccentPeach),
+                ],
+              ),
+            ),
+          ),
+          
           const SizedBox(height: 120), // Padding to ensure content is visible above floating nav bar
         ],
       ),

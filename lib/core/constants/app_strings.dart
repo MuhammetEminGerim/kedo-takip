@@ -28,7 +28,7 @@ class AppStrings {
 
   /// Returns the translated string for [key].
   /// Falls back to the key itself if not found.
-  static String get(String key) => current[key] ?? key;
+  static String get(String key, {String? fallback}) => current[key] ?? fallback ?? key;
 
   // ════════════════════════════════════════════════
   //  TURKISH  🇹🇷
@@ -285,6 +285,18 @@ class AppStrings {
     'search': 'Ara',
     'no_results': 'Sonuç bulunamadı',
     'app_name': 'PawLog',
+    
+    // ── Stamp Album ────────────────────────────────
+    'stamp_album': 'Anı Albümü',
+    'add_stamp': 'Pul Ekle',
+    'empty_album': 'Henüz hiç anı eklenmemiş.',
+    'select_photo': 'Fotoğraf Seç',
+    'caption': 'Kısa Not',
+    'caption_hint': 'Örn: İlk banyosu',
+    'save_stamp': 'Kaydet',
+    'delete_stamp': 'Pulu Sil',
+    'delete_stamp_desc': 'Bu anıyı albümden silmek istediğinize emin misiniz?',
+    'add_cat_first': 'Önce bir kedi eklemelisiniz.',
     'night_crying_tips': 'Kediler doğaları gereği alacakaranlıkta aktiftir. Gece ağlaması genellikle normal bir davranıştır.|Gece huzursuzluğunu azaltmak için yatmadan önce 15-20 dakika kedi oltasıyla oynatarak yorun.|Yatmadan hemen önce küçük bir öğün verin. Tok bir karın kedilerin uykulu hissetmesine yardımcı olur.|Tutarlı bir rutin oluşturun. Kediler öngörülebilirliği sever — her gün aynı saatler kaygıyı azaltır.|Ağlamasına ilgi göstererek yanıt vermeyin. Bu, onlara ağlamanın işe yaradığını öğretir. Sessizliği ödüllendirin.',
     'scratching_tips': 'Tırmalama kediler için temel bir ihtiyaçtır. Asla cezalandırmayın, bunun yerine yönlendirin.|Tırmalama tahtalarını halihazırda tırmaladığı alanların yakınına yerleştirin. Kediler uyandıktan hemen sonra tırmalamayı tercih eder.|Farklı malzemeler deneyin: sisal ip, karton, halı. Hem dikey hem yatay seçenekler sunun.|Tahtayı daha çekici hale getirmek için kedi otu (catnip) spreyi kullanın. Patilerini hafifçe sürterek gösterin.|Eğitim sırasında mobilyaları çift taraflı bant veya alüminyum folyo ile geçici olarak koruyun.',
     'biting_tips': 'Ellerinizi veya ayaklarınızı asla oyuncak olarak kullanmayın. Bu, insan vücut parçalarının hedeflenebilir olduğunu öğretir.|Kediniz oyun sırasında ısırdığında hemen donakalın ve sakince "Ah" deyin. Elinizi yavaşça geri çekin.|Isırma enerjisini interaktif oyuncaklara yönlendirin. Zihinsel ve fiziksel uyarım agresif oyunu azaltır.|Aşırı uyarılma belirtilerini izleyin: kuyruk sallama, kulakların düzleşmesi, derinin dalgalanması. Isırmadan önce sevmeyi bırakın.|Kedi sert ısırırsa, ayağa kalkıp uzaklaşın. Etkileşimi 1-2 dakika sonlandırın.',
@@ -545,6 +557,18 @@ class AppStrings {
     'search': 'Search',
     'no_results': 'No results found',
     'app_name': 'PawLog',
+
+    // ── Stamp Album ────────────────────────────────
+    'stamp_album': 'Stamp Album',
+    'add_stamp': 'Add Stamp',
+    'empty_album': 'No stamps added yet.',
+    'select_photo': 'Select Photo',
+    'caption': 'Caption',
+    'caption_hint': 'e.g. First bath',
+    'save_stamp': 'Save',
+    'delete_stamp': 'Delete Stamp',
+    'delete_stamp_desc': 'Are you sure you want to delete this stamp?',
+    'add_cat_first': 'Please add a cat first.',
     'night_crying_tips': 'Cats are naturally crepuscular — most active at dawn and dusk. Night crying is often normal behavior.|Play with your cat for 15-20 minutes before bedtime using a feather wand to tire them out.|Feed a small meal right before bed. A full tummy helps cats feel sleepy.|Keep a consistent routine. Cats thrive on predictability — same times each day reduces anxiety.|Never respond to crying by giving attention. This teaches them crying works. Wait for silence.',
     'scratching_tips': 'Scratching is essential for cats. Never punish scratching, redirect it instead.|Place scratching posts near areas your cat already scratches. Put one near their sleeping spot.|Try different materials: sisal rope, cardboard, carpet. Offer both vertical and horizontal options.|Use catnip spray or silvervine on the scratching post to make it irresistible.|Protect furniture temporarily with double-sided tape or aluminum foil while training.',
     'biting_tips': 'Never use your hands or feet as toys. This teaches cats that human body parts are acceptable targets.|When your cat bites during play, immediately freeze and say "ouch" calmly. Withdraw your hand slowly.|Redirect biting energy toward interactive toys. Mental and physical stimulation reduces aggressive play.|Watch for overstimulation signs: tail twitching, ears flattening. Stop petting before they bite.|If a cat bites hard, stand up and walk away. End all interaction for 1-2 minutes.',
