@@ -17,10 +17,10 @@ class MedicationAdapter extends TypeAdapter<Medication> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Medication(
-      id: fields[0] as String,
-      catId: fields[1] as String,
-      name: fields[2] as String,
-      dosage: fields[3] as String,
+      id: fields[0] == null ? '' : fields[0] as String,
+      catId: fields[1] == null ? '' : fields[1] as String,
+      name: fields[2] == null ? '' : fields[2] as String,
+      dosage: fields[3] == null ? '' : fields[3] as String,
       startDate: fields[4] as DateTime,
       endDate: fields[5] as DateTime?,
       frequency: fields[6] as String?,

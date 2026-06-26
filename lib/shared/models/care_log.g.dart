@@ -17,9 +17,9 @@ class CareLogAdapter extends TypeAdapter<CareLog> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return CareLog(
-      id: fields[0] as String,
-      catId: fields[1] as String,
-      type: fields[2] as String,
+      id: fields[0] == null ? '' : fields[0] as String,
+      catId: fields[1] == null ? '' : fields[1] as String,
+      type: fields[2] == null ? 'food' : fields[2] as String,
       timestamp: fields[3] as DateTime,
       value: fields[4] as String?,
     );

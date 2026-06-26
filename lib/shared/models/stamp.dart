@@ -4,16 +4,16 @@ part 'stamp.g.dart';
 
 @HiveType(typeId: 7)
 class Stamp extends HiveObject {
-  @HiveField(0)
+  @HiveField(0, defaultValue: '')
   final String id;
 
-  @HiveField(1)
+  @HiveField(1, defaultValue: '')
   final String catId;
 
-  @HiveField(2)
+  @HiveField(2, defaultValue: '')
   final String imagePath;
 
-  @HiveField(3)
+  @HiveField(3, defaultValue: '')
   final String caption;
 
   @HiveField(4)

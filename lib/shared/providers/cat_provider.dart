@@ -14,7 +14,24 @@ final selectedCatProvider = NotifierProvider<SelectedCatNotifier, Cat?>(Selected
 class SelectedCatNotifier extends Notifier<Cat?> {
   @override
   Cat? build() {
-    final cats = ref.watch(catListProvider);
+    final cats = ref.read(catListProvider);
+    
+    ref.listen<List<Cat>>(catListProvider, (previous, next) {
+      final currentCat = state;
+      if (currentCat == null) {
+        if (next.isNotEmpty) state = next.first;
+      } else {
+        // Check if the current cat still exists
+        final exists = next.any((c) => c.id == currentCat.id);
+        if (!exists) {
+          state = next.isNotEmpty ? next.first : null;
+        } else {
+          // Update the selected cat with the new data from the list (in case it was updated)
+          state = next.firstWhere((c) => c.id == currentCat.id);
+        }
+      }
+    });
+
     return cats.isNotEmpty ? cats.first : null;
   }
   

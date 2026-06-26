@@ -17,12 +17,12 @@ class CatAdapter extends TypeAdapter<Cat> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Cat(
-      id: fields[0] as String,
-      name: fields[1] as String,
-      breed: fields[2] as String,
+      id: fields[0] == null ? '' : fields[0] as String,
+      name: fields[1] == null ? '' : fields[1] as String,
+      breed: fields[2] == null ? '' : fields[2] as String,
       birthDate: fields[3] as DateTime,
-      isNeutered: fields[4] as bool,
-      gender: fields[5] as String,
+      isNeutered: fields[4] == null ? false : fields[4] as bool,
+      gender: fields[5] == null ? 'Unknown' : fields[5] as String,
       weight: fields[6] as double?,
       photoPath: fields[7] as String?,
     );

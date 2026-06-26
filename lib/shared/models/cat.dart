@@ -4,28 +4,28 @@ part 'cat.g.dart';
 
 @HiveType(typeId: 0)
 class Cat extends HiveObject {
-  @HiveField(0)
+  @HiveField(0, defaultValue: '')
   String id;
 
-  @HiveField(1)
+  @HiveField(1, defaultValue: '')
   String name;
 
-  @HiveField(2)
+  @HiveField(2, defaultValue: '')
   String breed;
 
   @HiveField(3)
   DateTime birthDate;
 
-  @HiveField(4)
+  @HiveField(4, defaultValue: false)
   bool isNeutered;
 
-  @HiveField(5)
+  @HiveField(5, defaultValue: 'Unknown')
   String gender;
 
-  @HiveField(6)
+  @HiveField(6, defaultValue: null)
   double? weight;
 
-  @HiveField(7)
+  @HiveField(7, defaultValue: null)
   String? photoPath;
 
   Cat({

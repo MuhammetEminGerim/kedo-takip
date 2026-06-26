@@ -4,8 +4,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'playful_theme.dart';
 import 'modern_theme.dart';
+import 'dark_theme.dart';
 
-enum AppThemeType { playful, modern }
+enum AppThemeType { playful, modern, dark }
 
 final themeProvider = NotifierProvider<ThemeNotifier, AppThemeType>(ThemeNotifier.new);
 
@@ -20,26 +21,25 @@ class ThemeNotifier extends Notifier<AppThemeType> {
 
   Future<void> _loadTheme() async {
     final prefs = await SharedPreferences.getInstance();
-    final isModern = prefs.getBool(_themeKey) ?? false;
-    if (isModern) {
-      state = AppThemeType.modern;
-    }
+    final themeIndex = prefs.getInt(_themeKey) ?? 0;
+    state = AppThemeType.values[themeIndex];
   }
 
-  Future<void> toggleTheme() async {
+  Future<void> setTheme(AppThemeType theme) async {
     final prefs = await SharedPreferences.getInstance();
-    if (state == AppThemeType.playful) {
-      state = AppThemeType.modern;
-      await prefs.setBool(_themeKey, true);
-    } else {
-      state = AppThemeType.playful;
-      await prefs.setBool(_themeKey, false);
-    }
+    state = theme;
+    await prefs.setInt(_themeKey, theme.index);
   }
 
   ThemeData get currentThemeData {
-    return state == AppThemeType.playful
-        ? PlayfulTheme.theme
-        : ModernTheme.theme;
+    switch (state) {
+      case AppThemeType.modern:
+        return ModernTheme.theme;
+      case AppThemeType.dark:
+        return DarkTheme.theme;
+      case AppThemeType.playful:
+      default:
+        return PlayfulTheme.theme;
+    }
   }
 }

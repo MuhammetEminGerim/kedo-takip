@@ -254,13 +254,11 @@ class DashboardScreen extends ConsumerWidget {
           Text(AppStrings.get('today_summary'), style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900, fontSize: 22, color: AppColors.playfulText)),
           const SizedBox(height: 16),
           
-          _buildKawaiiSummaryCard(
-            context,
-            ref,
+          KawaiiSummaryCard(
             color: AppColors.playfulSecondary.withOpacity(0.5),
             icon: AppIcons.bowl(),
             title: AppStrings.get('meals_label'),
-            valueBuilder: () {
+            valueBuilder: (ref) {
               final logs = ref.watch(careLogListProvider);
               final today = DateTime.now();
               final todayLogs = logs.where((m) => m.type == 'food' && m.timestamp.day == today.day).toList();
@@ -269,13 +267,11 @@ class DashboardScreen extends ConsumerWidget {
             },
           ),
           const SizedBox(height: 16),
-          _buildKawaiiSummaryCard(
-            context,
-            ref,
+          KawaiiSummaryCard(
             color: AppColors.playfulTertiary.withOpacity(0.5),
             icon: AppIcons.litter(),
             title: AppStrings.get('litter_label'),
-            valueBuilder: () {
+            valueBuilder: (ref) {
               final logs = ref.watch(careLogListProvider);
               final today = DateTime.now();
               final todayLogs = logs.where((m) => m.type == 'litter' && m.timestamp.day == today.day).toList();
@@ -337,10 +333,61 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildKawaiiSummaryCard(BuildContext context, WidgetRef ref, {required Color color, required Widget icon, required String title, required String Function() valueBuilder}) {
-    final text = valueBuilder();
+
+
+  ImageProvider _getCatImage(WidgetRef ref) {
+    final cat = ref.read(selectedCatProvider);
+    if (cat != null && cat.photoPath != null && cat.photoPath!.isNotEmpty) {
+      return FileImage(File(cat.photoPath!));
+    }
+    return const AssetImage('assets/images/cat_avatar.png');
+  }
+
+  String _calculateAge(DateTime birthDate) {
+    final now = DateTime.now();
+    int years = now.year - birthDate.year;
+    int months = now.month - birthDate.month;
+    if (months < 0) {
+      years--;
+      months += 12;
+    }
+    if (now.day < birthDate.day) {
+      months--;
+      if (months < 0) {
+        years--;
+        months += 12;
+      }
+    }
+    if (years > 0 && months > 0) return '$years ${AppStrings.get('yrs')} $months ${AppStrings.get('mo')}';
+    if (years > 0) return '$years ${AppStrings.get('years_old')}';
+    if (months > 0) return '$months ${AppStrings.get('months_old')}';
+    return AppStrings.get('newborn');
+  }
+
+  void _addCareLog(WidgetRef ref, String type, String value) {
+    ref.read(careLogListProvider.notifier).addLog(type: type, value: value);
+  }
+}
+
+class KawaiiSummaryCard extends ConsumerWidget {
+  final Color color;
+  final Widget icon;
+  final String title;
+  final String Function(WidgetRef ref) valueBuilder;
+
+  const KawaiiSummaryCard({
+    super.key,
+    required this.color,
+    required this.icon,
+    required this.title,
+    required this.valueBuilder,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final text = valueBuilder(ref);
     final parts = text.split('\n');
-    
+
     return Stack(
       clipBehavior: Clip.none,
       children: [
@@ -393,37 +440,12 @@ class DashboardScreen extends ConsumerWidget {
       ],
     );
   }
-
+  
   ImageProvider _getCatImage(WidgetRef ref) {
     final cat = ref.read(selectedCatProvider);
     if (cat != null && cat.photoPath != null && cat.photoPath!.isNotEmpty) {
       return FileImage(File(cat.photoPath!));
     }
     return const AssetImage('assets/images/cat_avatar.png');
-  }
-
-  String _calculateAge(DateTime birthDate) {
-    final now = DateTime.now();
-    int years = now.year - birthDate.year;
-    int months = now.month - birthDate.month;
-    if (months < 0) {
-      years--;
-      months += 12;
-    }
-    if (now.day < birthDate.day) {
-      months--;
-      if (months < 0) {
-        years--;
-        months += 12;
-      }
-    }
-    if (years > 0 && months > 0) return '$years ${AppStrings.get('yrs')} $months ${AppStrings.get('mo')}';
-    if (years > 0) return '$years ${AppStrings.get('years_old')}';
-    if (months > 0) return '$months ${AppStrings.get('months_old')}';
-    return AppStrings.get('newborn');
-  }
-
-  void _addCareLog(WidgetRef ref, String type, String value) {
-    ref.read(careLogListProvider.notifier).addLog(type: type, value: value);
   }
 }

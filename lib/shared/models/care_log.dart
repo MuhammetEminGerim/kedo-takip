@@ -4,19 +4,19 @@ part 'care_log.g.dart';
 
 @HiveType(typeId: 2)
 class CareLog extends HiveObject {
-  @HiveField(0)
+  @HiveField(0, defaultValue: '')
   String id;
 
-  @HiveField(1)
+  @HiveField(1, defaultValue: '')
   String catId;
 
-  @HiveField(2)
+  @HiveField(2, defaultValue: 'food')
   String type; // 'food', 'water', 'litter', 'mood', 'weight'
 
   @HiveField(3)
   DateTime timestamp;
 
-  @HiveField(4)
+  @HiveField(4, defaultValue: null)
   String? value; // 'Happy', '4.2', 'Refilled' vs.
 
   CareLog({

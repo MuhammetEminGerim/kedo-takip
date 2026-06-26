@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_strings.dart';
+import '../../../core/providers/locale_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../shared/widgets/pastel_card.dart';
@@ -18,8 +19,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final themeMode = ref.watch(themeProvider);
-    final isPlayful = themeMode == 'playful';
-    final isTurkish = AppStrings.locale == 'tr';
+    final isTurkish = ref.watch(localeProvider) == 'tr';
 
     return Scaffold(
       backgroundColor: AppColors.playfulBackground,
@@ -71,52 +71,28 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   const SizedBox(height: 16),
                   Row(
                     children: [
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () {
-                            if (!isPlayful) ref.read(themeProvider.notifier).toggleTheme();
-                          },
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            decoration: BoxDecoration(
-                              color: isPlayful ? AppColors.playfulPrimary : AppColors.playfulSurface,
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: isPlayful ? AppColors.playfulPrimary : AppColors.playfulText.withOpacity(0.1), width: 2),
-                            ),
-                            child: Column(
-                              children: [
-                                const Text('🐱', style: TextStyle(fontSize: 24)),
-                                const SizedBox(height: 4),
-                                Text(AppStrings.get('playful'), style: TextStyle(fontWeight: FontWeight.w900, fontSize: 13, color: isPlayful ? Colors.white : AppColors.playfulText)),
-                              ],
-                            ),
-                          ),
-                        ),
+                      _buildThemeOption(
+                        context,
+                        title: AppStrings.get('playful'),
+                        icon: '🐱',
+                        isSelected: themeMode == AppThemeType.playful,
+                        onTap: () => ref.read(themeProvider.notifier).setTheme(AppThemeType.playful),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () {
-                            if (isPlayful) ref.read(themeProvider.notifier).toggleTheme();
-                          },
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            decoration: BoxDecoration(
-                              color: !isPlayful ? AppColors.playfulPrimary : AppColors.playfulSurface,
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: !isPlayful ? AppColors.playfulPrimary : AppColors.playfulText.withOpacity(0.1), width: 2),
-                            ),
-                            child: Column(
-                              children: [
-                                const Text('✨', style: TextStyle(fontSize: 24)),
-                                const SizedBox(height: 4),
-                                Text(AppStrings.get('modern'), style: TextStyle(fontWeight: FontWeight.w900, fontSize: 13, color: !isPlayful ? Colors.white : AppColors.playfulText)),
-                              ],
-                            ),
-                          ),
-                        ),
+                      const SizedBox(width: 8),
+                      _buildThemeOption(
+                        context,
+                        title: AppStrings.get('modern'),
+                        icon: '✨',
+                        isSelected: themeMode == AppThemeType.modern,
+                        onTap: () => ref.read(themeProvider.notifier).setTheme(AppThemeType.modern),
+                      ),
+                      const SizedBox(width: 8),
+                      _buildThemeOption(
+                        context,
+                        title: AppStrings.get('dark_mode'),
+                        icon: '🌙',
+                        isSelected: themeMode == AppThemeType.dark,
+                        onTap: () => ref.read(themeProvider.notifier).setTheme(AppThemeType.dark),
                       ),
                     ],
                   ),
@@ -126,7 +102,42 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
             const SizedBox(height: 24),
 
-            // Language
+            // Notifications / Reminders
+            Text(AppStrings.get('notifications'), style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: AppColors.playfulText)),
+            const SizedBox(height: 12),
+            GestureDetector(
+              onTap: () => context.push('/reminders'),
+              child: PastelCard(
+                backgroundColor: Colors.white,
+                padding: const EdgeInsets.all(20),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: AppColors.playfulPrimary.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Text('🔔', style: TextStyle(fontSize: 20)),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(AppStrings.get('reminders'), style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: AppColors.playfulText)),
+                          const SizedBox(height: 2),
+                          Text(AppStrings.get('no_reminders_desc'), style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12, color: AppColors.playfulText.withValues(alpha: 0.6))),
+                        ],
+                      ),
+                    ),
+                    const Icon(Icons.arrow_forward_ios_rounded, color: AppColors.playfulTextLight, size: 18),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 24),
             Text(AppStrings.get('language'), style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: AppColors.playfulText)),
             const SizedBox(height: 12),
             PastelCard(
@@ -156,9 +167,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       Expanded(
                         child: GestureDetector(
                           onTap: () {
-                            setState(() {
-                              AppStrings.setLocale('tr');
-                            });
+                            ref.read(localeProvider.notifier).setLocale('tr');
                           },
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 200),
@@ -182,9 +191,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       Expanded(
                         child: GestureDetector(
                           onTap: () {
-                            setState(() {
-                              AppStrings.setLocale('en');
-                            });
+                            ref.read(localeProvider.notifier).setLocale('en');
                           },
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 200),
@@ -248,6 +255,39 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
             const SizedBox(height: 100),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildThemeOption(
+    BuildContext context, {
+    required String title,
+    required String icon,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          decoration: BoxDecoration(
+            color: isSelected ? AppColors.playfulPrimary : AppColors.playfulSurface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: isSelected ? AppColors.playfulPrimary : AppColors.playfulText.withOpacity(0.1), width: 2),
+          ),
+          child: Column(
+            children: [
+              Text(icon, style: const TextStyle(fontSize: 24)),
+              const SizedBox(height: 4),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(title, style: TextStyle(fontWeight: FontWeight.w900, fontSize: 13, color: isSelected ? Colors.white : AppColors.playfulText)),
+              ),
+            ],
+          ),
         ),
       ),
     );

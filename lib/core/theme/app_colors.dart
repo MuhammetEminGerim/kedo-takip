@@ -19,4 +19,15 @@ class AppColors {
   static const Color modernSecondary = Color(0xFF00B4D8); // Teal
   static const Color modernText = Color(0xFF1E293B); // Slate
   static const Color modernTextLight = Color(0xFF64748B);
+
+  // Dark Theme Colors (Kawaii Dark)
+  static const Color darkBackground = Color(0xFF1E1E2C); // Dark purple/navy
+  static const Color darkSurface = Color(0xFF2D2D44);
+  static const Color darkPrimary = Color(0xFFFF9E80); // Softer neon peach
+  static const Color darkSecondary = Color(0xFF80DEEA); // Neon mint
+  static const Color darkTertiary = Color(0xFFB39DDB); // Soft lavender
+  static const Color darkText = Color(0xFFE0E0E0); // Off-white
+  static const Color darkTextLight = Color(0xFFAAAAB4);
+  static const Color darkAccentPeach = Color(0xFFFFCCBC);
+  static const Color darkAccentBlue = Color(0xFF90CAF9);
 }

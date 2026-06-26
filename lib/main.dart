@@ -1,20 +1,26 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
+import 'core/providers/locale_provider.dart';
 import 'shared/models/cat.dart';
 import 'shared/models/care_log.dart';
 import 'shared/models/vaccine.dart';
 import 'shared/models/appointment.dart';
 import 'shared/models/medication.dart';
 import 'shared/models/stamp.dart';
+import 'shared/models/reminder.dart';
 import 'shared/providers/cat_provider.dart';
 import 'features/stamps/providers/stamp_provider.dart';
 import 'features/care_tracking/providers/care_log_provider.dart';
 import 'features/health/providers/health_provider.dart';
+import 'features/settings/providers/reminder_provider.dart';
 import 'features/onboarding/screens/onboarding_screen.dart';
+import 'core/services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,13 +32,37 @@ void main() async {
   Hive.registerAdapter(AppointmentAdapter());
   Hive.registerAdapter(MedicationAdapter());
   Hive.registerAdapter(StampAdapter());
+  Hive.registerAdapter(ReminderAdapter());
 
-  final catBox = await Hive.openBox<Cat>('cats');
-  final careLogBox = await Hive.openBox<CareLog>('care_logs');
-  final vaccineBox = await Hive.openBox<Vaccine>('vaccines');
-  final appointmentBox = await Hive.openBox<Appointment>('appointments');
-  final medicationBox = await Hive.openBox<Medication>('medications');
-  final stampBox = await Hive.openBox<Stamp>('stamps');
+  // Setup Secure Storage for Hive Encryption
+  const secureStorage = FlutterSecureStorage();
+  var containsEncryptionKey = await secureStorage.containsKey(key: 'pawlog_hive_key');
+  if (!containsEncryptionKey) {
+    var key = Hive.generateSecureKey();
+    await secureStorage.write(key: 'pawlog_hive_key', value: base64UrlEncode(key));
+  }
+  var encryptionKey = base64Url.decode((await secureStorage.read(key: 'pawlog_hive_key'))!);
+
+  Future<Box<T>> openSecureBox<T>(String name) async {
+    try {
+      return await Hive.openBox<T>(name, encryptionCipher: HiveAesCipher(encryptionKey));
+    } catch (e) {
+      // If box fails to open (e.g. was unencrypted before), delete and recreate
+      await Hive.deleteBoxFromDisk(name);
+      return await Hive.openBox<T>(name, encryptionCipher: HiveAesCipher(encryptionKey));
+    }
+  }
+
+  final catBox = await openSecureBox<Cat>('cats');
+  final careLogBox = await openSecureBox<CareLog>('care_logs');
+  final vaccineBox = await openSecureBox<Vaccine>('vaccines');
+  final appointmentBox = await openSecureBox<Appointment>('appointments');
+  final medicationBox = await openSecureBox<Medication>('medications');
+  final stampBox = await openSecureBox<Stamp>('stamps');
+  final reminderBox = await openSecureBox<Reminder>('reminders');
+
+  // Initialize notification service
+  await NotificationService.instance.init();
 
   // Check if onboarding is complete
   final prefs = await SharedPreferences.getInstance();
@@ -47,6 +77,7 @@ void main() async {
         appointmentBoxProvider.overrideWithValue(appointmentBox),
         medicationBoxProvider.overrideWithValue(medicationBox),
         stampBoxProvider.overrideWithValue(stampBox),
+        reminderBoxProvider.overrideWithValue(reminderBox),
       ],
       child: PawLogApp(showOnboarding: !onboardingComplete),
     ),
@@ -74,7 +105,10 @@ class _PawLogAppState extends ConsumerState<PawLogApp> {
   @override
   Widget build(BuildContext context) {
     final router = ref.watch(routerProvider);
-    final themeNotifier = ref.watch(themeProvider.notifier);
+    // Watch theme and locale state to trigger rebuild on changes
+    ref.watch(themeProvider);
+    ref.watch(localeProvider);
+    final themeNotifier = ref.read(themeProvider.notifier);
 
     if (_showOnboarding) {
       return MaterialApp(

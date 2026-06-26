@@ -17,9 +17,9 @@ class VaccineAdapter extends TypeAdapter<Vaccine> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Vaccine(
-      id: fields[0] as String,
-      catId: fields[1] as String,
-      name: fields[2] as String,
+      id: fields[0] == null ? '' : fields[0] as String,
+      catId: fields[1] == null ? '' : fields[1] as String,
+      name: fields[2] == null ? '' : fields[2] as String,
       dateAdministered: fields[3] as DateTime,
       nextDueDate: fields[4] as DateTime?,
       notes: fields[5] as String?,

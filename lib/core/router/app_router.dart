@@ -11,6 +11,7 @@ import '../../features/training/screens/training_screen.dart';
 import '../../features/stamps/screens/stamp_album_screen.dart';
 import '../../features/cat_profile/screens/cat_form_screen.dart';
 import '../../features/settings/screens/settings_screen.dart';
+import '../../features/settings/screens/reminders_screen.dart';
 import '../constants/app_strings.dart';
 import '../theme/app_icons.dart';
 import '../../shared/models/cat.dart';
@@ -44,6 +45,24 @@ final routerProvider = Provider<GoRouter>((ref) {
           return CustomTransitionPage(
             key: state.pageKey,
             child: const SettingsScreen(),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(
+                opacity: CurveTween(curve: Curves.easeInOut).animate(animation),
+                child: SlideTransition(
+                  position: Tween<Offset>(begin: const Offset(0, 0.05), end: Offset.zero).animate(CurveTween(curve: Curves.easeOut).animate(animation)),
+                  child: child,
+                ),
+              );
+            },
+          );
+        },
+      ),
+      GoRoute(
+        path: '/reminders',
+        pageBuilder: (context, state) {
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: const RemindersScreen(),
             transitionsBuilder: (context, animation, secondaryAnimation, child) {
               return FadeTransition(
                 opacity: CurveTween(curve: Curves.easeInOut).animate(animation),

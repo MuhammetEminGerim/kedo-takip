@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -104,17 +105,28 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
 
     if (source == null) return;
 
-    final picked = await picker.pickImage(source: source, maxWidth: 512, maxHeight: 512, imageQuality: 80);
+    final picked = await picker.pickImage(source: source);
     if (picked == null) return;
 
-    // Copy to app directory for persistence
+    // Copy to app directory for persistence and compress to webp
     final appDir = await getApplicationDocumentsDirectory();
-    final fileName = 'cat_photo_${DateTime.now().millisecondsSinceEpoch}.jpg';
-    final savedFile = await File(picked.path).copy('${appDir.path}/$fileName');
+    final fileName = 'cat_photo_${DateTime.now().millisecondsSinceEpoch}.webp';
+    final targetPath = '${appDir.path}/$fileName';
 
-    setState(() {
-      _photoPath = savedFile.path;
-    });
+    final compressedFile = await FlutterImageCompress.compressAndGetFile(
+      picked.path,
+      targetPath,
+      format: CompressFormat.webp,
+      quality: 80,
+      minWidth: 512,
+      minHeight: 512,
+    );
+
+    if (compressedFile != null) {
+      setState(() {
+        _photoPath = compressedFile.path;
+      });
+    }
   }
 
   Widget _buildPhotoOption({required IconData icon, required String label, required Color color, required VoidCallback onTap}) {

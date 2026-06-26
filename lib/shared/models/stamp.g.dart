@@ -17,10 +17,10 @@ class StampAdapter extends TypeAdapter<Stamp> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Stamp(
-      id: fields[0] as String,
-      catId: fields[1] as String,
-      imagePath: fields[2] as String,
-      caption: fields[3] as String,
+      id: fields[0] == null ? '' : fields[0] as String,
+      catId: fields[1] == null ? '' : fields[1] as String,
+      imagePath: fields[2] == null ? '' : fields[2] as String,
+      caption: fields[3] == null ? '' : fields[3] as String,
       date: fields[4] as DateTime,
     );
   }

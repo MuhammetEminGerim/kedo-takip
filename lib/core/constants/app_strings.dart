@@ -285,7 +285,8 @@ class AppStrings {
     'search': 'Ara',
     'no_results': 'Sonuç bulunamadı',
     'app_name': 'PawLog',
-    
+
+
     // ── Stamp Album ────────────────────────────────
     'stamp_album': 'Anı Albümü',
     'add_stamp': 'Pul Ekle',
@@ -299,7 +300,30 @@ class AppStrings {
     'add_cat_first': 'Önce bir kedi eklemelisiniz.',
     'night_crying_tips': 'Kediler doğaları gereği alacakaranlıkta aktiftir. Gece ağlaması genellikle normal bir davranıştır.|Gece huzursuzluğunu azaltmak için yatmadan önce 15-20 dakika kedi oltasıyla oynatarak yorun.|Yatmadan hemen önce küçük bir öğün verin. Tok bir karın kedilerin uykulu hissetmesine yardımcı olur.|Tutarlı bir rutin oluşturun. Kediler öngörülebilirliği sever — her gün aynı saatler kaygıyı azaltır.|Ağlamasına ilgi göstererek yanıt vermeyin. Bu, onlara ağlamanın işe yaradığını öğretir. Sessizliği ödüllendirin.',
     'scratching_tips': 'Tırmalama kediler için temel bir ihtiyaçtır. Asla cezalandırmayın, bunun yerine yönlendirin.|Tırmalama tahtalarını halihazırda tırmaladığı alanların yakınına yerleştirin. Kediler uyandıktan hemen sonra tırmalamayı tercih eder.|Farklı malzemeler deneyin: sisal ip, karton, halı. Hem dikey hem yatay seçenekler sunun.|Tahtayı daha çekici hale getirmek için kedi otu (catnip) spreyi kullanın. Patilerini hafifçe sürterek gösterin.|Eğitim sırasında mobilyaları çift taraflı bant veya alüminyum folyo ile geçici olarak koruyun.',
-    'biting_tips': 'Ellerinizi veya ayaklarınızı asla oyuncak olarak kullanmayın. Bu, insan vücut parçalarının hedeflenebilir olduğunu öğretir.|Kediniz oyun sırasında ısırdığında hemen donakalın ve sakince "Ah" deyin. Elinizi yavaşça geri çekin.|Isırma enerjisini interaktif oyuncaklara yönlendirin. Zihinsel ve fiziksel uyarım agresif oyunu azaltır.|Aşırı uyarılma belirtilerini izleyin: kuyruk sallama, kulakların düzleşmesi, derinin dalgalanması. Isırmadan önce sevmeyi bırakın.|Kedi sert ısırırsa, ayağa kalkıp uzaklaşın. Etkileşimi 1-2 dakika sonlandırın.',
+    'biting_tips': 'Ellerinizi veya ayaklarınızı asla oyuncak olarak kullanmayın. Bu, insan vücutparçalarının hedeflenebilir olduğunu öğretir.|Kediniz oyun sırasında ısırdığında hemen donakaın ve sakince "Ah" deyin. Elinizi yavaşça geri çekin.|Isırma enerjisini interaktif oyuncaklara yönlendirin. Zihinsel ve fiziksel uyarım agresif oyunu azaltır.|Aşırı uyarılma belirtilerini izleyin: kuyruk sallama, kulakların düzleşmesi, derinin dalgalanması. Isırmadan önce sevmeyi bırakın.|Kedi sert ısırırsa, ayağa kalkıp uzaklaşın. Etkileşimi 1-2 dakika sonlandırın.',
+
+    // ── Notifications / Reminders ─────────────────
+    'reminders': 'Hatırlatıcılar',
+    'meal_reminder': 'Mama Hatırlatıcısı',
+    'meal_reminder_desc': 'Günlük mama zamanlarını hatırlat',
+    'medication_reminder': 'İlaç Hatırlatıcısı',
+    'medication_reminder_desc': 'İlaç saatlerini hatırlat',
+    'appointment_reminder': 'Randevu Hatırlatıcısı',
+    'appointment_reminder_desc': 'Randevuları önceden hatırlat',
+    'add_reminder': 'Hatırlatıcı Ekle',
+    'edit_reminder': 'Hatırlatıcıyı Düzenle',
+    'delete_reminder': 'Hatırlatıcıyı Sil',
+    'reminder_time': 'Hatırlatıcı Saati',
+    'select_time': 'Saat Seç',
+    'reminder_added': 'Hatırlatıcı eklendi! 🔔',
+    'reminder_deleted': 'Hatırlatıcı silindi',
+    'no_reminders': 'Henüz hatırlatıcı yok',
+    'no_reminders_desc': 'Mama, ilaç veya randevu hatırlatıcısı ekleyin',
+    'test_notification': 'Test Bildirimi Gönder',
+    'select_cat_for_reminder': 'Önce bir kedi seçin',
+    'reminder_type': 'Hatırlatıcı Türü',
+    'reminder_title': 'Hatırlatıcı Başlığı',
+    'reminder_title_hint': 'Örn: Sabah maması',
   };
 
   // ════════════════════════════════════════════════
@@ -572,5 +596,28 @@ class AppStrings {
     'night_crying_tips': 'Cats are naturally crepuscular — most active at dawn and dusk. Night crying is often normal behavior.|Play with your cat for 15-20 minutes before bedtime using a feather wand to tire them out.|Feed a small meal right before bed. A full tummy helps cats feel sleepy.|Keep a consistent routine. Cats thrive on predictability — same times each day reduces anxiety.|Never respond to crying by giving attention. This teaches them crying works. Wait for silence.',
     'scratching_tips': 'Scratching is essential for cats. Never punish scratching, redirect it instead.|Place scratching posts near areas your cat already scratches. Put one near their sleeping spot.|Try different materials: sisal rope, cardboard, carpet. Offer both vertical and horizontal options.|Use catnip spray or silvervine on the scratching post to make it irresistible.|Protect furniture temporarily with double-sided tape or aluminum foil while training.',
     'biting_tips': 'Never use your hands or feet as toys. This teaches cats that human body parts are acceptable targets.|When your cat bites during play, immediately freeze and say "ouch" calmly. Withdraw your hand slowly.|Redirect biting energy toward interactive toys. Mental and physical stimulation reduces aggressive play.|Watch for overstimulation signs: tail twitching, ears flattening. Stop petting before they bite.|If a cat bites hard, stand up and walk away. End all interaction for 1-2 minutes.',
+
+    // ── Notifications / Reminders ─────────────────
+    'reminders': 'Reminders',
+    'meal_reminder': 'Meal Reminder',
+    'meal_reminder_desc': 'Remind daily meal times',
+    'medication_reminder': 'Medication Reminder',
+    'medication_reminder_desc': 'Remind medication times',
+    'appointment_reminder': 'Appointment Reminder',
+    'appointment_reminder_desc': 'Remind before appointments',
+    'add_reminder': 'Add Reminder',
+    'edit_reminder': 'Edit Reminder',
+    'delete_reminder': 'Delete Reminder',
+    'reminder_time': 'Reminder Time',
+    'select_time': 'Select Time',
+    'reminder_added': 'Reminder added! 🔔',
+    'reminder_deleted': 'Reminder deleted',
+    'no_reminders': 'No reminders yet',
+    'no_reminders_desc': 'Add meal, medication or appointment reminders',
+    'test_notification': 'Send Test Notification',
+    'select_cat_for_reminder': 'Select a cat first',
+    'reminder_type': 'Reminder Type',
+    'reminder_title': 'Reminder Title',
+    'reminder_title_hint': 'e.g. Morning meal',
   };
 }

@@ -1,11 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../shared/models/vaccine.dart';
 import '../../../shared/models/appointment.dart';
 import '../../../shared/models/medication.dart';
-import '../../../shared/providers/cat_provider.dart';
 
 // --- Boxes ---
 final vaccineBoxProvider = Provider<Box<Vaccine>>((ref) => throw UnimplementedError());

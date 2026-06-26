@@ -4,22 +4,22 @@ part 'appointment.g.dart';
 
 @HiveType(typeId: 5)
 class Appointment extends HiveObject {
-  @HiveField(0)
+  @HiveField(0, defaultValue: '')
   String id;
 
-  @HiveField(1)
+  @HiveField(1, defaultValue: '')
   String catId;
 
-  @HiveField(2)
+  @HiveField(2, defaultValue: '')
   String title;
 
   @HiveField(3)
   DateTime date;
 
-  @HiveField(4)
+  @HiveField(4, defaultValue: null)
   String? clinicName;
 
-  @HiveField(5)
+  @HiveField(5, defaultValue: null)
   String? notes;
 
   Appointment({

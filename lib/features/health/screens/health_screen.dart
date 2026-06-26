@@ -3,14 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_icons.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../shared/providers/cat_provider.dart';
 import '../../../shared/widgets/pastel_card.dart';
 import '../providers/health_provider.dart';
-import '../../../shared/models/vaccine.dart';
-import '../../../shared/models/appointment.dart';
-import '../../../shared/models/medication.dart';
 import '../widgets/add_health_record_dialogs.dart';
 
 class HealthScreen extends ConsumerStatefulWidget {
@@ -64,21 +60,22 @@ class _HealthScreenState extends ConsumerState<HealthScreen> with SingleTickerPr
         bottom: TabBar(
           controller: _tabController,
           labelColor: AppColors.playfulPrimary,
-          unselectedLabelColor: AppColors.playfulText.withOpacity(0.5),
+          unselectedLabelColor: AppColors.playfulText.withValues(alpha: 0.5),
           indicatorColor: AppColors.playfulPrimary,
           indicatorWeight: 4,
-          labelStyle: const TextStyle(fontWeight: FontWeight.w800, fontFamily: 'Nunito', fontSize: 16),
+          labelStyle: const TextStyle(fontWeight: FontWeight.w800, fontFamily: 'Nunito', fontSize: 14),
+          labelPadding: const EdgeInsets.symmetric(horizontal: 4),
           tabs: [
-            Tab(text: AppStrings.get('tab_vaccines')),
-            Tab(text: AppStrings.get('tab_appointments')),
-            Tab(text: AppStrings.get('tab_medications')),
+            Tab(child: FittedBox(fit: BoxFit.scaleDown, child: Text(AppStrings.get('tab_vaccines')))),
+            Tab(child: FittedBox(fit: BoxFit.scaleDown, child: Text(AppStrings.get('tab_appointments')))),
+            Tab(child: FittedBox(fit: BoxFit.scaleDown, child: Text(AppStrings.get('tab_medications')))),
           ],
         ),
       ),
       body: TabBarView(
         controller: _tabController,
         children: [
-          _VaccinesTab(catId: selectedCat!.id),
+          _VaccinesTab(catId: selectedCat.id),
           _AppointmentsTab(catId: selectedCat.id),
           _MedicationsTab(catId: selectedCat.id),
         ],
@@ -88,7 +85,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> with SingleTickerPr
         child: FloatingActionButton(
           onPressed: () {
             if (_tabController.index == 0) {
-              _showAddVaccineDialog(context, ref, selectedCat!.id);
+              _showAddVaccineDialog(context, ref, selectedCat.id);
             } else if (_tabController.index == 1) {
               _showAddAppointmentDialog(context, ref, selectedCat.id);
             } else {
