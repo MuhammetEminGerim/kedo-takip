@@ -7,6 +7,7 @@ import '../../care_tracking/providers/care_log_provider.dart';
 import '../../../shared/providers/cat_provider.dart';
 import '../../../shared/widgets/pastel_card.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../core/theme/app_theme.dart';
 
 class AnalyticsScreen extends ConsumerStatefulWidget {
   const AnalyticsScreen({super.key});
@@ -35,6 +36,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
     final careLogs = ref.watch(careLogListProvider);
     final selectedCat = ref.watch(selectedCatProvider);
     final catName = selectedCat?.name ?? AppStrings.get('your_cat');
+    final isModern = ref.watch(themeProvider) == AppThemeType.modern;
 
     // Calculate time range
     final now = DateTime.now();
@@ -66,14 +68,23 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
       appBar: AppBar(
         title: Row(
           mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: isModern ? MainAxisAlignment.start : MainAxisAlignment.center,
           children: [
-            Text('${AppStrings.get('insights')} ', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900, color: Theme.of(context).colorScheme.onSurface)),
-            Icon(Icons.bar_chart_outlined, color: Theme.of(context).colorScheme.onSurface, size: 28),
+            Text(
+              isModern ? AppStrings.get('insights').toUpperCase() : '${AppStrings.get('insights')} ', 
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                fontWeight: isModern ? FontWeight.w900 : FontWeight.w900, 
+                color: Theme.of(context).colorScheme.onSurface,
+                fontSize: isModern ? 20 : 26,
+                letterSpacing: isModern ? 1.5 : 0,
+              )
+            ),
+            if (!isModern) Icon(Icons.bar_chart_outlined, color: Theme.of(context).colorScheme.onSurface, size: 28),
           ],
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        centerTitle: true,
+        centerTitle: !isModern,
       ),
       extendBodyBehindAppBar: true,
       body: SafeArea(
@@ -85,9 +96,10 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
               // Tabs
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: isModern ? Colors.transparent : Colors.white,
                   borderRadius: BorderRadius.circular(30),
-                  boxShadow: [
+                  border: isModern ? Border.all(color: const Color(0xFFE2E8F0), width: 1.5) : null,
+                  boxShadow: isModern ? [] : [
                     BoxShadow(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4))
                   ]
                 ),
@@ -102,7 +114,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                           duration: const Duration(milliseconds: 200),
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           decoration: BoxDecoration(
-                            color: isSelected ? Theme.of(context).colorScheme.primary : Colors.transparent,
+                            color: isSelected ? (isModern ? const Color(0xFF1E293B) : Theme.of(context).colorScheme.primary) : Colors.transparent,
                             borderRadius: BorderRadius.circular(26),
                           ),
                           child: Center(
@@ -110,7 +122,9 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                               _localizedTab(tab),
                               style: TextStyle(
                                 fontWeight: FontWeight.w900,
-                                color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                                color: isSelected 
+                                    ? Colors.white 
+                                    : (isModern ? const Color(0xFF64748B) : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)),
                               ),
                             ),
                           ),
@@ -125,13 +139,16 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
 
               // Insight Card
               PastelCard(
-                backgroundColor: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.5),
+                backgroundColor: isModern ? Colors.white : Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.5),
                 child: Row(
                   children: [
                     Container(
                       padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.5), shape: BoxShape.circle),
-                      child: Icon(Icons.lightbulb_outline_rounded, color: Theme.of(context).colorScheme.onSurface, size: 28),
+                      decoration: BoxDecoration(
+                        color: isModern ? const Color(0xFFF1F5F9) : Colors.white.withValues(alpha: 0.5), 
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(Icons.lightbulb_outline_rounded, color: isModern ? const Color(0xFF1E293B) : Theme.of(context).colorScheme.onSurface, size: 28),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
@@ -140,7 +157,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                         children: [
                           Text(insight['title']!, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 14)),
                           const SizedBox(height: 4),
-                          Text(insight['subtitle']!, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8), fontSize: 12, fontWeight: FontWeight.bold)),
+                          Text(insight['subtitle']!, style: TextStyle(color: isModern ? const Color(0xFF64748B) : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8), fontSize: 12, fontWeight: FontWeight.bold)),
                         ],
                       ),
                     ),
@@ -152,18 +169,21 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
 
               Text(AppStrings.get('feeding_pattern'), style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
               const SizedBox(height: 16),
-              _buildFeedingTimeline(todayFoodLogs),
+              _buildFeedingTimeline(todayFoodLogs, isModern),
 
               const SizedBox(height: 32),
 
               Text(AppStrings.get('stats'), style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
               const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(child: _buildStatBox('$totalMeals', AppStrings.get('meals'), Icons.restaurant_outlined)),
-                  const SizedBox(width: 12),
-                  Expanded(child: _buildStatBox('$totalLitter', AppStrings.get('litter'), Icons.cleaning_services_outlined)),
-                ],
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(child: _buildStatBox('$totalMeals', AppStrings.get('meals'), Icons.restaurant_outlined, isModern)),
+                    const SizedBox(width: 12),
+                    Expanded(child: _buildStatBox('$totalLitter', AppStrings.get('litter'), Icons.cleaning_services_outlined, isModern)),
+                  ],
+                ),
               ),
               const SizedBox(height: 12),
               Row(
@@ -223,9 +243,10 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
     };
   }
 
-  Widget _buildFeedingTimeline(List todayFoodLogs) {
+  Widget _buildFeedingTimeline(List todayFoodLogs, bool isModern) {
     if (todayFoodLogs.isEmpty) {
       return PastelCard(
+        backgroundColor: isModern ? Colors.white : null,
         padding: const EdgeInsets.all(20),
         child: Center(
           child: Text(AppStrings.get('no_meals_logged_today'), style: TextStyle(fontWeight: FontWeight.w900, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4))),
@@ -238,12 +259,12 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          Container(height: 4, color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2)),
+          Container(height: isModern ? 2 : 4, color: isModern ? const Color(0xFFE2E8F0) : Theme.of(context).colorScheme.primary.withValues(alpha: 0.2)),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: todayFoodLogs.take(5).map((log) {
-              final time = DateFormat.jm().format(log.timestamp);
-              return _buildTimelinePoint(time, Theme.of(context).colorScheme.primary);
+              final time = DateFormat(isModern ? 'Hm' : 'jm').format(log.timestamp);
+              return _buildTimelinePoint(time, isModern ? const Color(0xFF1E293B) : Theme.of(context).colorScheme.primary, isModern);
             }).toList(),
           ),
         ],
@@ -251,37 +272,50 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
     );
   }
 
-  Widget _buildTimelinePoint(String time, Color color) {
+  Widget _buildTimelinePoint(String time, Color color, bool isModern) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          width: 36,
-          height: 36,
-          decoration: BoxDecoration(color: color.withValues(alpha: 0.6), shape: BoxShape.circle),
-          child: Center(child: Icon(Icons.restaurant_outlined, size: 20, color: Theme.of(context).colorScheme.onSurface)),
+          width: isModern ? 24 : 36,
+          height: isModern ? 24 : 36,
+          decoration: BoxDecoration(
+            color: isModern ? Colors.white : color.withValues(alpha: 0.6), 
+            shape: BoxShape.circle,
+            border: isModern ? Border.all(color: color, width: 2) : null,
+          ),
+          child: Center(child: Icon(Icons.restaurant_outlined, size: isModern ? 12 : 20, color: isModern ? color : Theme.of(context).colorScheme.onSurface)),
         ),
         const SizedBox(height: 4),
-        Text(time, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), fontWeight: FontWeight.w900, fontSize: 10)),
+        Text(time, style: TextStyle(color: isModern ? color : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), fontWeight: isModern ? FontWeight.w800 : FontWeight.w900, fontSize: 10)),
       ],
     );
   }
 
-  Widget _buildStatBox(String num, String label, IconData icon) {
+  Widget _buildStatBox(String num, String label, IconData icon, bool isModern) {
     return PastelCard(
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+      backgroundColor: isModern ? Colors.white : null,
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8),
       child: Column(
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(num, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 24)),
-              const SizedBox(width: 6),
-              Icon(icon, size: 20, color: Theme.of(context).colorScheme.onSurface),
+              Text(num, style: TextStyle(fontWeight: FontWeight.w900, fontSize: isModern ? 28 : 24, color: isModern ? const Color(0xFF1E293B) : Theme.of(context).colorScheme.onSurface)),
+              const SizedBox(width: 8),
+              Icon(icon, size: isModern ? 24 : 20, color: isModern ? const Color(0xFF1E293B) : Theme.of(context).colorScheme.onSurface),
             ],
           ),
-          const SizedBox(height: 4),
-          Text(label, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), fontWeight: FontWeight.w900, fontSize: 12)),
+          const SizedBox(height: 8),
+          Text(
+            isModern ? label.toUpperCase() : label, 
+            style: TextStyle(
+              color: isModern ? const Color(0xFF64748B) : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), 
+              fontWeight: isModern ? FontWeight.w800 : FontWeight.w900, 
+              fontSize: isModern ? 11 : 12,
+              letterSpacing: isModern ? 1.0 : 0.0,
+            )
+          ),
         ],
       ),
     );

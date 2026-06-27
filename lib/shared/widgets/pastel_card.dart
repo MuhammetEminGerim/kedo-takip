@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/theme/app_theme.dart';
 
-class PastelCard extends StatelessWidget {
+class PastelCard extends ConsumerWidget {
   final Widget child;
   final Color? backgroundColor;
   final EdgeInsetsGeometry? padding;
@@ -15,26 +17,34 @@ class PastelCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final effectiveColor = backgroundColor ?? Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeType = ref.watch(themeProvider);
+    final isModern = themeType == AppThemeType.modern;
+
+    final effectiveColor = isModern 
+        ? Colors.white 
+        : (backgroundColor ?? Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface);
 
     return Container(
       decoration: BoxDecoration(
         color: effectiveColor,
-        borderRadius: BorderRadius.circular(32),
-        boxShadow: [
-          BoxShadow(
-            color: effectiveColor.withValues(alpha: 0.15),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(isModern ? 16 : 32),
+        border: isModern ? Border.all(color: const Color(0xFFE2E8F0), width: 1.5) : null,
+        boxShadow: isModern 
+            ? [] 
+            : [
+                BoxShadow(
+                  color: effectiveColor.withValues(alpha: 0.15),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(32),
+          borderRadius: BorderRadius.circular(isModern ? 16 : 32),
           child: Padding(
             padding: padding ?? EdgeInsets.zero,
             child: child,

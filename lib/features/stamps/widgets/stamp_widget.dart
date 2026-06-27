@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:io';
 import '../../../shared/models/stamp.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import '../../../core/theme/app_theme.dart';
 
-class StampWidget extends StatelessWidget {
+class StampWidget extends ConsumerWidget {
   final Stamp stamp;
   final VoidCallback? onLongPress;
 
@@ -15,7 +17,9 @@ class StampWidget extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isModern = ref.watch(themeProvider) == AppThemeType.modern;
+
     return GestureDetector(
       onLongPress: onLongPress,
       onTap: () {
@@ -42,50 +46,112 @@ class StampWidget extends StatelessWidget {
           ),
         );
       },
-      child: CustomPaint(
-        painter: StampPainter(),
-        child: Container(
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
-                  child: Image.file(
-                    File(stamp.imagePath),
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) =>
-                        const Icon(Icons.broken_image, color: Colors.grey),
-                  ),
+      child: isModern ? _buildModernCard(context) : _buildPlayfulStamp(context),
+    );
+  }
+
+  Widget _buildModernCard(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0F172A).withValues(alpha: 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          )
+        ],
+      ),
+      padding: const EdgeInsets.all(8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.file(
+                File(stamp.imagePath),
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) =>
+                    const Icon(Icons.broken_image, color: Colors.grey),
+              ),
+            ),
+          ),
+          if (stamp.caption.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Text(
+              stamp.caption,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF1E293B),
+              ),
+            ),
+          ],
+          if (stamp.caption.isEmpty) const SizedBox(height: 8),
+          Text(
+            DateFormat('dd MMM yyyy').format(stamp.date),
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF64748B),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPlayfulStamp(BuildContext context) {
+    return CustomPaint(
+      painter: StampPainter(),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: Image.file(
+                  File(stamp.imagePath),
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) =>
+                      const Icon(Icons.broken_image, color: Colors.grey),
                 ),
               ),
-              if (stamp.caption.isNotEmpty) ...[
-                const SizedBox(height: 8),
-                Text(
-                  stamp.caption,
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.dancingScript(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                ),
-              ],
-              if (stamp.caption.isEmpty) const SizedBox(height: 8),
+            ),
+            if (stamp.caption.isNotEmpty) ...[
+              const SizedBox(height: 8),
               Text(
-                DateFormat('dd MMM yyyy').format(stamp.date),
-                textAlign: TextAlign.right,
-                style: GoogleFonts.nunito(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.grey.shade500,
+                stamp.caption,
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.dancingScript(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ],
-          ),
+            if (stamp.caption.isEmpty) const SizedBox(height: 8),
+            Text(
+              DateFormat('dd MMM yyyy').format(stamp.date),
+              textAlign: TextAlign.right,
+              style: GoogleFonts.nunito(
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey.shade500,
+              ),
+            ),
+          ],
         ),
       ),
     );
