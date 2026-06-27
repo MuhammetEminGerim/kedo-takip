@@ -10,7 +10,6 @@ import 'package:path_provider/path_provider.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../shared/models/cat.dart';
 import '../../../shared/providers/cat_provider.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../shared/widgets/pastel_card.dart';
 
 class CatFormScreen extends ConsumerStatefulWidget {
@@ -61,9 +60,9 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
       context: context,
       backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
-        padding: const EdgeInsets.all(24),
-        decoration: const BoxDecoration(
-          color: AppColors.playfulBackground,
+        padding: EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: Theme.of(context).scaffoldBackgroundColor,
           borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
         ),
         child: Column(
@@ -73,12 +72,12 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: AppColors.playfulText.withOpacity(0.2),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
             const SizedBox(height: 24),
-            Text(AppStrings.get('choose_photo'), style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 20, color: AppColors.playfulText)),
+            Text(AppStrings.get('choose_photo'), style: TextStyle(fontWeight: FontWeight.w900, fontSize: 20, color: Theme.of(context).colorScheme.onSurface)),
             const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -86,13 +85,13 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
                 _buildPhotoOption(
                   icon: Icons.camera_alt_rounded,
                   label: AppStrings.get('camera'),
-                  color: AppColors.playfulPrimary,
+                  color: Theme.of(context).colorScheme.primary,
                   onTap: () => Navigator.pop(ctx, ImageSource.camera),
                 ),
                 _buildPhotoOption(
                   icon: Icons.photo_library_rounded,
                   label: AppStrings.get('gallery'),
-                  color: AppColors.playfulSecondary,
+                  color: Theme.of(context).colorScheme.secondary,
                   onTap: () => Navigator.pop(ctx, ImageSource.gallery),
                 ),
               ],
@@ -138,13 +137,13 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
             width: 70,
             height: 70,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.3),
+              color: color.withValues(alpha: 0.3),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, size: 32, color: AppColors.playfulText),
+            child: Icon(icon, size: 32, color: Theme.of(context).colorScheme.onSurface),
           ),
           const SizedBox(height: 8),
-          Text(label, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: AppColors.playfulText)),
+          Text(label, style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: Theme.of(context).colorScheme.onSurface)),
         ],
       ),
     );
@@ -159,11 +158,11 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: AppColors.playfulPrimary,
+            colorScheme: ColorScheme.light(
+              primary: Theme.of(context).colorScheme.primary,
               onPrimary: Colors.white,
-              surface: AppColors.playfulBackground,
-              onSurface: AppColors.playfulText,
+              surface: Theme.of(context).scaffoldBackgroundColor,
+              onSurface: Theme.of(context).colorScheme.onSurface,
             ),
           ),
           child: child!,
@@ -183,7 +182,7 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(AppStrings.get('please_select_birth_date'), style: const TextStyle(fontWeight: FontWeight.w900)),
-            backgroundColor: AppColors.playfulPrimary,
+            backgroundColor: Theme.of(context).colorScheme.primary,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           ),
@@ -228,16 +227,16 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        backgroundColor: AppColors.playfulBackground,
-        title: Text(AppStrings.get('delete_cat'), style: const TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText)),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        title: Text(AppStrings.get('delete_cat'), style: TextStyle(fontWeight: FontWeight.w900, color: Theme.of(context).colorScheme.onSurface)),
         content: Text(
           '${widget.catToEdit!.name} ${AppStrings.get('are_you_sure_remove')}',
-          style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.playfulText),
+          style: TextStyle(fontWeight: FontWeight.w700, color: Theme.of(context).colorScheme.onSurface),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text(AppStrings.get('cancel'), style: const TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText)),
+            child: Text(AppStrings.get('cancel'), style: TextStyle(fontWeight: FontWeight.w900, color: Theme.of(context).colorScheme.onSurface)),
           ),
           ElevatedButton(
             onPressed: () {
@@ -261,14 +260,14 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
     final isEditing = widget.catToEdit != null;
 
     return Scaffold(
-      backgroundColor: AppColors.playfulBackground,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
               isEditing ? '${AppStrings.get('edit_cat')} ' : '${AppStrings.get('add_cat')} ',
-              style: const TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText, fontSize: 24),
+              style: TextStyle(fontWeight: FontWeight.w900, color: Theme.of(context).colorScheme.onSurface, fontSize: 24),
             ),
             const Text('🐱', style: TextStyle(fontSize: 24)),
           ],
@@ -277,7 +276,7 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: AppColors.playfulText),
+          icon: Icon(Icons.arrow_back_rounded, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => context.pop(),
         ),
         actions: [
@@ -305,11 +304,11 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
                         width: 130,
                         height: 130,
                         decoration: BoxDecoration(
-                          color: AppColors.playfulPrimary.withOpacity(0.2),
+                          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
                           shape: BoxShape.circle,
                           border: Border.all(color: Colors.white, width: 4),
                           boxShadow: [
-                            BoxShadow(color: AppColors.playfulPrimary.withOpacity(0.2), blurRadius: 10, offset: const Offset(0, 4)),
+                            BoxShadow(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2), blurRadius: 10, offset: const Offset(0, 4)),
                           ],
                           image: _photoPath != null
                               ? DecorationImage(image: FileImage(File(_photoPath!)), fit: BoxFit.cover)
@@ -323,7 +322,7 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
                           width: 40,
                           height: 40,
                           decoration: BoxDecoration(
-                            color: AppColors.playfulPrimary,
+                            color: Theme.of(context).colorScheme.primary,
                             shape: BoxShape.circle,
                             border: Border.all(color: Colors.white, width: 3),
                           ),
@@ -336,7 +335,7 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
               ),
               const SizedBox(height: 8),
               Center(
-                child: Text(AppStrings.get('tap_to_change_photo'), style: const TextStyle(color: AppColors.playfulText, fontWeight: FontWeight.w700, fontSize: 12)),
+                child: Text(AppStrings.get('tap_to_change_photo'), style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w700, fontSize: 12)),
               ),
               const SizedBox(height: 32),
 
@@ -362,36 +361,35 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
               GestureDetector(
                 onTap: () => _selectDate(context),
                 child: PastelCard(
-                  backgroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
                   child: Row(
                     children: [
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: AppColors.playfulTertiary.withOpacity(0.3),
+                          color: Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.3),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Icon(Icons.calendar_today_rounded, color: AppColors.playfulText, size: 20),
+                        child: Icon(Icons.calendar_today_rounded, color: Theme.of(context).colorScheme.onSurface, size: 20),
                       ),
                       const SizedBox(width: 16),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(AppStrings.get('birth_date'), style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: AppColors.playfulText)),
+                          Text(AppStrings.get('birth_date'), style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: Theme.of(context).colorScheme.onSurface)),
                           const SizedBox(height: 2),
                           Text(
                             _selectedDate == null ? AppStrings.get('select_date') : DateFormat.yMMMd().format(_selectedDate!),
                             style: TextStyle(
                               fontWeight: FontWeight.w700,
                               fontSize: 16,
-                              color: _selectedDate == null ? AppColors.playfulText.withOpacity(0.4) : AppColors.playfulText,
+                              color: _selectedDate == null ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4) : Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                         ],
                       ),
                       const Spacer(),
-                      Icon(Icons.arrow_forward_ios_rounded, size: 16, color: AppColors.playfulText.withOpacity(0.4)),
+                      Icon(Icons.arrow_forward_ios_rounded, size: 16, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)),
                     ],
                   ),
                 ),
@@ -400,24 +398,23 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
 
               // Gender
               PastelCard(
-                backgroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 child: Row(
                   children: [
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: AppColors.playfulSecondary.withOpacity(0.3),
+                        color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(
                         _gender == 'Female' ? Icons.female_rounded : Icons.male_rounded,
-                        color: AppColors.playfulText,
+                        color: Theme.of(context).colorScheme.onSurface,
                         size: 20,
                       ),
                     ),
                     const SizedBox(width: 16),
-                    Text(AppStrings.get('gender'), style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: AppColors.playfulText)),
+                    Text(AppStrings.get('gender'), style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: Theme.of(context).colorScheme.onSurface)),
                     const Spacer(),
                     _buildGenderChip('Female', '♀', AppStrings.get('female')),
                     const SizedBox(width: 8),
@@ -429,27 +426,26 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
 
               // Neutered
               PastelCard(
-                backgroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                 child: Row(
                   children: [
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: AppColors.playfulAccentPeach.withOpacity(0.3),
+                        color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(Icons.healing_rounded, color: AppColors.playfulText, size: 20),
+                      child: Icon(Icons.healing_rounded, color: Theme.of(context).colorScheme.onSurface, size: 20),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
-                      child: Text(AppStrings.get('neutered_spayed'), style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: AppColors.playfulText)),
+                      child: Text(AppStrings.get('neutered_spayed'), style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: Theme.of(context).colorScheme.onSurface)),
                     ),
                     Switch(
                       value: _isNeutered,
                       onChanged: (val) => setState(() => _isNeutered = val),
-                      activeColor: AppColors.playfulPrimary,
-                      activeTrackColor: AppColors.playfulPrimary.withOpacity(0.3),
+                      activeThumbColor: Theme.of(context).colorScheme.primary,
+                      activeTrackColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
                     ),
                   ],
                 ),
@@ -470,14 +466,14 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
               GestureDetector(
                 onTap: _saveCat,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 18),
+                  padding: EdgeInsets.symmetric(vertical: 18),
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [AppColors.playfulPrimary, AppColors.playfulAccentPeach],
+                    gradient: LinearGradient(
+                      colors: [Theme.of(context).colorScheme.primary, Theme.of(context).colorScheme.primaryContainer],
                     ),
                     borderRadius: BorderRadius.circular(24),
                     boxShadow: [
-                      BoxShadow(color: AppColors.playfulPrimary.withOpacity(0.4), blurRadius: 12, offset: const Offset(0, 4)),
+                      BoxShadow(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.4), blurRadius: 12, offset: const Offset(0, 4)),
                     ],
                   ),
                   child: Center(
@@ -505,17 +501,16 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
     String? suffixText,
   }) {
     return PastelCard(
-      backgroundColor: Colors.white,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: AppColors.playfulPrimary.withOpacity(0.15),
+              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, color: AppColors.playfulText, size: 20),
+            child: Icon(icon, color: Theme.of(context).colorScheme.onSurface, size: 20),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -523,12 +518,12 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
               controller: controller,
               validator: validator,
               keyboardType: keyboardType,
-              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: AppColors.playfulText),
+              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: Theme.of(context).colorScheme.onSurface),
               decoration: InputDecoration(
                 labelText: label,
-                labelStyle: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: AppColors.playfulText.withOpacity(0.5)),
+                labelStyle: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
                 suffixText: suffixText,
-                suffixStyle: const TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText),
+                suffixStyle: TextStyle(fontWeight: FontWeight.w900, color: Theme.of(context).colorScheme.onSurface),
                 border: InputBorder.none,
                 enabledBorder: InputBorder.none,
                 focusedBorder: InputBorder.none,
@@ -550,10 +545,10 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.playfulPrimary : AppColors.playfulSurface,
+          color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? AppColors.playfulPrimary : AppColors.playfulText.withOpacity(0.1),
+            color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
             width: 2,
           ),
         ),
@@ -562,7 +557,7 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
           style: TextStyle(
             fontWeight: FontWeight.w900,
             fontSize: 14,
-            color: isSelected ? Colors.white : AppColors.playfulText,
+            color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurface,
           ),
         ),
       ),

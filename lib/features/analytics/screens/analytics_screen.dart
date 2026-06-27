@@ -5,7 +5,6 @@ import 'package:fl_chart/fl_chart.dart';
 
 import '../../care_tracking/providers/care_log_provider.dart';
 import '../../../shared/providers/cat_provider.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../shared/widgets/pastel_card.dart';
 import '../../../core/constants/app_strings.dart';
 
@@ -68,8 +67,8 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('${AppStrings.get('insights')} ', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900, color: AppColors.playfulText)),
-            const Icon(Icons.bar_chart_outlined, color: AppColors.playfulText, size: 28),
+            Text('${AppStrings.get('insights')} ', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900, color: Theme.of(context).colorScheme.onSurface)),
+            Icon(Icons.bar_chart_outlined, color: Theme.of(context).colorScheme.onSurface, size: 28),
           ],
         ),
         backgroundColor: Colors.transparent,
@@ -89,7 +88,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(30),
                   boxShadow: [
-                    BoxShadow(color: AppColors.playfulText.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))
+                    BoxShadow(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4))
                   ]
                 ),
                 padding: const EdgeInsets.all(4),
@@ -103,7 +102,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                           duration: const Duration(milliseconds: 200),
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           decoration: BoxDecoration(
-                            color: isSelected ? AppColors.playfulPrimary : Colors.transparent,
+                            color: isSelected ? Theme.of(context).colorScheme.primary : Colors.transparent,
                             borderRadius: BorderRadius.circular(26),
                           ),
                           child: Center(
@@ -111,7 +110,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                               _localizedTab(tab),
                               style: TextStyle(
                                 fontWeight: FontWeight.w900,
-                                color: isSelected ? Colors.white : AppColors.playfulText.withOpacity(0.6),
+                                color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                               ),
                             ),
                           ),
@@ -126,13 +125,13 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
 
               // Insight Card
               PastelCard(
-                backgroundColor: AppColors.playfulAccentPeach.withOpacity(0.5),
+                backgroundColor: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.5),
                 child: Row(
                   children: [
                     Container(
                       padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(color: Colors.white.withOpacity(0.5), shape: BoxShape.circle),
-                      child: const Icon(Icons.lightbulb_outline_rounded, color: AppColors.playfulText, size: 28),
+                      decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.5), shape: BoxShape.circle),
+                      child: Icon(Icons.lightbulb_outline_rounded, color: Theme.of(context).colorScheme.onSurface, size: 28),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
@@ -141,7 +140,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                         children: [
                           Text(insight['title']!, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 14)),
                           const SizedBox(height: 4),
-                          Text(insight['subtitle']!, style: TextStyle(color: AppColors.playfulText.withOpacity(0.8), fontSize: 12, fontWeight: FontWeight.bold)),
+                          Text(insight['subtitle']!, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8), fontSize: 12, fontWeight: FontWeight.bold)),
                         ],
                       ),
                     ),
@@ -227,10 +226,9 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
   Widget _buildFeedingTimeline(List todayFoodLogs) {
     if (todayFoodLogs.isEmpty) {
       return PastelCard(
-        backgroundColor: Colors.white,
         padding: const EdgeInsets.all(20),
         child: Center(
-          child: Text(AppStrings.get('no_meals_logged_today'), style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText.withOpacity(0.4))),
+          child: Text(AppStrings.get('no_meals_logged_today'), style: TextStyle(fontWeight: FontWeight.w900, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4))),
         ),
       );
     }
@@ -240,12 +238,12 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          Container(height: 4, color: AppColors.playfulPrimary.withOpacity(0.2)),
+          Container(height: 4, color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2)),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: todayFoodLogs.take(5).map((log) {
               final time = DateFormat.jm().format(log.timestamp);
-              return _buildTimelinePoint(time, AppColors.playfulPrimary);
+              return _buildTimelinePoint(time, Theme.of(context).colorScheme.primary);
             }).toList(),
           ),
         ],
@@ -260,18 +258,17 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
         Container(
           width: 36,
           height: 36,
-          decoration: BoxDecoration(color: color.withOpacity(0.6), shape: BoxShape.circle),
-          child: const Center(child: Icon(Icons.restaurant_outlined, size: 20, color: AppColors.playfulText)),
+          decoration: BoxDecoration(color: color.withValues(alpha: 0.6), shape: BoxShape.circle),
+          child: Center(child: Icon(Icons.restaurant_outlined, size: 20, color: Theme.of(context).colorScheme.onSurface)),
         ),
         const SizedBox(height: 4),
-        Text(time, style: TextStyle(color: AppColors.playfulText.withOpacity(0.6), fontWeight: FontWeight.w900, fontSize: 10)),
+        Text(time, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), fontWeight: FontWeight.w900, fontSize: 10)),
       ],
     );
   }
 
   Widget _buildStatBox(String num, String label, IconData icon) {
     return PastelCard(
-      backgroundColor: Colors.white,
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
       child: Column(
         children: [
@@ -280,11 +277,11 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
             children: [
               Text(num, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 24)),
               const SizedBox(width: 6),
-              Icon(icon, size: 20, color: AppColors.playfulText),
+              Icon(icon, size: 20, color: Theme.of(context).colorScheme.onSurface),
             ],
           ),
           const SizedBox(height: 4),
-          Text(label, style: TextStyle(color: AppColors.playfulText.withOpacity(0.6), fontWeight: FontWeight.w900, fontSize: 12)),
+          Text(label, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), fontWeight: FontWeight.w900, fontSize: 12)),
         ],
       ),
     );
@@ -296,10 +293,9 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
 
     if (weightLogs.isEmpty) {
       return PastelCard(
-        backgroundColor: Colors.white,
         padding: const EdgeInsets.all(20),
         child: Center(
-          child: Text('Henüz kilo kaydı yok.', style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText.withOpacity(0.4))),
+          child: Text('Henüz kilo kaydı yok.', style: TextStyle(fontWeight: FontWeight.w900, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4))),
         ),
       );
     }
@@ -312,7 +308,6 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
     }).toList();
 
     return PastelCard(
-      backgroundColor: Colors.white,
       padding: const EdgeInsets.all(16),
       child: SizedBox(
         height: 200,
@@ -338,13 +333,13 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
               LineChartBarData(
                 spots: spots,
                 isCurved: true,
-                color: AppColors.playfulAccentPeach,
+                color: Theme.of(context).colorScheme.primaryContainer,
                 barWidth: 4,
                 isStrokeCapRound: true,
                 dotData: FlDotData(show: true),
                 belowBarData: BarAreaData(
                   show: true,
-                  color: AppColors.playfulAccentPeach.withOpacity(0.2),
+                  color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.2),
                 ),
               ),
             ],

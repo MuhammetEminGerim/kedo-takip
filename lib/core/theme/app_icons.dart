@@ -20,5 +20,5 @@ class AppIcons {
   static Widget navHealth({Color? color, double size = 28}) => _build(FluentIcons.stethoscope_24_filled, color, size);
   static Widget navCare({Color? color, double size = 28}) => _build(FluentIcons.heart_pulse_24_filled, color, size);
   static Widget navStats({Color? color, double size = 28}) => _build(FluentIcons.data_bar_vertical_24_filled, color, size);
-  static Widget navLearn({Color? color, double size = 28}) => _build(FluentIcons.book_24_filled, color, size);
+  static Widget navAlbum({Color? color, double size = 28}) => _build(FluentIcons.image_multiple_24_filled, color, size);
 }

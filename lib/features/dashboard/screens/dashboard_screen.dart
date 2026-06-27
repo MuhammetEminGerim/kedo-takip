@@ -6,17 +6,29 @@ import 'package:intl/intl.dart';
 
 import '../../../shared/providers/cat_provider.dart';
 import '../../care_tracking/providers/care_log_provider.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../../shared/widgets/pastel_card.dart';
 import '../../../shared/widgets/pastel_action_button.dart';
 import '../../../core/constants/app_strings.dart';
+import '../widgets/modern_dashboard.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final themeType = ref.watch(themeProvider);
+
+    // Modern theme uses bento-box dashboard
+    if (themeType == AppThemeType.modern) {
+      return Scaffold(
+        backgroundColor: const Color(0xFFF5F7FA),
+        body: const SafeArea(child: ModernDashboard()),
+      );
+    }
+
+    // Playful & Dark themes use existing kawaii dashboard
     final cats = ref.watch(catListProvider);
     final selectedCat = ref.watch(selectedCatProvider);
 
@@ -27,7 +39,7 @@ class DashboardScreen extends ConsumerWidget {
         elevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.settings_rounded, color: AppColors.playfulText),
+            icon: Icon(Icons.settings_rounded, color: Theme.of(context).colorScheme.onSurface),
             onPressed: () => context.push('/settings'),
           ),
         ],
@@ -46,7 +58,7 @@ class DashboardScreen extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.pets, size: 80, color: AppColors.playfulPrimary),
+            Icon(Icons.pets, size: 80, color: Theme.of(context).colorScheme.primary),
             const SizedBox(height: 24),
             Text(
               AppStrings.get('welcome'),
@@ -99,13 +111,13 @@ class DashboardScreen extends ConsumerWidget {
                               height: 60,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: AppColors.playfulSurface,
-                                border: Border.all(color: AppColors.playfulText.withOpacity(0.15), width: 2, style: BorderStyle.solid),
+                                color: Theme.of(context).cardColor,
+                                border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.15), width: 2, style: BorderStyle.solid),
                               ),
-                              child: Icon(Icons.add_rounded, size: 28, color: AppColors.playfulText.withOpacity(0.4)),
+                              child: Icon(Icons.add_rounded, size: 28, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)),
                             ),
                             const SizedBox(height: 6),
-                            Text(AppStrings.get('add'), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AppColors.playfulText.withOpacity(0.4))),
+                            Text(AppStrings.get('add'), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4))),
                           ],
                         ),
                       ),
@@ -126,13 +138,13 @@ class DashboardScreen extends ConsumerWidget {
                             height: isSelected ? 64 : 56,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: AppColors.playfulSurface,
+                              color: Theme.of(context).cardColor,
                               border: Border.all(
-                                color: isSelected ? AppColors.playfulPrimary : AppColors.playfulText.withOpacity(0.1),
+                                color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
                                 width: isSelected ? 3 : 2,
                               ),
                               boxShadow: isSelected
-                                  ? [BoxShadow(color: AppColors.playfulPrimary.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 2))]
+                                  ? [BoxShadow(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3), blurRadius: 8, offset: const Offset(0, 2))]
                                   : [],
                               image: cat.photoPath != null && cat.photoPath!.isNotEmpty
                                   ? DecorationImage(image: FileImage(File(cat.photoPath!)), fit: BoxFit.cover)
@@ -145,7 +157,7 @@ class DashboardScreen extends ConsumerWidget {
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: isSelected ? FontWeight.w900 : FontWeight.w700,
-                              color: isSelected ? AppColors.playfulPrimary : AppColors.playfulText.withOpacity(0.6),
+                              color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                             ),
                           ),
                         ],
@@ -168,11 +180,11 @@ class DashboardScreen extends ConsumerWidget {
                   width: 90,
                   height: 90,
                   decoration: BoxDecoration(
-                    color: AppColors.playfulSurface,
+                    color: Theme.of(context).cardColor,
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.white, width: 4),
                     boxShadow: [
-                      BoxShadow(color: AppColors.playfulPrimary.withOpacity(0.2), blurRadius: 10, offset: const Offset(0, 4))
+                      BoxShadow(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2), blurRadius: 10, offset: const Offset(0, 4))
                     ],
                     image: selectedCat.photoPath != null && selectedCat.photoPath!.isNotEmpty
                         ? DecorationImage(image: FileImage(File(selectedCat.photoPath!)), fit: BoxFit.cover)
@@ -186,11 +198,11 @@ class DashboardScreen extends ConsumerWidget {
                 children: [
                   Text(
                     selectedCat.name,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Nunito',
                       fontWeight: FontWeight.w900,
                       fontSize: 36,
-                      color: AppColors.playfulText,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                   if (selectedCat.breed != null && selectedCat.breed!.isNotEmpty)
@@ -200,7 +212,7 @@ class DashboardScreen extends ConsumerWidget {
                         fontFamily: 'Nunito',
                         fontWeight: FontWeight.w700,
                         fontSize: 14,
-                        color: AppColors.playfulText.withOpacity(0.6),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                     ),
                   Text(
@@ -209,20 +221,20 @@ class DashboardScreen extends ConsumerWidget {
                       fontFamily: 'Nunito',
                       fontWeight: FontWeight.w700,
                       fontSize: 12,
-                      color: AppColors.playfulText.withOpacity(0.4),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
                     ),
                   ),
                 ],
               ),
               const SizedBox(width: 8),
-              const Icon(Icons.pets, color: AppColors.playfulSecondary, size: 28),
+              Icon(Icons.pets, color: Theme.of(context).colorScheme.secondary, size: 28),
             ],
           ),
           
           const SizedBox(height: 40),
           
           // Quick Actions
-          Text(AppStrings.get('quick_actions'), style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900, fontSize: 22, color: AppColors.playfulText)),
+          Text(AppStrings.get('quick_actions'), style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900, fontSize: 22, color: Theme.of(context).colorScheme.onSurface)),
           const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -230,19 +242,19 @@ class DashboardScreen extends ConsumerWidget {
               PastelActionButton(
                 title: AppStrings.get('fed_action'),
                 icon: AppIcons.bowl(),
-                color: AppColors.playfulSecondary,
+                color: Theme.of(context).colorScheme.secondary,
                 onTap: () => _addCareLog(ref, 'food', AppStrings.get('fed')),
               ),
               PastelActionButton(
                 title: AppStrings.get('litter_action'),
                 icon: AppIcons.litter(),
-                color: AppColors.playfulTertiary,
+                color: Theme.of(context).colorScheme.tertiary,
                 onTap: () => _addCareLog(ref, 'litter', AppStrings.get('cleaned')),
               ),
               PastelActionButton(
                 title: AppStrings.get('water_action'),
                 icon: AppIcons.water(),
-                color: AppColors.playfulAccentBlue,
+                color: Theme.of(context).colorScheme.secondaryContainer,
                 onTap: () => _addCareLog(ref, 'water', AppStrings.get('refilled')),
               ),
             ],
@@ -251,11 +263,11 @@ class DashboardScreen extends ConsumerWidget {
           const SizedBox(height: 24),
           
           // Today Summary with Peeking Cats
-          Text(AppStrings.get('today_summary'), style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900, fontSize: 22, color: AppColors.playfulText)),
+          Text(AppStrings.get('today_summary'), style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900, fontSize: 22, color: Theme.of(context).colorScheme.onSurface)),
           const SizedBox(height: 16),
           
           KawaiiSummaryCard(
-            color: AppColors.playfulSecondary.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.5),
             icon: AppIcons.bowl(),
             title: AppStrings.get('meals_label'),
             valueBuilder: (ref) {
@@ -268,7 +280,7 @@ class DashboardScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
           KawaiiSummaryCard(
-            color: AppColors.playfulTertiary.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.5),
             icon: AppIcons.litter(),
             title: AppStrings.get('litter_label'),
             valueBuilder: (ref) {
@@ -287,19 +299,19 @@ class DashboardScreen extends ConsumerWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
               decoration: BoxDecoration(
-                color: AppColors.playfulAccentPeach.withOpacity(0.2),
+                color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: AppColors.playfulAccentPeach.withOpacity(0.5), width: 2),
+                border: Border.all(color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.5), width: 2),
                 boxShadow: [
-                  BoxShadow(color: AppColors.playfulAccentPeach.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4))
+                  BoxShadow(color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, 4))
                 ],
               ),
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: const BoxDecoration(
-                      color: AppColors.playfulAccentPeach,
+                    padding: EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primaryContainer,
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(Icons.photo_album_outlined, color: Colors.white, size: 28),
@@ -311,17 +323,17 @@ class DashboardScreen extends ConsumerWidget {
                       children: [
                         Text(
                           AppStrings.get('stamp_album'),
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.playfulText),
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Theme.of(context).colorScheme.onSurface),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           'Anılarını biriktir', // Can be localized later
-                          style: TextStyle(fontSize: 14, color: AppColors.playfulText.withOpacity(0.6)),
+                          style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)),
                         ),
                       ],
                     ),
                   ),
-                  const Icon(Icons.arrow_forward_ios, color: AppColors.playfulAccentPeach),
+                  Icon(Icons.arrow_forward_ios, color: Theme.of(context).colorScheme.primaryContainer),
                 ],
               ),
             ),
@@ -392,7 +404,6 @@ class KawaiiSummaryCard extends ConsumerWidget {
       clipBehavior: Clip.none,
       children: [
         PastelCard(
-          backgroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           child: Row(
             children: [
@@ -410,11 +421,11 @@ class KawaiiSummaryCard extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(title, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: AppColors.playfulText, letterSpacing: 1.2)),
+                    Text(title, style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: Theme.of(context).colorScheme.onSurface, letterSpacing: 1.2)),
                     const SizedBox(height: 2),
-                    Text(parts[0], style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: AppColors.playfulText)),
+                    Text(parts[0], style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: Theme.of(context).colorScheme.onSurface)),
                     if (parts.length > 1)
-                      Text(parts[1], style: TextStyle(color: AppColors.playfulText.withOpacity(0.7), fontSize: 12, fontWeight: FontWeight.bold)),
+                      Text(parts[1], style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 12, fontWeight: FontWeight.bold)),
                   ],
                 ),
               )
@@ -429,7 +440,7 @@ class KawaiiSummaryCard extends ConsumerWidget {
             height: 40,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 4, offset: const Offset(0, 2))],
+              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 4, offset: const Offset(0, 2))],
               image: DecorationImage(
                 image: _getCatImage(ref),
                 fit: BoxFit.cover,

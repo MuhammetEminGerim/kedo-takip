@@ -7,6 +7,7 @@
 ///   AppStrings.setLocale('en')         // switches to English
 ///   AppStrings.locale                  // current locale code
 ///   AppStrings.current                 // full active language map
+library;
 
 class AppStrings {
   AppStrings._();
@@ -39,7 +40,7 @@ class AppStrings {
     'nav_health': 'Sağlık',
     'nav_care': 'Bakım',
     'nav_stats': 'İstatistik',
-    'nav_learn': 'Öğren',
+    'nav_album': 'Arşiv',
 
     // ── Dashboard ─────────────────────────────────
     'welcome': 'PawLog\'a Hoş Geldin!',
@@ -335,7 +336,7 @@ class AppStrings {
     'nav_health': 'Health',
     'nav_care': 'Care',
     'nav_stats': 'Stats',
-    'nav_learn': 'Learn',
+    'nav_album': 'Album',
 
     // ── Dashboard ─────────────────────────────────
     'welcome': 'Welcome to PawLog!',

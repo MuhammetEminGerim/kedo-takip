@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/app_colors.dart';
 
 class PastelActionButton extends StatelessWidget {
   final String title;
@@ -18,6 +17,8 @@ class PastelActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textColor = Theme.of(context).colorScheme.onSurface;
+
     return Column(
       children: [
         GestureDetector(
@@ -28,7 +29,7 @@ class PastelActionButton extends StatelessWidget {
             decoration: BoxDecoration(
               color: color,
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: AppColors.playfulText.withOpacity(0.1), width: 1),
+              border: Border.all(color: textColor.withValues(alpha: 0.1), width: 1),
             ),
             child: Center(
               child: icon,
@@ -38,7 +39,7 @@ class PastelActionButton extends StatelessWidget {
         const SizedBox(height: 8),
         Text(
           title,
-          style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: AppColors.playfulText),
+          style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: textColor),
         ),
       ],
     );

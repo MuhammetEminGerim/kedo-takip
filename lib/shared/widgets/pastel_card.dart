@@ -2,27 +2,29 @@ import 'package:flutter/material.dart';
 
 class PastelCard extends StatelessWidget {
   final Widget child;
-  final Color backgroundColor;
+  final Color? backgroundColor;
   final EdgeInsetsGeometry? padding;
   final VoidCallback? onTap;
 
   const PastelCard({
     super.key,
     required this.child,
-    required this.backgroundColor,
+    this.backgroundColor,
     this.padding = const EdgeInsets.all(16.0),
     this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final effectiveColor = backgroundColor ?? Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface;
+
     return Container(
       decoration: BoxDecoration(
-        color: backgroundColor,
+        color: effectiveColor,
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-            color: backgroundColor.withOpacity(0.15),
+            color: effectiveColor.withValues(alpha: 0.15),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),

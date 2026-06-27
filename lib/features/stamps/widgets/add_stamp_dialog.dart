@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import '../../../core/theme/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../providers/stamp_provider.dart';
 import '../../../shared/providers/cat_provider.dart';
@@ -86,8 +85,8 @@ class _AddStampDialogState extends ConsumerState<AddStampDialog> {
         bottom: MediaQuery.of(context).viewInsets.bottom + 130, // Increased to avoid navbar
         top: 24, left: 24, right: 24,
       ),
-      decoration: const BoxDecoration(
-        color: AppColors.playfulSurface,
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
       ),
       child: SingleChildScrollView(
@@ -111,7 +110,7 @@ class _AddStampDialogState extends ConsumerState<AddStampDialog> {
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 16),
                   child: DropdownButtonFormField<String>(
-                    value: _selectedCatId,
+                    initialValue: _selectedCatId,
                     decoration: InputDecoration(
                       labelText: AppStrings.get('select_cat', fallback: 'Kedi Seç'),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
@@ -133,7 +132,7 @@ class _AddStampDialogState extends ConsumerState<AddStampDialog> {
               onTap: () {
                 showModalBottomSheet(
                   context: context,
-                  backgroundColor: AppColors.playfulSurface,
+                  backgroundColor: Theme.of(context).cardColor,
                   shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
                   ),
@@ -166,9 +165,9 @@ class _AddStampDialogState extends ConsumerState<AddStampDialog> {
               child: Container(
                 height: 200,
                 decoration: BoxDecoration(
-                  color: AppColors.playfulBackground,
+                  color: Theme.of(context).scaffoldBackgroundColor,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppColors.playfulPrimary.withOpacity(0.3), width: 2),
+                  border: Border.all(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3), width: 2),
                 ),
                 child: _selectedImagePath != null
                     ? ClipRRect(
@@ -178,9 +177,9 @@ class _AddStampDialogState extends ConsumerState<AddStampDialog> {
                     : Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.add_a_photo_outlined, size: 48, color: AppColors.playfulPrimary),
+                          Icon(Icons.add_a_photo_outlined, size: 48, color: Theme.of(context).colorScheme.primary),
                           const SizedBox(height: 8),
-                          Text(AppStrings.get('select_photo'), style: TextStyle(color: AppColors.playfulText.withOpacity(0.6))),
+                          Text(AppStrings.get('select_photo'), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6))),
                         ],
                       ),
               ),
@@ -205,7 +204,7 @@ class _AddStampDialogState extends ConsumerState<AddStampDialog> {
             ElevatedButton(
               onPressed: (_selectedImagePath == null || _isSaving) ? null : _saveStamp,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.playfulPrimary,
+                backgroundColor: Theme.of(context).colorScheme.primary,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),

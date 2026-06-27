@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../shared/providers/cat_provider.dart';
 import '../providers/stamp_provider.dart';
@@ -29,7 +28,7 @@ class _StampAlbumScreenState extends ConsumerState<StampAlbumScreen> {
         : stamps.where((s) => s.catId == _selectedFilterCatId).toList();
 
     return Scaffold(
-      backgroundColor: AppColors.playfulBackground,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
           AppStrings.get('stamp_album'),
@@ -56,7 +55,7 @@ class _StampAlbumScreenState extends ConsumerState<StampAlbumScreen> {
               padding: const EdgeInsets.only(bottom: 130.0), // Increased padding to stay clear of floating navbar
               child: FloatingActionButton.extended(
                 onPressed: () => _showAddStampDialog(context, _selectedFilterCatId ?? selectedCat.id),
-                backgroundColor: AppColors.playfulPrimary,
+                backgroundColor: Theme.of(context).colorScheme.primary,
                 icon: const Icon(Icons.add_photo_alternate_outlined),
                 label: Text(AppStrings.get('add_stamp')),
               ),
@@ -79,7 +78,7 @@ class _StampAlbumScreenState extends ConsumerState<StampAlbumScreen> {
               onSelected: (selected) {
                 if (selected) setState(() => _selectedFilterCatId = null);
               },
-              selectedColor: AppColors.playfulPrimary.withOpacity(0.3),
+              selectedColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
             ),
           ),
           ...cats.map((cat) => Padding(
@@ -90,9 +89,9 @@ class _StampAlbumScreenState extends ConsumerState<StampAlbumScreen> {
               onSelected: (selected) {
                 if (selected) setState(() => _selectedFilterCatId = cat.id);
               },
-              selectedColor: AppColors.playfulPrimary.withOpacity(0.3),
+              selectedColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
             ),
-          )).toList(),
+          )),
         ],
       ),
     );

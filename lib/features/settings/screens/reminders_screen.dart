@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_strings.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../core/services/notification_service.dart';
 import '../../../shared/providers/cat_provider.dart';
 import '../../../shared/models/reminder.dart';
@@ -29,12 +28,12 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
     final aptReminders = reminders.where((r) => r.type == 'appointment').toList();
 
     return Scaffold(
-      backgroundColor: AppColors.playfulBackground,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('${AppStrings.get('reminders')} ', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900, color: AppColors.playfulText)),
+            Text('${AppStrings.get('reminders')} ', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900, color: Theme.of(context).colorScheme.onSurface)),
             const Text('🔔', style: TextStyle(fontSize: 24)),
           ],
         ),
@@ -42,7 +41,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: AppColors.playfulText),
+          icon: Icon(Icons.arrow_back_rounded, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => context.pop(),
         ),
       ),
@@ -89,7 +88,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: const Text('🔔 Test bildirimi gönderildi!', style: TextStyle(fontWeight: FontWeight.w900)),
-              backgroundColor: AppColors.playfulPrimary,
+              backgroundColor: Theme.of(context).colorScheme.primary,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             ),
@@ -100,7 +99,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [AppColors.playfulPrimary, AppColors.playfulPrimary.withValues(alpha: 0.7)],
+            colors: [Theme.of(context).colorScheme.primary, Theme.of(context).colorScheme.primary.withValues(alpha: 0.7)],
           ),
           borderRadius: BorderRadius.circular(20),
         ),
@@ -122,7 +121,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: AppColors.playfulPrimary.withValues(alpha: 0.15),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Text(emoji, style: const TextStyle(fontSize: 24)),
@@ -132,8 +131,8 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: AppColors.playfulText)),
-              Text(subtitle, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: AppColors.playfulText.withValues(alpha: 0.6))),
+              Text(title, style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: Theme.of(context).colorScheme.onSurface)),
+              Text(subtitle, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6))),
             ],
           ),
         ),
@@ -151,7 +150,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
-          BoxShadow(color: AppColors.playfulPrimary.withValues(alpha: 0.08), blurRadius: 10, offset: const Offset(0, 4)),
+          BoxShadow(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.08), blurRadius: 10, offset: const Offset(0, 4)),
         ],
       ),
       child: Row(
@@ -160,7 +159,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
-              color: reminder.isEnabled ? AppColors.playfulPrimary.withValues(alpha: 0.15) : Colors.grey.withValues(alpha: 0.1),
+              color: reminder.isEnabled ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.15) : Colors.grey.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
@@ -168,7 +167,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
               style: TextStyle(
                 fontWeight: FontWeight.w900,
                 fontSize: 20,
-                color: reminder.isEnabled ? AppColors.playfulPrimary : Colors.grey,
+                color: reminder.isEnabled ? Theme.of(context).colorScheme.primary : Colors.grey,
               ),
             ),
           ),
@@ -183,7 +182,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                   style: TextStyle(
                     fontWeight: FontWeight.w800,
                     fontSize: 15,
-                    color: reminder.isEnabled ? AppColors.playfulText : Colors.grey,
+                    color: reminder.isEnabled ? Theme.of(context).colorScheme.onSurface : Colors.grey,
                   ),
                 ),
                 Text(
@@ -191,7 +190,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                   style: TextStyle(
                     fontWeight: FontWeight.w700,
                     fontSize: 12,
-                    color: reminder.isEnabled ? AppColors.playfulTextLight : Colors.grey,
+                    color: reminder.isEnabled ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6) : Colors.grey,
                   ),
                 ),
               ],
@@ -201,8 +200,8 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
           Switch(
             value: reminder.isEnabled,
             onChanged: (_) => ref.read(reminderListProvider.notifier).toggleReminder(reminder.id),
-            activeTrackColor: AppColors.playfulPrimary.withValues(alpha: 0.4),
-            thumbColor: WidgetStatePropertyAll(reminder.isEnabled ? AppColors.playfulPrimary : Colors.grey),
+            activeTrackColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.4),
+            thumbColor: WidgetStatePropertyAll(reminder.isEnabled ? Theme.of(context).colorScheme.primary : Colors.grey),
           ),
           // Delete
           GestureDetector(
@@ -221,16 +220,16 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
         margin: const EdgeInsets.only(top: 8),
         padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
-          color: AppColors.playfulPrimary.withValues(alpha: 0.08),
+          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.playfulPrimary.withValues(alpha: 0.2), width: 2),
+          border: Border.all(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2), width: 2),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.add_rounded, color: AppColors.playfulPrimary, size: 22),
+            Icon(Icons.add_rounded, color: Theme.of(context).colorScheme.primary, size: 22),
             const SizedBox(width: 8),
-            Text(AppStrings.get('add_reminder'), style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: AppColors.playfulPrimary)),
+            Text(AppStrings.get('add_reminder'), style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: Theme.of(context).colorScheme.primary)),
           ],
         ),
       ),
@@ -242,13 +241,13 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        backgroundColor: AppColors.playfulBackground,
-        title: Text(AppStrings.get('delete_reminder'), style: const TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText)),
-        content: Text('${reminder.title} hatırlatıcısını silmek istediğinize emin misiniz?', style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.playfulText)),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        title: Text(AppStrings.get('delete_reminder'), style: TextStyle(fontWeight: FontWeight.w900, color: Theme.of(context).colorScheme.onSurface)),
+        content: Text('${reminder.title} hatırlatıcısını silmek istediğinize emin misiniz?', style: TextStyle(fontWeight: FontWeight.w700, color: Theme.of(context).colorScheme.onSurface)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text(AppStrings.get('cancel'), style: const TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText)),
+            child: Text(AppStrings.get('cancel'), style: TextStyle(fontWeight: FontWeight.w900, color: Theme.of(context).colorScheme.onSurface)),
           ),
           ElevatedButton(
             onPressed: () {
@@ -257,7 +256,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(AppStrings.get('reminder_deleted'), style: const TextStyle(fontWeight: FontWeight.w900)),
-                  backgroundColor: AppColors.playfulPrimary,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
                   behavior: SnackBarBehavior.floating,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 ),
@@ -282,7 +281,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(AppStrings.get('add_cat_first'), style: const TextStyle(fontWeight: FontWeight.w900)),
-          backgroundColor: AppColors.playfulPrimary,
+          backgroundColor: Theme.of(context).colorScheme.primary,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         ),
@@ -315,7 +314,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
       builder: (ctx) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-          backgroundColor: AppColors.playfulBackground,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           title: Row(
             children: [
               Text(
@@ -323,7 +322,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                 style: const TextStyle(fontSize: 24),
               ),
               const SizedBox(width: 8),
-              Text(AppStrings.get('add_reminder'), style: const TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText, fontSize: 18)),
+              Text(AppStrings.get('add_reminder'), style: TextStyle(fontWeight: FontWeight.w900, color: Theme.of(context).colorScheme.onSurface, fontSize: 18)),
             ],
           ),
           content: SingleChildScrollView(
@@ -333,7 +332,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
               children: [
                 // Cat Selector
                 if (cats.length > 1) ...[
-                  Text('Kedi', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: AppColors.playfulTextLight)),
+                  Text('Kedi', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6))),
                   const SizedBox(height: 6),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -359,7 +358,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                 ],
 
                 // Title
-                Text(AppStrings.get('reminder_title'), style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: AppColors.playfulTextLight)),
+                Text(AppStrings.get('reminder_title'), style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6))),
                 const SizedBox(height: 6),
                 TextField(
                   controller: titleController,
@@ -370,12 +369,12 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   ),
-                  style: const TextStyle(fontWeight: FontWeight.w800, color: AppColors.playfulText),
+                  style: TextStyle(fontWeight: FontWeight.w800, color: Theme.of(context).colorScheme.onSurface),
                 ),
                 const SizedBox(height: 16),
 
                 // Time Picker
-                Text(AppStrings.get('reminder_time'), style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: AppColors.playfulTextLight)),
+                Text(AppStrings.get('reminder_time'), style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6))),
                 const SizedBox(height: 6),
                 GestureDetector(
                   onTap: () async {
@@ -385,11 +384,11 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                       builder: (context, child) {
                         return Theme(
                           data: Theme.of(context).copyWith(
-                            colorScheme: const ColorScheme.light(
-                              primary: AppColors.playfulPrimary,
+                            colorScheme: ColorScheme.light(
+                              primary: Theme.of(context).colorScheme.primary,
                               onPrimary: Colors.white,
-                              surface: AppColors.playfulBackground,
-                              onSurface: AppColors.playfulText,
+                              surface: Theme.of(context).scaffoldBackgroundColor,
+                              onSurface: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                           child: child!,
@@ -411,9 +410,9 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                       children: [
                         Text(
                           '${selectedTime.hour.toString().padLeft(2, '0')}:${selectedTime.minute.toString().padLeft(2, '0')}',
-                          style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 22, color: AppColors.playfulText),
+                          style: TextStyle(fontWeight: FontWeight.w900, fontSize: 22, color: Theme.of(context).colorScheme.onSurface),
                         ),
-                        const Icon(Icons.access_time_rounded, color: AppColors.playfulPrimary),
+                        Icon(Icons.access_time_rounded, color: Theme.of(context).colorScheme.primary),
                       ],
                     ),
                   ),
@@ -424,7 +423,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: Text(AppStrings.get('cancel'), style: const TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText)),
+              child: Text(AppStrings.get('cancel'), style: TextStyle(fontWeight: FontWeight.w900, color: Theme.of(context).colorScheme.onSurface)),
             ),
             ElevatedButton(
               onPressed: () {
@@ -444,14 +443,14 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(AppStrings.get('reminder_added'), style: const TextStyle(fontWeight: FontWeight.w900)),
-                    backgroundColor: AppColors.playfulSecondary,
+                    backgroundColor: Theme.of(context).colorScheme.secondary,
                     behavior: SnackBarBehavior.floating,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.playfulPrimary,
+                backgroundColor: Theme.of(context).colorScheme.primary,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               ),

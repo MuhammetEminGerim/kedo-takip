@@ -14,6 +14,7 @@ import '../../features/settings/screens/settings_screen.dart';
 import '../../features/settings/screens/reminders_screen.dart';
 import '../constants/app_strings.dart';
 import '../theme/app_icons.dart';
+import '../theme/app_theme.dart';
 import '../../shared/models/cat.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -121,82 +122,114 @@ class ScaffoldWithBottomNavBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentIndex = _calculateSelectedIndex(context);
+    final theme = Theme.of(context);
+    final themeType = ref.watch(themeProvider);
+
+    // Theme-adaptive navbar colors
+    Color navBg;
+    Color activeColor;
+    Color inactiveColor;
+    bool showActiveUnderline;
+
+    switch (themeType) {
+      case AppThemeType.modern:
+        navBg = Colors.white;
+        activeColor = const Color(0xFF1E293B);
+        inactiveColor = const Color(0xFF94A3B8);
+        showActiveUnderline = true;
+        break;
+      case AppThemeType.dark:
+        navBg = theme.colorScheme.surface;
+        activeColor = theme.colorScheme.primary;
+        inactiveColor = theme.colorScheme.onSurface.withValues(alpha: 0.4);
+        showActiveUnderline = false;
+        break;
+      case AppThemeType.playful:
+      default:
+        navBg = const Color(0xFFFFECD6);
+        activeColor = const Color(0xFFC0A3E5);
+        inactiveColor = const Color(0xFF3E2723);
+        showActiveUnderline = false;
+        break;
+    }
 
     return Scaffold(
-      body: Stack(
-        children: [
-          child,
-          // Floating Pill Nav Bar
-          Positioned(
-            left: 12,
-            right: 12,
-            bottom: 24,
-            child: Container(
-              height: 85,
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFF6ED), // Match the cream background of the mockup nav
-                borderRadius: BorderRadius.circular(42),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF8D6E63).withOpacity(0.1),
-                    blurRadius: 15,
-                    offset: const Offset(0, 5),
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _buildNavItem(context, 0, currentIndex, AppIcons.navHome, AppStrings.get('nav_home')),
-                  _buildNavItem(context, 1, currentIndex, AppIcons.navHealth, AppStrings.get('nav_health')),
-                  _buildNavItem(context, 2, currentIndex, AppIcons.navCare, AppStrings.get('nav_care')),
-                  _buildNavItem(context, 3, currentIndex, AppIcons.navStats, AppStrings.get('nav_stats')),
-                  _buildNavItem(context, 4, currentIndex, AppIcons.navLearn, AppStrings.get('nav_learn')),
-                ],
-              ),
+      body: child,
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: navBg,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(24),
+            topRight: Radius.circular(24),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.06),
+              blurRadius: 12,
+              offset: const Offset(0, -3),
+            ),
+          ],
+        ),
+        child: SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildNavItem(context, 0, currentIndex, AppIcons.navHome, AppStrings.get('nav_home'), activeColor, inactiveColor, showActiveUnderline),
+                _buildNavItem(context, 1, currentIndex, AppIcons.navHealth, AppStrings.get('nav_health'), activeColor, inactiveColor, showActiveUnderline),
+                _buildNavItem(context, 2, currentIndex, AppIcons.navCare, AppStrings.get('nav_care'), activeColor, inactiveColor, showActiveUnderline),
+                _buildNavItem(context, 3, currentIndex, AppIcons.navStats, AppStrings.get('nav_stats'), activeColor, inactiveColor, showActiveUnderline),
+                _buildNavItem(context, 4, currentIndex, AppIcons.navAlbum, AppStrings.get('nav_album'), activeColor, inactiveColor, showActiveUnderline),
+              ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildNavItem(BuildContext context, int index, int currentIndex, Widget Function({Color? color, double size}) iconBuilder, String label) {
+  Widget _buildNavItem(BuildContext context, int index, int currentIndex, Widget Function({Color? color, double size}) iconBuilder, String label, Color activeColor, Color inactiveColor, bool showUnderline) {
     final isSelected = index == currentIndex;
-    const selectedColor = Color(0xFFFF9E80); // Lighter coral to match mockup
-    final iconColor = isSelected ? Colors.white : const Color(0xFF5D4037);
 
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => _onItemTapped(index, context),
-        behavior: HitTestBehavior.opaque,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          height: double.infinity,
-          margin: const EdgeInsets.symmetric(horizontal: 4),
-          decoration: BoxDecoration(
-            color: isSelected ? selectedColor : Colors.transparent,
-            borderRadius: BorderRadius.circular(35),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              iconBuilder(color: iconColor, size: 24),
+    return GestureDetector(
+      onTap: () => _onItemTapped(index, context),
+      behavior: HitTestBehavior.opaque,
+      child: SizedBox(
+        width: 56,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            iconBuilder(
+              color: isSelected ? activeColor : inactiveColor,
+              size: 24,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 10,
+                fontFamily: 'Nunito',
+                fontWeight: isSelected ? FontWeight.w900 : FontWeight.w700,
+                color: isSelected ? activeColor : inactiveColor,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            if (showUnderline) ...[
               const SizedBox(height: 4),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 10,
-                  fontFamily: 'Nunito',
-                  fontWeight: FontWeight.w900,
-                  color: iconColor,
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                height: 2.5,
+                width: isSelected ? 20 : 0,
+                decoration: BoxDecoration(
+                  color: activeColor,
+                  borderRadius: BorderRadius.circular(2),
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
               ),
             ],
-          ),
+          ],
         ),
       ),
     );
@@ -207,7 +240,7 @@ class ScaffoldWithBottomNavBar extends ConsumerWidget {
     if (location.startsWith('/health')) return 1;
     if (location.startsWith('/care')) return 2;
     if (location.startsWith('/analytics')) return 3;
-    if (location.startsWith('/training')) return 4;
+    if (location.startsWith('/stamps')) return 4;
     return 0;
   }
 
@@ -226,8 +259,9 @@ class ScaffoldWithBottomNavBar extends ConsumerWidget {
         context.go('/analytics');
         break;
       case 4:
-        context.go('/training');
+        context.go('/stamps');
         break;
     }
   }
 }
+

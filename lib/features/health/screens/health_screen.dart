@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-import '../../../core/theme/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../shared/providers/cat_provider.dart';
 import '../../../shared/widgets/pastel_card.dart';
@@ -39,13 +38,13 @@ class _HealthScreenState extends ConsumerState<HealthScreen> with SingleTickerPr
       return Scaffold(
         appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
         body: Center(
-          child: Text(AppStrings.get('no_cat_selected'), style: const TextStyle(color: AppColors.playfulText)),
+          child: Text(AppStrings.get('no_cat_selected'), style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
         ),
       );
     }
 
     return Scaffold(
-      backgroundColor: AppColors.playfulBackground,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -54,14 +53,14 @@ class _HealthScreenState extends ConsumerState<HealthScreen> with SingleTickerPr
           AppStrings.get('health_title'),
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.w900,
-            color: AppColors.playfulText,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
         bottom: TabBar(
           controller: _tabController,
-          labelColor: AppColors.playfulPrimary,
-          unselectedLabelColor: AppColors.playfulText.withValues(alpha: 0.5),
-          indicatorColor: AppColors.playfulPrimary,
+          labelColor: Theme.of(context).colorScheme.primary,
+          unselectedLabelColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+          indicatorColor: Theme.of(context).colorScheme.primary,
           indicatorWeight: 4,
           labelStyle: const TextStyle(fontWeight: FontWeight.w800, fontFamily: 'Nunito', fontSize: 14),
           labelPadding: const EdgeInsets.symmetric(horizontal: 4),
@@ -92,7 +91,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> with SingleTickerPr
               _showAddMedicationDialog(context, ref, selectedCat.id);
             }
           },
-          backgroundColor: AppColors.playfulPrimary,
+          backgroundColor: Theme.of(context).colorScheme.primary,
           child: const Icon(Icons.add, color: Colors.white, size: 32),
         ),
       ),
@@ -123,7 +122,7 @@ class _VaccinesTab extends ConsumerWidget {
 
     if (vaccines.isEmpty) {
       return Center(
-        child: Text(AppStrings.get('no_vaccines'), style: TextStyle(color: AppColors.playfulText.withOpacity(0.6))),
+        child: Text(AppStrings.get('no_vaccines'), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6))),
       );
     }
 
@@ -135,20 +134,19 @@ class _VaccinesTab extends ConsumerWidget {
         return Padding(
           padding: const EdgeInsets.only(bottom: 12),
           child: PastelCard(
-            backgroundColor: Colors.white,
             child: ListTile(
             leading: Container(
               padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(color: AppColors.playfulAccentBlue.withOpacity(0.3), shape: BoxShape.circle),
-              child: const Icon(Icons.vaccines, color: AppColors.playfulAccentBlue),
+              decoration: BoxDecoration(color: Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.3), shape: BoxShape.circle),
+              child: Icon(Icons.vaccines, color: Theme.of(context).colorScheme.secondaryContainer),
             ),
-            title: Text(v.name, style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.playfulText)),
+            title: Text(v.name, style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('${AppStrings.get('date_administered')}: ${DateFormat.yMMMd().format(v.dateAdministered)}'),
                 if (v.nextDueDate != null)
-                  Text('${AppStrings.get('next_due_date')}: ${DateFormat.yMMMd().format(v.nextDueDate!)}', style: const TextStyle(color: AppColors.playfulPrimary, fontWeight: FontWeight.w600)),
+                  Text('${AppStrings.get('next_due_date')}: ${DateFormat.yMMMd().format(v.nextDueDate!)}', style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.w600)),
               ],
             ),
             trailing: IconButton(
@@ -174,7 +172,7 @@ class _AppointmentsTab extends ConsumerWidget {
 
     if (appts.isEmpty) {
       return Center(
-        child: Text(AppStrings.get('no_appointments'), style: TextStyle(color: AppColors.playfulText.withOpacity(0.6))),
+        child: Text(AppStrings.get('no_appointments'), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6))),
       );
     }
 
@@ -186,14 +184,13 @@ class _AppointmentsTab extends ConsumerWidget {
         return Padding(
           padding: const EdgeInsets.only(bottom: 12),
           child: PastelCard(
-            backgroundColor: Colors.white,
             child: ListTile(
             leading: Container(
               padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(color: AppColors.playfulPrimary.withOpacity(0.3), shape: BoxShape.circle),
-              child: const Icon(Icons.calendar_month, color: AppColors.playfulPrimary),
+              decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3), shape: BoxShape.circle),
+              child: Icon(Icons.calendar_month, color: Theme.of(context).colorScheme.primary),
             ),
-            title: Text(a.title, style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.playfulText)),
+            title: Text(a.title, style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -225,7 +222,7 @@ class _MedicationsTab extends ConsumerWidget {
 
     if (meds.isEmpty) {
       return Center(
-        child: Text(AppStrings.get('no_medications'), style: TextStyle(color: AppColors.playfulText.withOpacity(0.6))),
+        child: Text(AppStrings.get('no_medications'), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6))),
       );
     }
 
@@ -237,14 +234,13 @@ class _MedicationsTab extends ConsumerWidget {
         return Padding(
           padding: const EdgeInsets.only(bottom: 12),
           child: PastelCard(
-            backgroundColor: Colors.white,
             child: ListTile(
             leading: Container(
               padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(color: AppColors.playfulSecondary.withOpacity(0.3), shape: BoxShape.circle),
-              child: const Icon(Icons.medication, color: AppColors.playfulSecondary),
+              decoration: BoxDecoration(color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.3), shape: BoxShape.circle),
+              child: Icon(Icons.medication, color: Theme.of(context).colorScheme.secondary),
             ),
-            title: Text(m.name, style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.playfulText)),
+            title: Text(m.name, style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

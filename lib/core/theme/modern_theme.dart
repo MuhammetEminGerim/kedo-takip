@@ -12,18 +12,20 @@ class ModernTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      colorScheme: ColorScheme.light(
+      colorScheme: const ColorScheme.light(
         primary: AppColors.modernPrimary,
         secondary: AppColors.modernSecondary,
-        background: AppColors.modernBackground,
+        tertiary: Color(0xFF6366F1),
         surface: AppColors.modernSurface,
+        primaryContainer: Color(0xFFFFEDD5), // Light orange
+        secondaryContainer: Color(0xFFCCFBF1), // Light teal
       ),
       scaffoldBackgroundColor: AppColors.modernBackground,
       textTheme: textTheme,
       cardTheme: CardThemeData(
         color: AppColors.modernSurface,
         elevation: 2,
-        shadowColor: Colors.black.withOpacity(0.05),
+        shadowColor: Colors.black.withValues(alpha: 0.05),
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(16)),
         ),

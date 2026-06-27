@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/constants/app_strings.dart';
-import '../../../core/theme/app_colors.dart';
 
 class OnboardingScreen extends StatefulWidget {
   final VoidCallback onComplete;
@@ -36,24 +35,24 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         emoji: '🐱',
         title: AppStrings.get('onboarding_title_1'),
         subtitle: AppStrings.get('onboarding_subtitle_1'),
-        color: AppColors.playfulPrimary,
+        color: Theme.of(context).colorScheme.primary,
       ),
       _OnboardingPage(
         emoji: '🎙️',
         title: AppStrings.get('onboarding_title_2'),
         subtitle: AppStrings.get('onboarding_subtitle_2'),
-        color: AppColors.playfulSecondary,
+        color: Theme.of(context).colorScheme.secondary,
       ),
       _OnboardingPage(
         emoji: '💊',
         title: AppStrings.get('onboarding_title_3'),
         subtitle: AppStrings.get('onboarding_subtitle_3'),
-        color: AppColors.playfulTertiary,
+        color: Theme.of(context).colorScheme.tertiary,
       ),
     ];
 
     return Scaffold(
-      backgroundColor: AppColors.playfulBackground,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -69,7 +68,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     style: TextStyle(
                       fontWeight: FontWeight.w900,
                       fontSize: 16,
-                      color: AppColors.playfulText.withOpacity(0.5),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                     ),
                   ),
                 ),
@@ -94,7 +93,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           width: 150,
                           height: 150,
                           decoration: BoxDecoration(
-                            color: page.color.withOpacity(0.2),
+                            color: page.color.withValues(alpha: 0.2),
                             shape: BoxShape.circle,
                           ),
                           child: Center(
@@ -105,22 +104,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         Text(
                           page.title,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontFamily: 'Nunito',
                             fontWeight: FontWeight.w900,
                             fontSize: 32,
-                            color: AppColors.playfulText,
+                            color: Theme.of(context).colorScheme.onSurface,
                             height: 1.2,
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        SizedBox(height: 16),
                         Text(
                           page.subtitle,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontWeight: FontWeight.w700,
                             fontSize: 16,
-                            color: AppColors.playfulText.withOpacity(0.6),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                             height: 1.4,
                           ),
                         ),
@@ -148,8 +147,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         height: 10,
                         decoration: BoxDecoration(
                           color: _currentPage == index
-                              ? AppColors.playfulPrimary
-                              : AppColors.playfulText.withOpacity(0.15),
+                              ? Theme.of(context).colorScheme.primary
+                              : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(5),
                         ),
                       ),
@@ -177,13 +176,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         gradient: LinearGradient(
                           colors: [
                             pages[_currentPage].color,
-                            AppColors.playfulAccentPeach,
+                            Theme.of(context).colorScheme.primaryContainer,
                           ],
                         ),
                         borderRadius: BorderRadius.circular(24),
                         boxShadow: [
                           BoxShadow(
-                            color: pages[_currentPage].color.withOpacity(0.4),
+                            color: pages[_currentPage].color.withValues(alpha: 0.4),
                             blurRadius: 12,
                             offset: const Offset(0, 4),
                           ),

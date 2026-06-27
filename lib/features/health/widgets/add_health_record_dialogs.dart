@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-import '../../../core/theme/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../providers/health_provider.dart';
 
@@ -23,8 +22,8 @@ void showAddVaccineDialog(BuildContext context, WidgetRef ref, String catId) {
               bottom: MediaQuery.of(ctx).viewInsets.bottom + 130,
               top: 24, left: 24, right: 24,
             ),
-            decoration: const BoxDecoration(
-              color: AppColors.playfulBackground,
+            decoration: BoxDecoration(
+              color: Theme.of(context).scaffoldBackgroundColor,
               borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
             ),
             child: SingleChildScrollView(
@@ -67,7 +66,7 @@ void showAddVaccineDialog(BuildContext context, WidgetRef ref, String catId) {
                 const SizedBox(height: 24),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.playfulPrimary,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -111,8 +110,8 @@ void showAddAppointmentDialog(BuildContext context, WidgetRef ref, String catId)
               bottom: MediaQuery.of(ctx).viewInsets.bottom + 130,
               top: 24, left: 24, right: 24,
             ),
-            decoration: const BoxDecoration(
-              color: AppColors.playfulBackground,
+            decoration: BoxDecoration(
+              color: Theme.of(context).scaffoldBackgroundColor,
               borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
             ),
             child: Column(
@@ -160,7 +159,7 @@ void showAddAppointmentDialog(BuildContext context, WidgetRef ref, String catId)
                 const SizedBox(height: 24),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.playfulPrimary,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -204,8 +203,8 @@ void showAddMedicationDialog(BuildContext context, WidgetRef ref, String catId) 
               bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
               top: 24, left: 24, right: 24,
             ),
-            decoration: const BoxDecoration(
-              color: AppColors.playfulBackground,
+            decoration: BoxDecoration(
+              color: Theme.of(context).scaffoldBackgroundColor,
               borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
             ),
             child: Column(
@@ -266,7 +265,7 @@ void showAddMedicationDialog(BuildContext context, WidgetRef ref, String catId) 
                 const SizedBox(height: 24),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.playfulPrimary,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),

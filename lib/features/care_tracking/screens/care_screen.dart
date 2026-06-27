@@ -6,7 +6,6 @@ import 'package:intl/intl.dart';
 import '../providers/care_log_provider.dart';
 import '../../../shared/providers/cat_provider.dart';
 import '../../../shared/models/care_log.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../shared/widgets/pastel_card.dart';
 import '../../../core/constants/app_strings.dart';
 
@@ -26,12 +25,12 @@ class CareScreen extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('${AppStrings.get('care_log')} ', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900, color: AppColors.playfulText, fontSize: 26)),
-                const Icon(Icons.pets, color: AppColors.playfulText, size: 24),
+                Text('${AppStrings.get('care_log')} ', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900, color: Theme.of(context).colorScheme.onSurface, fontSize: 26)),
+                Icon(Icons.pets, color: Theme.of(context).colorScheme.onSurface, size: 24),
               ],
             ),
             const SizedBox(height: 4),
-            Text(DateFormat("EEEE, d MMMM").format(DateTime.now()), style: TextStyle(color: AppColors.playfulText.withOpacity(0.8), fontSize: 14, fontWeight: FontWeight.bold)),
+            Text(DateFormat("EEEE, d MMMM").format(DateTime.now()), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8), fontSize: 14, fontWeight: FontWeight.bold)),
           ],
         ),
         toolbarHeight: 80,
@@ -67,8 +66,8 @@ class CareScreen extends ConsumerWidget {
                               height: 70,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: AppColors.playfulSurface,
-                                border: isSelected ? Border.all(color: AppColors.playfulPrimary, width: 4) : Border.all(color: AppColors.playfulText.withOpacity(0.1), width: 2),
+                                color: Theme.of(context).cardColor,
+                                border: isSelected ? Border.all(color: Theme.of(context).colorScheme.primary, width: 4) : Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1), width: 2),
                                 image: cat.photoPath != null && cat.photoPath!.isNotEmpty
                                     ? DecorationImage(image: FileImage(File(cat.photoPath!)), fit: BoxFit.cover)
                                     : const DecorationImage(image: AssetImage('assets/images/cat_avatar.png'), fit: BoxFit.cover),
@@ -80,7 +79,7 @@ class CareScreen extends ConsumerWidget {
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: isSelected ? FontWeight.w900 : FontWeight.bold,
-                                color: AppColors.playfulText,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
                           ],
@@ -97,7 +96,7 @@ class CareScreen extends ConsumerWidget {
                 ref: ref,
                 title: AppStrings.get('food'),
                 emoji: '🥣',
-                bgColor: AppColors.playfulPrimary,
+                bgColor: Theme.of(context).colorScheme.primary,
                 lastLog: _getLastLog(logs, 'food'),
                 allLogs: _getAllLogs(logs, 'food'),
                 statusText: _getFoodStatus(logs),
@@ -110,7 +109,7 @@ class CareScreen extends ConsumerWidget {
                 ref: ref,
                 title: AppStrings.get('water'),
                 emoji: '💧',
-                bgColor: AppColors.playfulAccentBlue,
+                bgColor: Theme.of(context).colorScheme.secondaryContainer,
                 lastLog: _getLastLog(logs, 'water'),
                 allLogs: _getAllLogs(logs, 'water'),
                 statusText: _getWaterStatus(logs),
@@ -123,7 +122,7 @@ class CareScreen extends ConsumerWidget {
                 ref: ref,
                 title: AppStrings.get('litter'),
                 emoji: '🚽',
-                bgColor: AppColors.playfulSecondary,
+                bgColor: Theme.of(context).colorScheme.secondary,
                 lastLog: _getLastLog(logs, 'litter'),
                 allLogs: _getAllLogs(logs, 'litter'),
                 statusText: _getLitterStatus(logs),
@@ -187,9 +186,9 @@ class CareScreen extends ConsumerWidget {
       isScrollControlled: true,
       builder: (ctx) => Container(
         constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.6),
-        padding: const EdgeInsets.all(24),
-        decoration: const BoxDecoration(
-          color: AppColors.playfulBackground,
+        padding: EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: Theme.of(context).scaffoldBackgroundColor,
           borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
         ),
         child: Column(
@@ -199,17 +198,17 @@ class CareScreen extends ConsumerWidget {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: AppColors.playfulText.withOpacity(0.2),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
             const SizedBox(height: 16),
-            Text('$emoji $historyTitle', style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 20, color: AppColors.playfulText)),
+            Text('$emoji $historyTitle', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 20, color: Theme.of(context).colorScheme.onSurface)),
             const SizedBox(height: 16),
             if (allLogs.isEmpty)
               Padding(
                 padding: const EdgeInsets.all(32),
-                child: Text(noLogsText, style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText.withOpacity(0.4))),
+                child: Text(noLogsText, style: TextStyle(fontWeight: FontWeight.w900, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4))),
               )
             else
               Flexible(
@@ -236,11 +235,11 @@ class CareScreen extends ConsumerWidget {
                           context: context,
                           builder: (c) => AlertDialog(
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-                            backgroundColor: AppColors.playfulBackground,
-                            title: Text(AppStrings.get('delete_log'), style: const TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText)),
+                            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                            title: Text(AppStrings.get('delete_log'), style: TextStyle(fontWeight: FontWeight.w900, color: Theme.of(context).colorScheme.onSurface)),
                             content: Text(AppStrings.get('cannot_be_undone'), style: const TextStyle(fontWeight: FontWeight.w700)),
                             actions: [
-                              TextButton(onPressed: () => Navigator.pop(c, false), child: Text(AppStrings.get('cancel'), style: const TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText))),
+                              TextButton(onPressed: () => Navigator.pop(c, false), child: Text(AppStrings.get('cancel'), style: TextStyle(fontWeight: FontWeight.w900, color: Theme.of(context).colorScheme.onSurface))),
                               ElevatedButton(
                                 onPressed: () => Navigator.pop(c, true),
                                 style: ElevatedButton.styleFrom(backgroundColor: Colors.red.shade300, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
@@ -268,15 +267,15 @@ class CareScreen extends ConsumerWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(log.value ?? '', style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: AppColors.playfulText)),
+                                  Text(log.value ?? '', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: Theme.of(context).colorScheme.onSurface)),
                                   Text(
                                     DateFormat('MMM d, yyyy • h:mm a').format(log.timestamp),
-                                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12, color: AppColors.playfulText.withOpacity(0.6)),
+                                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)),
                                   ),
                                 ],
                               ),
                             ),
-                            Text(_getTimeAgo(log.timestamp), style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: AppColors.playfulText.withOpacity(0.4))),
+                            Text(_getTimeAgo(log.timestamp), style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4))),
                           ],
                         ),
                       ),
@@ -305,14 +304,14 @@ class CareScreen extends ConsumerWidget {
     return GestureDetector(
       onTap: () => _showCareHistory(context, ref, historyKey, emoji, allLogs),
       child: PastelCard(
-        backgroundColor: bgColor.withOpacity(0.4),
+        backgroundColor: bgColor.withValues(alpha: 0.4),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: bgColor.withOpacity(0.6),
+                color: bgColor.withValues(alpha: 0.6),
                 shape: BoxShape.circle,
               ),
               child: Text(emoji, style: const TextStyle(fontSize: 28)),
@@ -322,9 +321,9 @@ class CareScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 22, color: AppColors.playfulText, letterSpacing: 1.1)),
+                  Text(title, style: TextStyle(fontWeight: FontWeight.w900, fontSize: 22, color: Theme.of(context).colorScheme.onSurface, letterSpacing: 1.1)),
                   const SizedBox(height: 4),
-                  Text(statusText, style: TextStyle(color: AppColors.playfulText.withOpacity(0.9), fontSize: 14, fontWeight: FontWeight.w800)),
+                  Text(statusText, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9), fontSize: 14, fontWeight: FontWeight.w800)),
                 ],
               ),
             ),
@@ -336,9 +335,9 @@ class CareScreen extends ConsumerWidget {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   shape: BoxShape.circle,
-                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4, offset: const Offset(0, 2))],
+                  boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 4, offset: const Offset(0, 2))],
                 ),
-                child: const Icon(Icons.add_rounded, color: AppColors.playfulText, size: 28),
+                child: Icon(Icons.add_rounded, color: Theme.of(context).colorScheme.onSurface, size: 28),
               ),
             )
           ],
@@ -353,14 +352,14 @@ class CareScreen extends ConsumerWidget {
     return GestureDetector(
       onTap: () => _showCareHistory(context, ref, 'weight', '⚖️', weightLogs),
       child: PastelCard(
-        backgroundColor: AppColors.playfulAccentPeach.withOpacity(0.4),
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.4),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppColors.playfulAccentPeach.withOpacity(0.6),
+                color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.6),
                 shape: BoxShape.circle,
               ),
               child: const Text('⚖️', style: TextStyle(fontSize: 28)),
@@ -370,9 +369,9 @@ class CareScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(AppStrings.get('weight'), style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 22, color: AppColors.playfulText, letterSpacing: 1.1)),
+                  Text(AppStrings.get('weight'), style: TextStyle(fontWeight: FontWeight.w900, fontSize: 22, color: Theme.of(context).colorScheme.onSurface, letterSpacing: 1.1)),
                   const SizedBox(height: 4),
-                  Text('$currentWeight ${AppStrings.get('kg')}', style: TextStyle(color: AppColors.playfulText.withOpacity(0.9), fontSize: 14, fontWeight: FontWeight.w800)),
+                  Text('$currentWeight ${AppStrings.get('kg')}', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9), fontSize: 14, fontWeight: FontWeight.w800)),
                 ],
               ),
             ),
@@ -384,9 +383,9 @@ class CareScreen extends ConsumerWidget {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   shape: BoxShape.circle,
-                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4, offset: const Offset(0, 2))],
+                  boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 4, offset: const Offset(0, 2))],
                 ),
-                child: const Icon(Icons.add_rounded, color: AppColors.playfulText, size: 28),
+                child: Icon(Icons.add_rounded, color: Theme.of(context).colorScheme.onSurface, size: 28),
               ),
             )
           ],
@@ -402,16 +401,16 @@ class CareScreen extends ConsumerWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        backgroundColor: AppColors.playfulBackground,
-        title: Text(AppStrings.get('update_weight'), style: const TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText)),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        title: Text(AppStrings.get('update_weight'), style: TextStyle(fontWeight: FontWeight.w900, color: Theme.of(context).colorScheme.onSurface)),
         content: TextField(
           controller: controller,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 20, color: AppColors.playfulText),
+          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 20, color: Theme.of(context).colorScheme.onSurface),
           decoration: InputDecoration(
             hintText: selectedCat?.weight?.toString() ?? '0.0',
             suffixText: AppStrings.get('kg'),
-            suffixStyle: const TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText),
+            suffixStyle: TextStyle(fontWeight: FontWeight.w900, color: Theme.of(context).colorScheme.onSurface),
             filled: true,
             fillColor: Colors.white,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
@@ -420,7 +419,7 @@ class CareScreen extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text(AppStrings.get('cancel'), style: const TextStyle(fontWeight: FontWeight.w900, color: AppColors.playfulText)),
+            child: Text(AppStrings.get('cancel'), style: TextStyle(fontWeight: FontWeight.w900, color: Theme.of(context).colorScheme.onSurface)),
           ),
           ElevatedButton(
             onPressed: () {
@@ -428,12 +427,12 @@ class CareScreen extends ConsumerWidget {
               if (weight != null && selectedCat != null) {
                 selectedCat.weight = weight;
                 ref.read(catListProvider.notifier).updateCat(selectedCat);
-                ref.read(careLogListProvider.notifier).addLog(type: 'weight', value: '${weight}${AppStrings.get('kg')}');
+                ref.read(careLogListProvider.notifier).addLog(type: 'weight', value: '$weight${AppStrings.get('kg')}');
                 Navigator.pop(ctx);
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.playfulPrimary,
+              backgroundColor: Theme.of(context).colorScheme.primary,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             ),
             child: Text(AppStrings.get('save'), style: const TextStyle(fontWeight: FontWeight.w900, color: Colors.white)),

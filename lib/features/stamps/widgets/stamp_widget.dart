@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
 import '../../../shared/models/stamp.dart';
-import '../../../core/theme/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
@@ -71,7 +70,7 @@ class StampWidget extends StatelessWidget {
                   style: GoogleFonts.dancingScript(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.playfulText,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
               ],
@@ -101,7 +100,7 @@ class StampPainter extends CustomPainter {
       ..style = PaintingStyle.fill;
 
     final shadowPaint = Paint()
-      ..color = Colors.black.withOpacity(0.1)
+      ..color = Colors.black.withValues(alpha: 0.1)
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
 
     final path = Path();

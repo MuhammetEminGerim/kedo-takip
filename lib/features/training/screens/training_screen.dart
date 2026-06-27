@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 
-import '../../../core/theme/app_colors.dart';
 import '../../../shared/widgets/pastel_card.dart';
 import '../../../core/constants/app_strings.dart';
 
@@ -154,15 +153,15 @@ class _TrainingScreenState extends ConsumerState<TrainingScreen> {
         return StatefulBuilder(
           builder: (ctx, setDialogState) {
             return AlertDialog(
-              backgroundColor: AppColors.playfulBackground,
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
               title: Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Nunito',
                   fontWeight: FontWeight.w900,
                   fontSize: 22,
-                  color: AppColors.playfulText,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -180,23 +179,23 @@ class _TrainingScreenState extends ConsumerState<TrainingScreen> {
                     child: Center(
                       child: Text(
                         '${sliderVal.round()}%',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'Nunito',
                           fontWeight: FontWeight.w900,
                           fontSize: 22,
-                          color: AppColors.playfulText,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 20),
                   Text(
                     AppStrings.get('set_training_progress'),
                     style: TextStyle(
                       fontFamily: 'Nunito',
                       fontWeight: FontWeight.w900,
                       fontSize: 14,
-                      color: AppColors.playfulText.withValues(alpha: 0.6),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -232,7 +231,7 @@ class _TrainingScreenState extends ConsumerState<TrainingScreen> {
                     style: TextStyle(
                       fontFamily: 'Nunito',
                       fontWeight: FontWeight.w900,
-                      color: AppColors.playfulText.withValues(alpha: 0.5),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                     ),
                   ),
                 ),
@@ -240,7 +239,7 @@ class _TrainingScreenState extends ConsumerState<TrainingScreen> {
                   onPressed: () => Navigator.pop(ctx, sliderVal.round()),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: color,
-                    foregroundColor: AppColors.playfulText,
+                    foregroundColor: Theme.of(context).colorScheme.onSurface,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                     padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
                     elevation: 0,
@@ -278,8 +277,8 @@ class _TrainingScreenState extends ConsumerState<TrainingScreen> {
           constraints: BoxConstraints(
             maxHeight: MediaQuery.of(ctx).size.height * 0.7,
           ),
-          decoration: const BoxDecoration(
-            color: AppColors.playfulBackground,
+          decoration: BoxDecoration(
+            color: Theme.of(context).scaffoldBackgroundColor,
             borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
           ),
           child: Column(
@@ -290,7 +289,7 @@ class _TrainingScreenState extends ConsumerState<TrainingScreen> {
                 width: 48,
                 height: 5,
                 decoration: BoxDecoration(
-                  color: AppColors.playfulText.withValues(alpha: 0.15),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
@@ -302,19 +301,19 @@ class _TrainingScreenState extends ConsumerState<TrainingScreen> {
                   color: accentColor.withValues(alpha: 0.3),
                   shape: BoxShape.circle,
                 ),
-                child: Center(child: Icon(icon, size: 28, color: AppColors.playfulText)),
+                child: Center(child: Icon(icon, size: 28, color: Theme.of(context).colorScheme.onSurface)),
               ),
               const SizedBox(height: 12),
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Nunito',
                   fontWeight: FontWeight.w900,
                   fontSize: 22,
-                  color: AppColors.playfulText,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               Flexible(
                 child: ListView.separated(
                   shrinkWrap: true,
@@ -323,7 +322,6 @@ class _TrainingScreenState extends ConsumerState<TrainingScreen> {
                   separatorBuilder: (context, index) => const SizedBox(height: 12),
                   itemBuilder: (context, i) {
                     return PastelCard(
-                      backgroundColor: Colors.white,
                       padding: const EdgeInsets.all(16),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -338,24 +336,24 @@ class _TrainingScreenState extends ConsumerState<TrainingScreen> {
                             child: Center(
                               child: Text(
                                 '${i + 1}',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontFamily: 'Nunito',
                                   fontWeight: FontWeight.w900,
                                   fontSize: 14,
-                                  color: AppColors.playfulText,
+                                  color: Theme.of(context).colorScheme.onSurface,
                                 ),
                               ),
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          SizedBox(width: 12),
                           Expanded(
                             child: Text(
                               tips[i],
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontFamily: 'Nunito',
                                 fontWeight: FontWeight.w900,
                                 fontSize: 14,
-                                color: AppColors.playfulText,
+                                color: Theme.of(context).colorScheme.onSurface,
                                 height: 1.4,
                               ),
                             ),
@@ -377,9 +375,9 @@ class _TrainingScreenState extends ConsumerState<TrainingScreen> {
   @override
   Widget build(BuildContext context) {
     if (!_loaded) {
-      return const Scaffold(
+      return Scaffold(
         body: Center(
-          child: CircularProgressIndicator(color: AppColors.playfulPrimary),
+          child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary),
         ),
       );
     }
@@ -392,10 +390,10 @@ class _TrainingScreenState extends ConsumerState<TrainingScreen> {
               '${AppStrings.get('training')} ',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.w900,
-                    color: AppColors.playfulText,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
             ),
-            const Icon(Icons.school_outlined, color: AppColors.playfulText, size: 28),
+            Icon(Icons.school_outlined, color: Theme.of(context).colorScheme.onSurface, size: 28),
           ],
         ),
         backgroundColor: Colors.transparent,
@@ -412,14 +410,14 @@ class _TrainingScreenState extends ConsumerState<TrainingScreen> {
               // ─── Clicker Section ───
               Text(
                 AppStrings.get('clicker_button'),
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Nunito',
                   fontWeight: FontWeight.w900,
                   fontSize: 18,
-                  color: AppColors.playfulText,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               Row(
                 children: [
                   GestureDetector(
@@ -428,12 +426,12 @@ class _TrainingScreenState extends ConsumerState<TrainingScreen> {
                       width: 90,
                       height: 90,
                       decoration: BoxDecoration(
-                        color: AppColors.playfulSecondary,
+                        color: Theme.of(context).colorScheme.secondary,
                         shape: BoxShape.circle,
                         border: Border.all(color: Colors.white, width: 4),
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.playfulSecondary.withValues(alpha: 0.5),
+                            color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.5),
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           ),
@@ -442,11 +440,11 @@ class _TrainingScreenState extends ConsumerState<TrainingScreen> {
                       child: Center(
                         child: Text(
                           AppStrings.get('click'),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontFamily: 'Nunito',
                             fontWeight: FontWeight.w900,
                             fontSize: 20,
-                            color: AppColors.playfulText,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                       ),
@@ -458,18 +456,18 @@ class _TrainingScreenState extends ConsumerState<TrainingScreen> {
                     children: [
                       Text(
                         '$_tapsToday ${AppStrings.get('taps')}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'Nunito',
                           fontWeight: FontWeight.w900,
                           fontSize: 24,
-                          color: AppColors.playfulText,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                       Text(
                         AppStrings.get('today'),
                         style: TextStyle(
                           fontFamily: 'Nunito',
-                          color: AppColors.playfulText.withValues(alpha: 0.6),
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                           fontWeight: FontWeight.w900,
                           fontSize: 16,
                         ),
@@ -484,26 +482,26 @@ class _TrainingScreenState extends ConsumerState<TrainingScreen> {
               // ─── Training Plan ───
               Text(
                 AppStrings.get('cute_training_plan'),
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Nunito',
                   fontWeight: FontWeight.w900,
                   fontSize: 18,
-                  color: AppColors.playfulText,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               SizedBox(
                 height: 180,
                 child: ListView(
                   scrollDirection: Axis.horizontal,
                   children: [
-                    _buildTrainingPlanCard(AppStrings.get('sit'), 'sit', Icons.chair_alt_outlined, AppColors.playfulSecondary),
+                    _buildTrainingPlanCard(AppStrings.get('sit'), 'sit', Icons.chair_alt_outlined, Theme.of(context).colorScheme.secondary),
                     const SizedBox(width: 16),
-                    _buildTrainingPlanCard(AppStrings.get('come'), 'come', Icons.pets_outlined, AppColors.playfulPrimary),
+                    _buildTrainingPlanCard(AppStrings.get('come'), 'come', Icons.pets_outlined, Theme.of(context).colorScheme.primary),
                     const SizedBox(width: 16),
-                    _buildTrainingPlanCard(AppStrings.get('high_five'), 'highfive', Icons.pan_tool_outlined, AppColors.playfulTertiary),
+                    _buildTrainingPlanCard(AppStrings.get('high_five'), 'highfive', Icons.pan_tool_outlined, Theme.of(context).colorScheme.tertiary),
                     const SizedBox(width: 16),
-                    _buildTrainingPlanCard(AppStrings.get('carrier'), 'carrier', Icons.inventory_2_outlined, AppColors.playfulAccentPeach),
+                    _buildTrainingPlanCard(AppStrings.get('carrier'), 'carrier', Icons.inventory_2_outlined, Theme.of(context).colorScheme.primaryContainer),
                   ],
                 ),
               ),
@@ -512,7 +510,6 @@ class _TrainingScreenState extends ConsumerState<TrainingScreen> {
 
               // ─── Streak Card ───
               PastelCard(
-                backgroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 20),
                 child: Column(
                   children: [
@@ -521,26 +518,26 @@ class _TrainingScreenState extends ConsumerState<TrainingScreen> {
                       children: [
                         Icon(
                           Icons.local_fire_department_outlined,
-                          color: _streak > 0 ? Colors.deepOrange : AppColors.playfulText.withValues(alpha: 0.4),
+                          color: _streak > 0 ? Colors.deepOrange : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
                         ),
                         const SizedBox(width: 8),
                         Text(
                           '$_streak ${AppStrings.get('day_streak_label')}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontFamily: 'Nunito',
                             fontWeight: FontWeight.w900,
                             fontSize: 20,
-                            color: AppColors.playfulText,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: 4),
                     Text(
                       _streak > 0 ? AppStrings.get('keep_going') : AppStrings.get('tap_clicker_to_start'),
                       style: TextStyle(
                         fontFamily: 'Nunito',
-                        color: AppColors.playfulText.withValues(alpha: 0.6),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                         fontWeight: FontWeight.w900,
                       ),
                     ),
@@ -555,35 +552,35 @@ class _TrainingScreenState extends ConsumerState<TrainingScreen> {
                 children: [
                   Text(
                     '${AppStrings.get('guides')} ',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Nunito',
                       fontWeight: FontWeight.w900,
                       fontSize: 18,
-                      color: AppColors.playfulText,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
-                  const Icon(Icons.menu_book_outlined, size: 20, color: AppColors.playfulText),
+                  Icon(Icons.menu_book_outlined, size: 20, color: Theme.of(context).colorScheme.onSurface),
                 ],
               ),
               const SizedBox(height: 16),
               _buildGuideCard(
                 AppStrings.get('night_crying'),
                 Icons.nights_stay_outlined,
-                AppColors.playfulTertiary,
+                Theme.of(context).colorScheme.tertiary,
                 AppStrings.get('night_crying_tips').split('|'),
               ),
               const SizedBox(height: 12),
               _buildGuideCard(
                 AppStrings.get('scratching'),
                 Icons.pets_outlined,
-                AppColors.playfulPrimary,
+                Theme.of(context).colorScheme.primary,
                 AppStrings.get('scratching_tips').split('|'),
               ),
               const SizedBox(height: 12),
               _buildGuideCard(
                 AppStrings.get('biting'),
                 Icons.mood_bad_outlined,
-                AppColors.playfulAccentPeach,
+                Theme.of(context).colorScheme.primaryContainer,
                 AppStrings.get('biting_tips').split('|'),
               ),
               const SizedBox(height: 100),
@@ -623,17 +620,17 @@ class _TrainingScreenState extends ConsumerState<TrainingScreen> {
                 Flexible(
                   child: Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Nunito',
                       fontWeight: FontWeight.w900,
                       fontSize: 16,
-                      color: AppColors.playfulText,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                const SizedBox(width: 4),
-                Icon(icon, size: 16, color: AppColors.playfulText),
+                SizedBox(width: 4),
+                Icon(icon, size: 16, color: Theme.of(context).colorScheme.onSurface),
               ],
             ),
             const SizedBox(height: 8),
@@ -662,14 +659,14 @@ class _TrainingScreenState extends ConsumerState<TrainingScreen> {
             const SizedBox(height: 4),
             Text(
               '$progress%',
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Nunito',
                 fontWeight: FontWeight.w900,
                 fontSize: 12,
-                color: AppColors.playfulText,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
-            const Spacer(),
+            Spacer(),
             Container(
               width: 40,
               height: 40,
@@ -692,7 +689,6 @@ class _TrainingScreenState extends ConsumerState<TrainingScreen> {
 
   Widget _buildGuideCard(String title, IconData icon, Color accentColor, List<String> tips) {
     return PastelCard(
-      backgroundColor: Colors.white,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       onTap: () => _showGuideBottomSheet(title, icon, accentColor, tips),
       child: Row(
@@ -704,7 +700,7 @@ class _TrainingScreenState extends ConsumerState<TrainingScreen> {
               color: accentColor.withValues(alpha: 0.25),
               borderRadius: BorderRadius.circular(16),
             ),
-            child: Center(child: Icon(icon, size: 24, color: AppColors.playfulText)),
+            child: Center(child: Icon(icon, size: 24, color: Theme.of(context).colorScheme.onSurface)),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -713,16 +709,16 @@ class _TrainingScreenState extends ConsumerState<TrainingScreen> {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Nunito',
                     fontWeight: FontWeight.w900,
                     fontSize: 16,
-                    color: AppColors.playfulText,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: 4),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
                     color: accentColor.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
@@ -731,7 +727,7 @@ class _TrainingScreenState extends ConsumerState<TrainingScreen> {
                     AppStrings.get('read_more'),
                     style: TextStyle(
                       fontFamily: 'Nunito',
-                      color: AppColors.playfulText.withValues(alpha: 0.7),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                       fontWeight: FontWeight.w900,
                       fontSize: 12,
                     ),

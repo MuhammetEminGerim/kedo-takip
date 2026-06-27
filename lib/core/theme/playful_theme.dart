@@ -24,12 +24,13 @@ class PlayfulTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      colorScheme: ColorScheme.light(
+      colorScheme: const ColorScheme.light(
         primary: AppColors.playfulPrimary,
         secondary: AppColors.playfulSecondary,
         tertiary: AppColors.playfulTertiary,
-        background: AppColors.playfulBackground,
         surface: AppColors.playfulSurface,
+        primaryContainer: AppColors.playfulAccentPeach,
+        secondaryContainer: AppColors.playfulAccentBlue,
       ),
       scaffoldBackgroundColor: AppColors.playfulBackground,
       textTheme: textTheme,

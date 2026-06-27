@@ -36,10 +36,12 @@ class NotificationService {
         onDidReceiveNotificationResponse: _onNotificationTapped,
       );
 
-      // Request Android 13+ notification permission
+      // Request Android 13+ notification permissions
       if (Platform.isAndroid) {
-        await _plugin.resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()?.requestNotificationsPermission();
+        final androidImplementation = _plugin.resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>();
+            
+        await androidImplementation?.requestNotificationsPermission();
       }
     } catch (e) {
       debugPrint('🔔 Notification initialization failed (expected on Windows/Linux): $e');
@@ -85,7 +87,7 @@ class NotificationService {
           styleInformation: const BigTextStyleInformation(''),
         ),
       ),
-      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       matchDateTimeComponents: DateTimeComponents.time, // daily repeat
       payload: 'daily_$notificationId',
     );
@@ -124,7 +126,7 @@ class NotificationService {
           styleInformation: const BigTextStyleInformation(''),
         ),
       ),
-      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       payload: 'appointment_$notificationId',
     );
 
