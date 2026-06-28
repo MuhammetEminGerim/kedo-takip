@@ -33,14 +33,61 @@ class StampWidget extends ConsumerWidget {
               alignment: Alignment.topRight,
               children: [
                 InteractiveViewer(
-                  child: Image.file(
-                    File(stamp.imagePath),
-                    fit: BoxFit.contain,
+                  child: Center(
+                    child: CustomPaint(
+                      painter: StampPainter(),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Container(
+                          constraints: BoxConstraints(
+                            maxHeight: MediaQuery.of(context).size.height * 0.7,
+                            maxWidth: MediaQuery.of(context).size.width * 0.85,
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Flexible(
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.file(
+                                    File(stamp.imagePath),
+                                    fit: BoxFit.contain,
+                                  ),
+                                ),
+                              ),
+                              if (stamp.caption.isNotEmpty) ...[
+                                const SizedBox(height: 12),
+                                Text(
+                                  stamp.caption,
+                                  textAlign: TextAlign.center,
+                                  style: isModern 
+                                    ? const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Color(0xFF1E293B))
+                                    : GoogleFonts.dancingScript(fontSize: 24, fontWeight: FontWeight.bold, color: const Color(0xFF1E293B)),
+                                ),
+                              ],
+                              const SizedBox(height: 8),
+                              Text(
+                                DateFormat('dd MMM yyyy').format(stamp.date),
+                                textAlign: TextAlign.right,
+                                style: isModern
+                                  ? const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF94A3B8))
+                                  : GoogleFonts.nunito(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade600),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.close, color: Colors.white, size: 32),
-                  onPressed: () => Navigator.pop(ctx),
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: IconButton(
+                    icon: const Icon(Icons.close, color: Colors.white, size: 32),
+                    onPressed: () => Navigator.pop(ctx),
+                  ),
                 ),
               ],
             ),
@@ -52,69 +99,63 @@ class StampWidget extends ConsumerWidget {
   }
 
   Widget _buildModernCard(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF0F172A).withValues(alpha: 0.08),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-          )
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            Image.file(
-              File(stamp.imagePath),
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) =>
-                  const ColoredBox(color: Color(0xFFE2E8F0), child: Icon(Icons.broken_image, color: Colors.grey)),
-            ),
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: ClipRect(
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                    color: Colors.black.withValues(alpha: 0.4),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (stamp.caption.isNotEmpty)
+    return CustomPaint(
+      painter: StampPainter(),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Image.file(
+                File(stamp.imagePath),
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) =>
+                    const ColoredBox(color: Color(0xFFE2E8F0), child: Icon(Icons.broken_image, color: Colors.grey)),
+              ),
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: ClipRect(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      color: Colors.black.withValues(alpha: 0.4),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (stamp.caption.isNotEmpty)
+                            Text(
+                              stamp.caption,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.white,
+                              ),
+                            ),
+                          if (stamp.caption.isNotEmpty) const SizedBox(height: 2),
                           Text(
-                            stamp.caption,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.white,
+                            DateFormat('dd MMM yyyy').format(stamp.date),
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white.withValues(alpha: 0.8),
                             ),
                           ),
-                        if (stamp.caption.isNotEmpty) const SizedBox(height: 2),
-                        Text(
-                          DateFormat('dd MMM yyyy').format(stamp.date),
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white.withValues(alpha: 0.8),
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
