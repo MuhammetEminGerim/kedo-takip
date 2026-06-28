@@ -308,7 +308,7 @@ class DashboardScreen extends ConsumerWidget {
             },
           ),
           
-          const SizedBox(height: 120), // Padding to ensure content is visible above floating nav bar
+          const SizedBox(height: 16),
         ],
       ),
     );
