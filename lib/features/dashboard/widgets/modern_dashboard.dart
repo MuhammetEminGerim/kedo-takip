@@ -6,7 +6,6 @@ import 'package:intl/intl.dart';
 
 import '../../../shared/providers/cat_provider.dart';
 import '../../care_tracking/providers/care_log_provider.dart';
-import '../../../core/theme/app_icons.dart';
 import '../../../core/constants/app_strings.dart';
 
 class ModernDashboard extends ConsumerWidget {

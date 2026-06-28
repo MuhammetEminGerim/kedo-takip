@@ -4,7 +4,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'playful_theme.dart';
 import 'modern_theme.dart';
-import 'dark_theme.dart';
 
 enum AppThemeType { playful, modern }
 
