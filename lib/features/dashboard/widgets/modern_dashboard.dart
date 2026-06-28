@@ -7,12 +7,14 @@ import 'package:intl/intl.dart';
 import '../../../shared/providers/cat_provider.dart';
 import '../../care_tracking/providers/care_log_provider.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../core/providers/locale_provider.dart';
 
 class ModernDashboard extends ConsumerWidget {
   const ModernDashboard({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(localeProvider);
     final cats = ref.watch(catListProvider);
     final selectedCat = ref.watch(selectedCatProvider);
 

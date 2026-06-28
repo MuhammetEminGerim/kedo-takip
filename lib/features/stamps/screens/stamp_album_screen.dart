@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../core/providers/locale_provider.dart';
 import '../../../shared/providers/cat_provider.dart';
 import '../providers/stamp_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -20,6 +21,7 @@ class _StampAlbumScreenState extends ConsumerState<StampAlbumScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(localeProvider);
     final selectedCat = ref.watch(selectedCatProvider);
     final cats = ref.watch(catListProvider);
     final stamps = ref.watch(stampsProvider);

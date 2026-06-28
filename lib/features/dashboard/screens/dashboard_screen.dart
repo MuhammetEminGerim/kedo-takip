@@ -11,6 +11,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../shared/widgets/pastel_card.dart';
 import '../../../shared/widgets/pastel_action_button.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../core/providers/locale_provider.dart';
 import '../widgets/modern_dashboard.dart';
 
 class DashboardScreen extends ConsumerWidget {
@@ -18,6 +19,7 @@ class DashboardScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(localeProvider);
     final themeType = ref.watch(themeProvider);
 
     // Modern theme uses bento-box dashboard

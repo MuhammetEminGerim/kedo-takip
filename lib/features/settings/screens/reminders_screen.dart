@@ -7,6 +7,7 @@ import '../../../core/services/notification_service.dart';
 import '../../../shared/providers/cat_provider.dart';
 import '../../../shared/models/reminder.dart';
 import '../providers/reminder_provider.dart';
+import '../../../core/providers/locale_provider.dart';
 import '../../../core/theme/app_theme.dart';
 
 class RemindersScreen extends ConsumerStatefulWidget {
@@ -19,6 +20,7 @@ class RemindersScreen extends ConsumerStatefulWidget {
 class _RemindersScreenState extends ConsumerState<RemindersScreen> {
   @override
   Widget build(BuildContext context) {
+    ref.watch(localeProvider);
     final reminders = ref.watch(reminderListProvider);
     ref.watch(catListProvider);
     ref.watch(selectedCatProvider);

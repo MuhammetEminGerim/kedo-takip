@@ -8,6 +8,7 @@ import '../../../shared/providers/cat_provider.dart';
 import '../../../shared/models/care_log.dart';
 import '../../../shared/widgets/pastel_card.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../core/providers/locale_provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/app_icons.dart';
 
@@ -16,6 +17,7 @@ class CareScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(localeProvider);
     final logs = ref.watch(careLogListProvider);
     final cats = ref.watch(catListProvider);
     final selectedCat = ref.watch(selectedCatProvider);

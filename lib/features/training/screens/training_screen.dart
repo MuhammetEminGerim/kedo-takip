@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 
 import '../../../shared/widgets/pastel_card.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../core/providers/locale_provider.dart';
 import '../../../core/theme/app_theme.dart';
 
 class TrainingScreen extends ConsumerStatefulWidget {
@@ -383,6 +384,7 @@ class _TrainingScreenState extends ConsumerState<TrainingScreen> {
       );
     }
 
+    ref.watch(localeProvider);
     final isModern = ref.watch(themeProvider) == AppThemeType.modern;
 
     return Scaffold(

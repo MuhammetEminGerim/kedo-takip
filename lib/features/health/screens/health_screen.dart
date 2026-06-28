@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/constants/app_strings.dart';
+import '../../../core/providers/locale_provider.dart';
 import '../../../shared/providers/cat_provider.dart';
 import '../../../shared/widgets/pastel_card.dart';
 import '../providers/health_provider.dart';
@@ -165,6 +166,7 @@ class _VaccinesTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(localeProvider);
     final vaccines = ref.watch(vaccineListProvider).where((v) => v.catId == catId).toList();
     final isModern = ref.watch(themeProvider) == AppThemeType.modern;
     vaccines.sort((a, b) => b.dateAdministered.compareTo(a.dateAdministered));

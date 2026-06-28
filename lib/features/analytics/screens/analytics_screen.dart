@@ -8,6 +8,7 @@ import '../../../shared/providers/cat_provider.dart';
 import '../../../shared/widgets/pastel_card.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/providers/locale_provider.dart';
 
 class AnalyticsScreen extends ConsumerStatefulWidget {
   const AnalyticsScreen({super.key});
@@ -33,6 +34,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(localeProvider);
     final careLogs = ref.watch(careLogListProvider);
     final selectedCat = ref.watch(selectedCatProvider);
     final catName = selectedCat?.name ?? AppStrings.get('your_cat');
