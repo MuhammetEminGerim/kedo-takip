@@ -201,16 +201,29 @@ class CareScreen extends ConsumerWidget {
     final historyTitle = AppStrings.get('${historyKey}_history');
     final noLogsText = AppStrings.get('no_${historyKey}_logs_yet');
 
+    final displayLogs = allLogs.take(30).toList();
+    final groupedLogs = <DateTime, List<CareLog>>{};
+    for (var log in displayLogs) {
+      final date = DateTime(log.timestamp.year, log.timestamp.month, log.timestamp.day);
+      groupedLogs.putIfAbsent(date, () => []).add(log);
+    }
+    final sortedDates = groupedLogs.keys.toList()..sort((a, b) => b.compareTo(a));
+    final listItems = <dynamic>[];
+    for (var date in sortedDates) {
+      listItems.add(date);
+      listItems.addAll(groupedLogs[date]!);
+    }
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       builder: (ctx) => Container(
-        constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.6),
-        padding: EdgeInsets.all(24),
+        constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.7),
+        padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
           color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -242,9 +255,27 @@ class CareScreen extends ConsumerWidget {
               Flexible(
                 child: ListView.builder(
                   shrinkWrap: true,
-                  itemCount: allLogs.length > 20 ? 20 : allLogs.length,
+                  itemCount: listItems.length,
                   itemBuilder: (ctx, index) {
-                    final log = allLogs[index];
+                    final item = listItems[index];
+                    
+                    if (item is DateTime) {
+                      final now = DateTime.now();
+                      String dateStr;
+                      if (item.year == now.year && item.month == now.month && item.day == now.day) {
+                        dateStr = AppStrings.get('today') == 'today' ? 'Bugün' : AppStrings.get('today');
+                      } else if (item.year == now.year && item.month == now.month && item.day == now.day - 1) {
+                        dateStr = AppStrings.get('yesterday') == 'yesterday' ? 'Dün' : AppStrings.get('yesterday');
+                      } else {
+                        dateStr = DateFormat('MMM d, yyyy').format(item);
+                      }
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 16, bottom: 8, left: 4),
+                        child: Text(dateStr, style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5))),
+                      );
+                    }
+
+                    final log = item as CareLog;
                     return Dismissible(
                       key: Key(log.id),
                       direction: DismissDirection.endToStart,
@@ -279,6 +310,8 @@ class CareScreen extends ConsumerWidget {
                       },
                       onDismissed: (_) {
                         ref.read(careLogListProvider.notifier).deleteLog(log);
+                        // Trigger hot reload implicitly or notify state
+                        // Actually provider handles state update.
                       },
                       child: Container(
                         margin: const EdgeInsets.only(bottom: 8),
@@ -297,7 +330,7 @@ class CareScreen extends ConsumerWidget {
                                 children: [
                                   Text(log.value ?? '', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: Theme.of(context).colorScheme.onSurface)),
                                   Text(
-                                    DateFormat('MMM d, yyyy • h:mm a').format(log.timestamp),
+                                    DateFormat('h:mm a').format(log.timestamp),
                                     style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)),
                                   ),
                                 ],

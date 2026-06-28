@@ -44,15 +44,42 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
     int daysBack = _selectedTab == 'Week' ? 7 : _selectedTab == 'Month' ? 30 : 365;
     final startDate = today.subtract(Duration(days: daysBack - 1));
 
+    // Calculate effective days for averages
+    int effectiveDays = daysBack;
+    if (careLogs.isNotEmpty) {
+      final firstLogDate = careLogs.map((l) => l.timestamp).reduce((a, b) => a.isBefore(b) ? a : b);
+      final daysSinceFirstLog = today.difference(DateTime(firstLogDate.year, firstLogDate.month, firstLogDate.day)).inDays + 1;
+      if (daysSinceFirstLog < effectiveDays) {
+        effectiveDays = daysSinceFirstLog > 0 ? daysSinceFirstLog : 1;
+      }
+    } else {
+      effectiveDays = 1;
+    }
+
     // Filter records by time range
     final filteredLogs = careLogs.where((l) => l.timestamp.isAfter(startDate)).toList();
 
-    // Calculate real stats
+    // Calculate averages
     final totalMeals = filteredLogs.where((l) => l.type == 'food').length;
+    final avgMeals = (totalMeals / effectiveDays).toStringAsFixed(1);
+    
     final totalLitter = filteredLogs.where((l) => l.type == 'litter').length;
+    final avgLitter = (totalLitter / effectiveDays).toStringAsFixed(1);
+
     final totalWater = filteredLogs.where((l) => l.type == 'water').length;
-    final weightLogsList = filteredLogs.where((l) => l.type == 'weight').toList()..sort((a, b) => b.timestamp.compareTo(a.timestamp));
-    final latestWeight = weightLogsList.isNotEmpty ? (weightLogsList.first.value ?? '0.0') : '0.0';
+    final avgWater = (totalWater / effectiveDays).toStringAsFixed(1);
+
+    // Calculate Weight Delta
+    final weightLogsList = filteredLogs.where((l) => l.type == 'weight').toList()..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    String weightDeltaStr = '0.0 kg';
+    if (weightLogsList.length >= 2) {
+      final latestW = double.tryParse(weightLogsList.last.value?.replaceAll(',', '.') ?? '0') ?? 0.0;
+      final oldestW = double.tryParse(weightLogsList.first.value?.replaceAll(',', '.') ?? '0') ?? 0.0;
+      final delta = latestW - oldestW;
+      weightDeltaStr = '${delta > 0 ? '+' : ''}${delta.toStringAsFixed(1)} kg';
+    } else if (weightLogsList.length == 1) {
+      weightDeltaStr = '0.0 kg';
+    }
     final streak = _calculateStreak(careLogs);
 
     // Get today's food logs for timeline
@@ -167,7 +194,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
 
               const SizedBox(height: 32),
 
-              Text(AppStrings.get('feeding_pattern'), style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
+              Text('${AppStrings.get('today_summary')} - ${AppStrings.get('feeding_pattern')}', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
               const SizedBox(height: 16),
               _buildFeedingTimeline(todayFoodLogs, isModern),
 
@@ -179,18 +206,18 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Expanded(child: _buildStatBox('$totalMeals', AppStrings.get('meals'), Icons.restaurant_outlined, isModern)),
+                    Expanded(child: _buildStatBox(avgMeals, '${AppStrings.get('meals')}/Gün', Icons.restaurant_outlined, isModern)),
                     const SizedBox(width: 12),
-                    Expanded(child: _buildStatBox('$totalLitter', AppStrings.get('litter'), Icons.cleaning_services_outlined, isModern)),
+                    Expanded(child: _buildStatBox(avgLitter, '${AppStrings.get('litter')}/Gün', Icons.cleaning_services_outlined, isModern)),
                   ],
                 ),
               ),
               const SizedBox(height: 12),
               Row(
                 children: [
-                  Expanded(child: _buildStatBox('$totalWater', AppStrings.get('water'), Icons.water_drop_outlined, isModern)),
+                  Expanded(child: _buildStatBox(avgWater, '${AppStrings.get('water')}/Gün', Icons.water_drop_outlined, isModern)),
                   const SizedBox(width: 12),
-                  Expanded(child: _buildStatBox(latestWeight, AppStrings.get('weight'), Icons.monitor_weight_outlined, isModern)),
+                  Expanded(child: _buildStatBox(weightDeltaStr, 'Kilo Değişimi', Icons.monitor_weight_outlined, isModern)),
                 ],
               ),
               const SizedBox(height: 12),
