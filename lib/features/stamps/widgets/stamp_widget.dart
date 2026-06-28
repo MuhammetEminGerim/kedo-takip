@@ -6,6 +6,7 @@ import '../../../shared/models/stamp.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/constants/app_strings.dart';
 
 class StampWidget extends ConsumerWidget {
   final Stamp stamp;
@@ -68,7 +69,7 @@ class StampWidget extends ConsumerWidget {
                               ],
                               const SizedBox(height: 8),
                               Text(
-                                DateFormat('dd MMM yyyy').format(stamp.date),
+                                DateFormat('dd MMM yyyy', AppStrings.locale).format(stamp.date),
                                 textAlign: TextAlign.right,
                                 style: isModern
                                   ? const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF94A3B8))
@@ -141,7 +142,7 @@ class StampWidget extends ConsumerWidget {
                             ),
                           if (stamp.caption.isNotEmpty) const SizedBox(height: 2),
                           Text(
-                            DateFormat('dd MMM yyyy').format(stamp.date),
+                            DateFormat('dd MMM yyyy', AppStrings.locale).format(stamp.date),
                             style: TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.w600,
@@ -196,7 +197,7 @@ class StampWidget extends ConsumerWidget {
             ],
             if (stamp.caption.isEmpty) const SizedBox(height: 8),
             Text(
-              DateFormat('dd MMM yyyy').format(stamp.date),
+              DateFormat('dd MMM yyyy', AppStrings.locale).format(stamp.date),
               textAlign: TextAlign.right,
               style: GoogleFonts.nunito(
                 fontSize: 10,
