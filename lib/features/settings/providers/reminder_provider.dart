@@ -39,7 +39,8 @@ class ReminderListNotifier extends Notifier<List<Reminder>> {
     String? linkedId,
     DateTime? specificDate,
   }) async {
-    final notificationId = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    // Use microseconds to prevent collision if added very quickly, modulo max 32-bit int for Android.
+    final notificationId = DateTime.now().microsecondsSinceEpoch % 2147483647;
 
     final reminder = Reminder(
       id: const Uuid().v4(),
@@ -107,6 +108,7 @@ class ReminderListNotifier extends Notifier<List<Reminder>> {
     required String catName,
     required int hour,
     required int minute,
+    DateTime? specificDate,
   }) async {
     final box = ref.read(reminderBoxProvider);
     final reminder = box.get(reminderId);
@@ -119,6 +121,7 @@ class ReminderListNotifier extends Notifier<List<Reminder>> {
     reminder.catName = catName;
     reminder.hour = hour;
     reminder.minute = minute;
+    if (specificDate != null) reminder.specificDate = specificDate;
     
     await reminder.save();
     state = box.values.toList();

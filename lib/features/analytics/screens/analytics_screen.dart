@@ -41,7 +41,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
     // Calculate time range
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    int daysBack = _selectedTab == 'Week' ? 7 : _selectedTab == 'Month' ? 30 : 365;
+    int daysBack = _selectedTab == 'Week' ? 7 : _selectedTab == 'Month' ? 30 : 36500;
     final startDate = today.subtract(Duration(days: daysBack - 1));
 
     // Calculate effective days for averages

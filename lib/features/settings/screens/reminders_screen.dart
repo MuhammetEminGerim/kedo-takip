@@ -302,12 +302,14 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
 
     String titleValue = '';
     TimeOfDay selectedTime = const TimeOfDay(hour: 8, minute: 0);
+    DateTime? selectedDate = type == 'appointment' ? DateTime.now() : null;
     String chosenCatId = existing?.catId ?? (selectedCat?.id ?? cats.first.id);
     String chosenCatName = existing?.catName ?? (selectedCat?.name ?? cats.first.name);
 
     if (existing != null) {
       titleValue = existing.title;
       selectedTime = TimeOfDay(hour: existing.hour, minute: existing.minute);
+      if (existing.specificDate != null) selectedDate = existing.specificDate;
     } else {
       // Set default title based on type
       switch (type) {
@@ -388,6 +390,42 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                   style: TextStyle(fontWeight: FontWeight.w800, color: Theme.of(context).colorScheme.onSurface),
                 ),
                 const SizedBox(height: 16),
+                
+                if (type == 'appointment') ...[
+                  Text('Tarih', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6))),
+                  const SizedBox(height: 6),
+                  GestureDetector(
+                    onTap: () async {
+                      final picked = await showDatePicker(
+                        context: context,
+                        initialDate: selectedDate ?? DateTime.now(),
+                        firstDate: DateTime.now(),
+                        lastDate: DateTime.now().add(const Duration(days: 365)),
+                      );
+                      if (picked != null) {
+                        setDialogState(() => selectedDate = picked);
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            selectedDate != null ? '${selectedDate!.day.toString().padLeft(2, '0')}/${selectedDate!.month.toString().padLeft(2, '0')}/${selectedDate!.year}' : '',
+                            style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: Theme.of(context).colorScheme.onSurface),
+                          ),
+                          Icon(Icons.calendar_today_rounded, color: Theme.of(context).colorScheme.primary),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
 
                 // Time Picker
                 Text(AppStrings.get('reminder_time'), style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6))),
@@ -454,6 +492,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                     title: title,
                     hour: selectedTime.hour,
                     minute: selectedTime.minute,
+                    specificDate: selectedDate,
                   );
                 } else {
                   ref.read(reminderListProvider.notifier).addReminder(
@@ -463,6 +502,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                     title: title,
                     hour: selectedTime.hour,
                     minute: selectedTime.minute,
+                    specificDate: selectedDate,
                   );
                 }
 

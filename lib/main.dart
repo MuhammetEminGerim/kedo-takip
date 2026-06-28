@@ -5,6 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'core/providers/locale_provider.dart';
@@ -49,9 +50,11 @@ void main() async {
     try {
       return await Hive.openBox<T>(name, encryptionCipher: HiveAesCipher(encryptionKey));
     } catch (e) {
-      // If box fails to open (e.g. was unencrypted before), delete and recreate
-      await Hive.deleteBoxFromDisk(name);
-      return await Hive.openBox<T>(name, encryptionCipher: HiveAesCipher(encryptionKey));
+      debugPrint('Error opening secure box $name: $e');
+      // If decryption fails, do not blindly delete.
+      // In a real app we might prompt the user or backup the corrupted file.
+      // For now, we will throw an exception instead of deleting user data silently.
+      throw Exception('Failed to open secure box: $name. Encryption key might be lost or corrupted.');
     }
   }
 
@@ -73,6 +76,7 @@ void main() async {
   runApp(
     ProviderScope(
       overrides: [
+        sharedPreferencesProvider.overrideWithValue(prefs),
         catBoxProvider.overrideWithValue(catBox),
         careLogBoxProvider.overrideWithValue(careLogBox),
         vaccineBoxProvider.overrideWithValue(vaccineBox),
@@ -120,6 +124,16 @@ class _PawLogAppState extends ConsumerState<PawLogApp> {
         theme: themeNotifier.currentThemeData,
         darkTheme: themeNotifier.currentDarkThemeData,
         themeMode: themeMode,
+        locale: Locale(ref.watch(localeProvider)),
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale('en'),
+          Locale('tr'),
+        ],
         home: OnboardingScreen(
           onComplete: () {
             setState(() => _showOnboarding = false);
@@ -134,6 +148,16 @@ class _PawLogAppState extends ConsumerState<PawLogApp> {
       theme: themeNotifier.currentThemeData,
       darkTheme: themeNotifier.currentDarkThemeData,
       themeMode: themeMode,
+      locale: Locale(ref.watch(localeProvider)),
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en'),
+        Locale('tr'),
+      ],
       routerConfig: router,
     );
   }

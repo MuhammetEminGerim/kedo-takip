@@ -2,7 +2,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:uuid/uuid.dart';
 import '../models/cat.dart';
-
+import '../../features/care_tracking/providers/care_log_provider.dart';
+import '../../features/health/providers/health_provider.dart';
+import '../../features/stamps/providers/stamp_provider.dart';
+import '../../features/settings/providers/reminder_provider.dart';
 final catBoxProvider = Provider<Box<Cat>>((ref) {
   throw UnimplementedError('catBox is not initialized');
 });
@@ -78,8 +81,37 @@ class CatListNotifier extends Notifier<List<Cat>> {
   }
 
   Future<void> deleteCat(Cat cat) async {
+    // Cascading delete
+    final careLogBox = ref.read(careLogBoxProvider);
+    final careLogsToDelete = careLogBox.values.where((e) => e.catId == cat.id).map((e) => e.id).toList();
+    await careLogBox.deleteAll(careLogsToDelete);
+
+    final vaccineBox = ref.read(vaccineBoxProvider);
+    final vaccinesToDelete = vaccineBox.values.where((e) => e.catId == cat.id).map((e) => e.id).toList();
+    await vaccineBox.deleteAll(vaccinesToDelete);
+
+    final appointmentBox = ref.read(appointmentBoxProvider);
+    final appointmentsToDelete = appointmentBox.values.where((e) => e.catId == cat.id).map((e) => e.id).toList();
+    await appointmentBox.deleteAll(appointmentsToDelete);
+
+    final medicationBox = ref.read(medicationBoxProvider);
+    final medicationsToDelete = medicationBox.values.where((e) => e.catId == cat.id).map((e) => e.id).toList();
+    await medicationBox.deleteAll(medicationsToDelete);
+
+    final stampBox = ref.read(stampBoxProvider);
+    final stampsToDelete = stampBox.values.where((e) => e.catId == cat.id).map((e) => e.id).toList();
+    for (var id in stampsToDelete) {
+      await ref.read(stampsProvider.notifier).deleteStamp(id);
+    }
+
+    final reminderBox = ref.read(reminderBoxProvider);
+    final remindersToDelete = reminderBox.values.where((e) => e.catId == cat.id).map((e) => e.id).toList();
+    for (var id in remindersToDelete) {
+      await ref.read(reminderListProvider.notifier).deleteReminder(id);
+    }
+
     final box = ref.read(catBoxProvider);
-    await cat.delete();
+    await box.delete(cat.id);
     state = box.values.toList();
   }
 }
