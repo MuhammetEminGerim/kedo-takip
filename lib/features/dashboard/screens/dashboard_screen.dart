@@ -34,6 +34,7 @@ class DashboardScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: 32,
         title: const Text(''),
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -86,7 +87,7 @@ class DashboardScreen extends ConsumerWidget {
     if (selectedCat == null) return const SizedBox.shrink();
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+      padding: const EdgeInsets.fromLTRB(24.0, 0.0, 24.0, 16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
