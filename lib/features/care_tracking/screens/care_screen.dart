@@ -9,6 +9,7 @@ import '../../../shared/models/care_log.dart';
 import '../../../shared/widgets/pastel_card.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/app_icons.dart';
 
 class CareScreen extends ConsumerWidget {
   const CareScreen({super.key});
@@ -36,7 +37,7 @@ class CareScreen extends ConsumerWidget {
                     letterSpacing: isModern ? 1.5 : 0,
                   )
                 ),
-                if (!isModern) Icon(Icons.pets, color: Theme.of(context).colorScheme.onSurface, size: 24),
+                if (!isModern) AppIcons.paw(color: Theme.of(context).colorScheme.onSurface, size: 24),
               ],
             ),
             if (!isModern) const SizedBox(height: 4),
@@ -81,20 +82,25 @@ class CareScreen extends ConsumerWidget {
                                     ? Border.all(color: isModern ? const Color(0xFF1E293B) : Theme.of(context).colorScheme.primary, width: isModern ? 2 : 4) 
                                     : Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1), width: isModern ? 1 : 2),
                                 image: cat.photoPath != null && cat.photoPath!.isNotEmpty
-                                    ? DecorationImage(image: FileImage(File(cat.photoPath!)), fit: BoxFit.cover)
+                                    ? DecorationImage(image: ResizeImage(FileImage(File(cat.photoPath!)), width: 150), fit: BoxFit.cover)
                                     : const DecorationImage(image: AssetImage('assets/images/cat_avatar.png'), fit: BoxFit.cover),
                               ),
                             ),
-                            const SizedBox(height: 8),
-                            if (!isModern)
-                              Text(
-                                cat.name,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: isSelected ? FontWeight.w900 : FontWeight.bold,
-                                  color: Theme.of(context).colorScheme.onSurface,
-                                ),
-                              ),
+                            const SizedBox(height: 6),
+                            Text(
+                              cat.name,
+                              style: isModern 
+                                ? TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
+                                    color: isSelected ? const Color(0xFF1E293B) : const Color(0xFF94A3B8),
+                                  )
+                                : TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: isSelected ? FontWeight.w900 : FontWeight.bold,
+                                    color: Theme.of(context).colorScheme.onSurface,
+                                  ),
+                            ),
                           ],
                         ),
                       ),
@@ -105,45 +111,12 @@ class CareScreen extends ConsumerWidget {
               const SizedBox(height: 24),
 
               if (isModern) ...[
-                _buildModernCareRow(
-                  context: context, ref: ref,
-                  title: AppStrings.locale == 'tr' ? 'MAMA' : 'FOOD',
-                  icon: Icons.restaurant_outlined,
-                  lastLog: _getLastLog(logs, 'food'),
-                  allLogs: _getAllLogs(logs, 'food'),
-                  statusText: _getFoodStatus(logs),
-                  onAdd: () => _addLog(ref, 'food', AppStrings.get('fed')),
-                  historyKey: 'food',
-                ),
-                const SizedBox(height: 12),
-                _buildModernCareRow(
-                  context: context, ref: ref,
-                  title: AppStrings.locale == 'tr' ? 'SU' : 'WATER',
-                  icon: Icons.water_drop_outlined,
-                  lastLog: _getLastLog(logs, 'water'),
-                  allLogs: _getAllLogs(logs, 'water'),
-                  statusText: _getWaterStatus(logs),
-                  onAdd: () => _addLog(ref, 'water', AppStrings.get('refilled')),
-                  historyKey: 'water',
-                ),
-                const SizedBox(height: 12),
-                _buildModernCareRow(
-                  context: context, ref: ref,
-                  title: AppStrings.locale == 'tr' ? 'KUM' : 'LITTER',
-                  icon: Icons.inventory_2_outlined,
-                  lastLog: _getLastLog(logs, 'litter'),
-                  allLogs: _getAllLogs(logs, 'litter'),
-                  statusText: _getLitterStatus(logs),
-                  onAdd: () => _addLog(ref, 'litter', AppStrings.get('cleaned')),
-                  historyKey: 'litter',
-                ),
-                const SizedBox(height: 12),
-                _buildModernWeightRow(context, ref, selectedCat, _getAllLogs(logs, 'weight')),
+                _buildModernDashboard(context, ref, logs, selectedCat),
               ] else ...[
                 _buildCareCard(
                   context: context, ref: ref,
                   title: AppStrings.get('food'),
-                  emoji: '🥣',
+                  iconWidget: AppIcons.bowl(size: 40),
                   bgColor: Theme.of(context).colorScheme.primary,
                   lastLog: _getLastLog(logs, 'food'),
                   allLogs: _getAllLogs(logs, 'food'),
@@ -155,7 +128,7 @@ class CareScreen extends ConsumerWidget {
                 _buildCareCard(
                   context: context, ref: ref,
                   title: AppStrings.get('water'),
-                  emoji: '💧',
+                  iconWidget: AppIcons.water(size: 40),
                   bgColor: Theme.of(context).colorScheme.secondaryContainer,
                   lastLog: _getLastLog(logs, 'water'),
                   allLogs: _getAllLogs(logs, 'water'),
@@ -167,7 +140,7 @@ class CareScreen extends ConsumerWidget {
                 _buildCareCard(
                   context: context, ref: ref,
                   title: AppStrings.get('litter'),
-                  emoji: '🚽',
+                  iconWidget: AppIcons.litter(size: 40),
                   bgColor: Theme.of(context).colorScheme.secondary,
                   lastLog: _getLastLog(logs, 'litter'),
                   allLogs: _getAllLogs(logs, 'litter'),
@@ -224,7 +197,7 @@ class CareScreen extends ConsumerWidget {
     ref.read(careLogListProvider.notifier).addLog(type: type, value: value);
   }
 
-  void _showCareHistory(BuildContext context, WidgetRef ref, String historyKey, String emoji, List<CareLog> allLogs) {
+  void _showCareHistory(BuildContext context, WidgetRef ref, String historyKey, Widget iconWidget, List<CareLog> allLogs) {
     final historyTitle = AppStrings.get('${historyKey}_history');
     final noLogsText = AppStrings.get('no_${historyKey}_logs_yet');
 
@@ -251,7 +224,14 @@ class CareScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 16),
-            Text('$emoji $historyTitle', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 20, color: Theme.of(context).colorScheme.onSurface)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(width: 32, height: 32, child: iconWidget),
+                const SizedBox(width: 8),
+                Text(historyTitle, style: TextStyle(fontWeight: FontWeight.w900, fontSize: 20, color: Theme.of(context).colorScheme.onSurface)),
+              ],
+            ),
             const SizedBox(height: 16),
             if (allLogs.isEmpty)
               Padding(
@@ -276,7 +256,7 @@ class CareScreen extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(16),
                         ),
                         alignment: Alignment.centerRight,
-                        child: const Icon(Icons.delete_outline_rounded, color: Colors.white, size: 24),
+                        child: AppIcons.delete(color: Colors.white, size: 24),
                       ),
                       confirmDismiss: (_) async {
                         return await showDialog<bool>(
@@ -309,7 +289,7 @@ class CareScreen extends ConsumerWidget {
                         ),
                         child: Row(
                           children: [
-                            Text(emoji, style: const TextStyle(fontSize: 24)),
+                            SizedBox(width: 32, height: 32, child: iconWidget),
                             const SizedBox(width: 12),
                             Expanded(
                               child: Column(
@@ -341,7 +321,7 @@ class CareScreen extends ConsumerWidget {
     required BuildContext context,
     required WidgetRef ref,
     required String title,
-    required String emoji,
+    required Widget iconWidget,
     required Color bgColor,
     required CareLog? lastLog,
     required List<CareLog> allLogs,
@@ -350,7 +330,7 @@ class CareScreen extends ConsumerWidget {
     required String historyKey,
   }) {
     return GestureDetector(
-      onTap: () => _showCareHistory(context, ref, historyKey, emoji, allLogs),
+      onTap: () => _showCareHistory(context, ref, historyKey, iconWidget, allLogs),
       child: PastelCard(
         backgroundColor: bgColor.withValues(alpha: 0.4),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
@@ -362,7 +342,7 @@ class CareScreen extends ConsumerWidget {
                 color: bgColor.withValues(alpha: 0.6),
                 shape: BoxShape.circle,
               ),
-              child: Text(emoji, style: const TextStyle(fontSize: 28)),
+              child: SizedBox(width: 36, height: 36, child: iconWidget),
             ),
             const SizedBox(width: 20),
             Expanded(
@@ -385,7 +365,7 @@ class CareScreen extends ConsumerWidget {
                   shape: BoxShape.circle,
                   boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 4, offset: const Offset(0, 2))],
                 ),
-                child: Icon(Icons.add_rounded, color: Theme.of(context).colorScheme.onSurface, size: 28),
+                child: AppIcons.add(color: Theme.of(context).colorScheme.onSurface, size: 28),
               ),
             )
           ],
@@ -398,7 +378,7 @@ class CareScreen extends ConsumerWidget {
     final currentWeight = selectedCat?.weight?.toString() ?? '--';
 
     return GestureDetector(
-      onTap: () => _showCareHistory(context, ref, 'weight', '⚖️', weightLogs),
+      onTap: () => _showCareHistory(context, ref, 'weight', AppIcons.paw(size: 32), weightLogs),
       child: PastelCard(
         backgroundColor: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.4),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
@@ -410,7 +390,7 @@ class CareScreen extends ConsumerWidget {
                 color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.6),
                 shape: BoxShape.circle,
               ),
-              child: const Text('⚖️', style: TextStyle(fontSize: 28)),
+              child: SizedBox(width: 36, height: 36, child: AppIcons.paw(size: 36)),
             ),
             const SizedBox(width: 20),
             Expanded(
@@ -433,7 +413,7 @@ class CareScreen extends ConsumerWidget {
                   shape: BoxShape.circle,
                   boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 4, offset: const Offset(0, 2))],
                 ),
-                child: Icon(Icons.add_rounded, color: Theme.of(context).colorScheme.onSurface, size: 28),
+                child: AppIcons.add(color: Theme.of(context).colorScheme.onSurface, size: 28),
               ),
             )
           ],
@@ -500,87 +480,176 @@ class CareScreen extends ConsumerWidget {
     return AppStrings.get('just_now');
   }
 
-  Widget _buildModernCareRow({
+  Widget _buildModernDashboard(BuildContext context, WidgetRef ref, List<CareLog> logs, dynamic selectedCat) {
+    final foodLogs = _getAllLogs(logs, 'food');
+    final waterLogs = _getAllLogs(logs, 'water');
+    final litterLogs = _getAllLogs(logs, 'litter');
+    final weightLogs = _getAllLogs(logs, 'weight');
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            _buildBentoCard(
+              context: context,
+              title: AppStrings.locale == 'tr' ? 'Mama' : 'Food',
+              iconWidget: Icon(Icons.restaurant_outlined, color: Theme.of(context).colorScheme.onSurface, size: 24),
+              iconColor: Theme.of(context).colorScheme.onSurface,
+              statusText: _getFoodStatus(logs),
+              onAdd: () => _addLog(ref, 'food', AppStrings.get('fed')),
+              onTap: () => _showCareHistory(context, ref, 'food', Icon(Icons.restaurant_outlined, color: Theme.of(context).colorScheme.onSurface, size: 24), foodLogs),
+            ),
+            const SizedBox(width: 16),
+            _buildBentoCard(
+              context: context,
+              title: AppStrings.locale == 'tr' ? 'Su' : 'Water',
+              iconWidget: Icon(Icons.water_drop_outlined, color: Theme.of(context).colorScheme.onSurface, size: 24),
+              iconColor: Theme.of(context).colorScheme.onSurface,
+              statusText: _getWaterStatus(logs),
+              onAdd: () => _addLog(ref, 'water', AppStrings.get('refilled')),
+              onTap: () => _showCareHistory(context, ref, 'water', Icon(Icons.water_drop_outlined, color: Theme.of(context).colorScheme.onSurface, size: 24), waterLogs),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            _buildBentoCard(
+              context: context,
+              title: AppStrings.locale == 'tr' ? 'Kum' : 'Litter',
+              iconWidget: Icon(Icons.cleaning_services_outlined, color: Theme.of(context).colorScheme.onSurface, size: 24),
+              iconColor: Theme.of(context).colorScheme.onSurface,
+              statusText: _getLitterStatus(logs),
+              onAdd: () => _addLog(ref, 'litter', AppStrings.get('cleaned')),
+              onTap: () => _showCareHistory(context, ref, 'litter', Icon(Icons.cleaning_services_outlined, color: Theme.of(context).colorScheme.onSurface, size: 24), litterLogs),
+            ),
+            const SizedBox(width: 16),
+            _buildBentoCard(
+              context: context,
+              title: AppStrings.locale == 'tr' ? 'Kilo' : 'Weight',
+              iconWidget: Icon(Icons.monitor_weight_outlined, color: Theme.of(context).colorScheme.onSurface, size: 24),
+              iconColor: Theme.of(context).colorScheme.onSurface,
+              statusText: '${selectedCat?.weight?.toString() ?? '--'} ${AppStrings.get('kg')}',
+              onAdd: () => _showWeightDialog(context, ref, selectedCat),
+              onTap: () => _showCareHistory(context, ref, 'weight', Icon(Icons.monitor_weight_outlined, color: Theme.of(context).colorScheme.onSurface, size: 24), weightLogs),
+            ),
+          ],
+        ),
+        const SizedBox(height: 32),
+        _buildModernTimeline(context, ref, logs),
+      ],
+    );
+  }
+
+  Widget _buildBentoCard({
     required BuildContext context,
-    required WidgetRef ref,
     required String title,
-    required IconData icon,
-    required CareLog? lastLog,
-    required List<CareLog> allLogs,
+    required Widget iconWidget,
     required String statusText,
     required VoidCallback onAdd,
-    required String historyKey,
+    required VoidCallback onTap,
+    Color? iconColor,
   }) {
-    return GestureDetector(
-      onTap: () => _showCareHistory(context, ref, historyKey, '', allLogs),
-      child: PastelCard(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-        child: Row(
-          children: [
-            Icon(icon, color: const Color(0xFF1E293B), size: 28),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBg = isDark ? const Color(0xFF1E293B) : Colors.white;
+    final textColor = isDark ? Colors.white : const Color(0xFF1E293B);
+    final subColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: cardBg,
+            borderRadius: BorderRadius.circular(24),
+            border: isDark ? Border.all(color: const Color(0xFF334155), width: 1.5) : Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(title, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: Color(0xFF1E293B), letterSpacing: 1.2)),
-                  const SizedBox(height: 2),
-                  Text(statusText, style: const TextStyle(color: Color(0xFF64748B), fontSize: 13, fontWeight: FontWeight.w600)),
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    child: iconWidget,
+                  ),
+                  GestureDetector(
+                    onTap: onAdd,
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+                        shape: BoxShape.circle,
+                      ),
+                      child: AppIcons.add(color: textColor, size: 20),
+                    ),
+                  ),
                 ],
               ),
-            ),
-            GestureDetector(
-              onTap: onAdd,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1E293B),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Text('Add', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 13)),
-              ),
-            )
-          ],
+              const SizedBox(height: 16),
+              Text(title, style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: textColor, letterSpacing: 0.5)),
+              const SizedBox(height: 4),
+              Text(statusText, style: TextStyle(color: subColor, fontSize: 12, fontWeight: FontWeight.w600)),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildModernWeightRow(BuildContext context, WidgetRef ref, dynamic selectedCat, List<CareLog> weightLogs) {
-    final currentWeight = selectedCat?.weight?.toString() ?? '--';
+  Widget _buildModernTimeline(BuildContext context, WidgetRef ref, List<CareLog> logs) {
+    final now = DateTime.now();
+    final todayLogs = logs.where((l) => l.timestamp.year == now.year && l.timestamp.month == now.month && l.timestamp.day == now.day).toList()
+      ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
 
-    return GestureDetector(
-      onTap: () => _showCareHistory(context, ref, 'weight', '', weightLogs),
-      child: PastelCard(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-        child: Row(
-          children: [
-            const Icon(Icons.monitor_weight_outlined, color: Color(0xFF1E293B), size: 28),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(AppStrings.locale == 'tr' ? 'KİLO' : 'WEIGHT', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: Color(0xFF1E293B), letterSpacing: 1.2)),
-                  const SizedBox(height: 2),
-                  Text('$currentWeight ${AppStrings.get('kg')}', style: const TextStyle(color: Color(0xFF64748B), fontSize: 13, fontWeight: FontWeight.w600)),
-                ],
-              ),
-            ),
-            GestureDetector(
-              onTap: () => _showWeightDialog(context, ref, selectedCat),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1E293B),
-                  borderRadius: BorderRadius.circular(12),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? Colors.white : const Color(0xFF1E293B);
+
+    if (todayLogs.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(AppStrings.get('today'), style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: textColor)),
+        const SizedBox(height: 16),
+        ...todayLogs.map((log) {
+          Widget iconWidget;
+          Color color;
+          final iconColor = Theme.of(context).colorScheme.onSurface;
+          switch (log.type) {
+            case 'food': iconWidget = Icon(Icons.restaurant_outlined, color: iconColor, size: 20); color = iconColor; break;
+            case 'water': iconWidget = Icon(Icons.water_drop_outlined, color: iconColor, size: 20); color = iconColor; break;
+            case 'litter': iconWidget = Icon(Icons.cleaning_services_outlined, color: iconColor, size: 20); color = iconColor; break;
+            case 'weight': iconWidget = Icon(Icons.monitor_weight_outlined, color: iconColor, size: 20); color = iconColor; break;
+            default: iconWidget = Icon(Icons.check, color: iconColor, size: 20); color = iconColor;
+          }
+
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  child: iconWidget,
                 ),
-                child: const Text('Add', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 13)),
-              ),
-            )
-          ],
-        ),
-      ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(log.value ?? '', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: textColor)),
+                      Text(DateFormat('HH:mm').format(log.timestamp), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B))),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        }),
+      ],
     );
   }
 }

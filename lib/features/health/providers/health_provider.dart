@@ -50,6 +50,27 @@ class VaccineListNotifier extends Notifier<List<Vaccine>> {
     _box.delete(id);
     state = _box.values.toList();
   }
+
+  void updateVaccine(String id, {
+    required String name,
+    required DateTime dateAdministered,
+    DateTime? nextDueDate,
+    String? notes,
+  }) {
+    final v = _box.get(id);
+    if (v != null) {
+      final updated = Vaccine(
+        id: id,
+        catId: v.catId,
+        name: name,
+        dateAdministered: dateAdministered,
+        nextDueDate: nextDueDate,
+        notes: notes,
+      );
+      _box.put(id, updated);
+      state = _box.values.toList();
+    }
+  }
 }
 
 class AppointmentListNotifier extends Notifier<List<Appointment>> {
@@ -84,6 +105,27 @@ class AppointmentListNotifier extends Notifier<List<Appointment>> {
   void deleteAppointment(String id) {
     _box.delete(id);
     state = _box.values.toList();
+  }
+
+  void updateAppointment(String id, {
+    required String title,
+    required DateTime date,
+    String? clinicName,
+    String? notes,
+  }) {
+    final a = _box.get(id);
+    if (a != null) {
+      final updated = Appointment(
+        id: id,
+        catId: a.catId,
+        title: title,
+        date: date,
+        clinicName: clinicName,
+        notes: notes,
+      );
+      _box.put(id, updated);
+      state = _box.values.toList();
+    }
   }
 }
 
@@ -123,5 +165,30 @@ class MedicationListNotifier extends Notifier<List<Medication>> {
   void deleteMedication(String id) {
     _box.delete(id);
     state = _box.values.toList();
+  }
+
+  void updateMedication(String id, {
+    required String name,
+    required String dosage,
+    required DateTime startDate,
+    DateTime? endDate,
+    String? frequency,
+    String? notes,
+  }) {
+    final m = _box.get(id);
+    if (m != null) {
+      final updated = Medication(
+        id: id,
+        catId: m.catId,
+        name: name,
+        dosage: dosage,
+        startDate: startDate,
+        endDate: endDate,
+        frequency: frequency,
+        notes: notes,
+      );
+      _box.put(id, updated);
+      state = _box.values.toList();
+    }
   }
 }

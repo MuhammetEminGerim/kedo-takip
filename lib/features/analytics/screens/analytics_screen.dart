@@ -188,15 +188,15 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
               const SizedBox(height: 12),
               Row(
                 children: [
-                  Expanded(child: _buildStatBox('$totalWater', AppStrings.get('water'), Icons.water_drop_outlined)),
+                  Expanded(child: _buildStatBox('$totalWater', AppStrings.get('water'), Icons.water_drop_outlined, isModern)),
                   const SizedBox(width: 12),
-                  Expanded(child: _buildStatBox(latestWeight, AppStrings.get('weight'), Icons.monitor_weight_outlined)),
+                  Expanded(child: _buildStatBox(latestWeight, AppStrings.get('weight'), Icons.monitor_weight_outlined, isModern)),
                 ],
               ),
               const SizedBox(height: 12),
               Row(
                 children: [
-                  Expanded(child: _buildStatBox('$streak', AppStrings.get('day_streak'), Icons.local_fire_department_outlined)),
+                  Expanded(child: _buildStatBox('$streak', AppStrings.get('day_streak'), Icons.local_fire_department_outlined, isModern)),
                 ],
               ),
               const SizedBox(height: 32),
@@ -329,7 +329,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
       return PastelCard(
         padding: const EdgeInsets.all(20),
         child: Center(
-          child: Text('Henüz kilo kaydı yok.', style: TextStyle(fontWeight: FontWeight.w900, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4))),
+          child: Text(AppStrings.get('no_weight_logs_yet', fallback: 'Henüz kilo kaydı yok.'), style: TextStyle(fontWeight: FontWeight.w900, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4))),
         ),
       );
     }

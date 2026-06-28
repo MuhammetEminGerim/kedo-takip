@@ -67,7 +67,7 @@ class _StampAlbumScreenState extends ConsumerState<StampAlbumScreen> {
       ),
       floatingActionButton: selectedCat != null
           ? Padding(
-              padding: const EdgeInsets.only(bottom: 130.0), // Increased padding to stay clear of floating navbar
+              padding: const EdgeInsets.only(bottom: 16.0), // Padding to stay clear of floating navbar
               child: FloatingActionButton.extended(
                 onPressed: () => _showAddStampDialog(context, _selectedFilterCatId ?? selectedCat.id),
                 backgroundColor: isModern ? const Color(0xFF1E293B) : Theme.of(context).colorScheme.primary,

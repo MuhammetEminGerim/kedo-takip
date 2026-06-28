@@ -21,15 +21,17 @@ class PastelCard extends ConsumerWidget {
     final themeType = ref.watch(themeProvider);
     final isModern = themeType == AppThemeType.modern;
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     final effectiveColor = isModern 
-        ? Colors.white 
+        ? (isDark ? Theme.of(context).colorScheme.surface : Colors.white)
         : (backgroundColor ?? Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface);
 
     return Container(
       decoration: BoxDecoration(
         color: effectiveColor,
         borderRadius: BorderRadius.circular(isModern ? 16 : 32),
-        border: isModern ? Border.all(color: const Color(0xFFE2E8F0), width: 1.5) : null,
+        border: isModern ? Border.all(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0), width: 1.5) : null,
         boxShadow: isModern 
             ? [] 
             : [

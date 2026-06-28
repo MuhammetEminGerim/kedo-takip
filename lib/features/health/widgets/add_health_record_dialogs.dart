@@ -4,11 +4,14 @@ import 'package:intl/intl.dart';
 
 import '../../../core/constants/app_strings.dart';
 import '../providers/health_provider.dart';
+import '../../../shared/models/vaccine.dart';
+import '../../../shared/models/appointment.dart';
+import '../../../shared/models/medication.dart';
 
-void showAddVaccineDialog(BuildContext context, WidgetRef ref, String catId) {
-  final nameCtrl = TextEditingController();
-  DateTime dateAdmin = DateTime.now();
-  DateTime? nextDate;
+void showAddVaccineDialog(BuildContext context, WidgetRef ref, String catId, {Vaccine? existing}) {
+  final nameCtrl = TextEditingController(text: existing?.name);
+  DateTime dateAdmin = existing?.dateAdministered ?? DateTime.now();
+  DateTime? nextDate = existing?.nextDueDate;
 
   showModalBottomSheet(
     context: context,
@@ -19,7 +22,7 @@ void showAddVaccineDialog(BuildContext context, WidgetRef ref, String catId) {
         builder: (ctx, setState) {
           return Container(
             padding: EdgeInsets.only(
-              bottom: MediaQuery.of(ctx).viewInsets.bottom + 130,
+              bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
               top: 24, left: 24, right: 24,
             ),
             decoration: BoxDecoration(
@@ -31,7 +34,7 @@ void showAddVaccineDialog(BuildContext context, WidgetRef ref, String catId) {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(AppStrings.get('add_vaccine'), style: Theme.of(ctx).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
+                Text(existing != null ? AppStrings.get('edit', fallback: 'Düzenle') : AppStrings.get('add_vaccine'), style: Theme.of(ctx).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
                 const SizedBox(height: 16),
                 TextField(
                   controller: nameCtrl,
@@ -74,12 +77,21 @@ void showAddVaccineDialog(BuildContext context, WidgetRef ref, String catId) {
                   child: Text(AppStrings.get('save'), style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
                   onPressed: () {
                     if (nameCtrl.text.trim().isEmpty) return;
-                    ref.read(vaccineListProvider.notifier).addVaccine(
-                      catId: catId,
-                      name: nameCtrl.text.trim(),
-                      dateAdministered: dateAdmin,
-                      nextDueDate: nextDate,
-                    );
+                    if (existing != null) {
+                      ref.read(vaccineListProvider.notifier).updateVaccine(
+                        existing.id,
+                        name: nameCtrl.text.trim(),
+                        dateAdministered: dateAdmin,
+                        nextDueDate: nextDate,
+                      );
+                    } else {
+                      ref.read(vaccineListProvider.notifier).addVaccine(
+                        catId: catId,
+                        name: nameCtrl.text.trim(),
+                        dateAdministered: dateAdmin,
+                        nextDueDate: nextDate,
+                      );
+                    }
                     Navigator.pop(ctx);
                   },
                 ),
@@ -93,10 +105,10 @@ void showAddVaccineDialog(BuildContext context, WidgetRef ref, String catId) {
   );
 }
 
-void showAddAppointmentDialog(BuildContext context, WidgetRef ref, String catId) {
-  final titleCtrl = TextEditingController();
-  final clinicCtrl = TextEditingController();
-  DateTime date = DateTime.now().add(const Duration(days: 1));
+void showAddAppointmentDialog(BuildContext context, WidgetRef ref, String catId, {Appointment? existing}) {
+  final titleCtrl = TextEditingController(text: existing?.title);
+  final clinicCtrl = TextEditingController(text: existing?.clinicName);
+  DateTime date = existing?.date ?? DateTime.now().add(const Duration(days: 1));
 
   showModalBottomSheet(
     context: context,
@@ -107,18 +119,19 @@ void showAddAppointmentDialog(BuildContext context, WidgetRef ref, String catId)
         builder: (ctx, setState) {
           return Container(
             padding: EdgeInsets.only(
-              bottom: MediaQuery.of(ctx).viewInsets.bottom + 130,
+              bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
               top: 24, left: 24, right: 24,
             ),
             decoration: BoxDecoration(
               color: Theme.of(context).scaffoldBackgroundColor,
               borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(AppStrings.get('add_appointment'), style: Theme.of(ctx).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                Text(existing != null ? AppStrings.get('edit', fallback: 'Düzenle') : AppStrings.get('add_appointment'), style: Theme.of(ctx).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
                 const SizedBox(height: 16),
                 TextField(
                   controller: titleCtrl,
@@ -146,7 +159,7 @@ void showAddAppointmentDialog(BuildContext context, WidgetRef ref, String catId)
                   subtitle: Text(DateFormat('MMM d, yyyy - HH:mm').format(date)),
                   trailing: const Icon(Icons.calendar_today),
                   onTap: () async {
-                    final d = await showDatePicker(context: ctx, initialDate: date, firstDate: DateTime.now(), lastDate: DateTime(2030));
+                    final d = await showDatePicker(context: ctx, initialDate: date, firstDate: DateTime.now().subtract(const Duration(days: 365)), lastDate: DateTime(2030));
                     if (d != null) {
                       if (!ctx.mounted) return;
                       final t = await showTimePicker(context: ctx, initialTime: TimeOfDay.fromDateTime(date));
@@ -167,16 +180,26 @@ void showAddAppointmentDialog(BuildContext context, WidgetRef ref, String catId)
                   child: Text(AppStrings.get('save'), style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
                   onPressed: () {
                     if (titleCtrl.text.trim().isEmpty) return;
-                    ref.read(appointmentListProvider.notifier).addAppointment(
-                      catId: catId,
-                      title: titleCtrl.text.trim(),
-                      clinicName: clinicCtrl.text.trim(),
-                      date: date,
-                    );
+                    if (existing != null) {
+                      ref.read(appointmentListProvider.notifier).updateAppointment(
+                        existing.id,
+                        title: titleCtrl.text.trim(),
+                        clinicName: clinicCtrl.text.trim(),
+                        date: date,
+                      );
+                    } else {
+                      ref.read(appointmentListProvider.notifier).addAppointment(
+                        catId: catId,
+                        title: titleCtrl.text.trim(),
+                        clinicName: clinicCtrl.text.trim(),
+                        date: date,
+                      );
+                    }
                     Navigator.pop(ctx);
                   },
                 ),
               ],
+            ),
             ),
           );
         },
@@ -185,11 +208,11 @@ void showAddAppointmentDialog(BuildContext context, WidgetRef ref, String catId)
   );
 }
 
-void showAddMedicationDialog(BuildContext context, WidgetRef ref, String catId) {
-  final nameCtrl = TextEditingController();
-  final dosageCtrl = TextEditingController();
-  final freqCtrl = TextEditingController();
-  DateTime startDate = DateTime.now();
+void showAddMedicationDialog(BuildContext context, WidgetRef ref, String catId, {Medication? existing}) {
+  final nameCtrl = TextEditingController(text: existing?.name);
+  final dosageCtrl = TextEditingController(text: existing?.dosage);
+  final freqCtrl = TextEditingController(text: existing?.frequency);
+  DateTime startDate = existing?.startDate ?? DateTime.now();
 
   showModalBottomSheet(
     context: context,
@@ -207,11 +230,12 @@ void showAddMedicationDialog(BuildContext context, WidgetRef ref, String catId) 
               color: Theme.of(context).scaffoldBackgroundColor,
               borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(AppStrings.get('add_medication'), style: Theme.of(ctx).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                Text(existing != null ? AppStrings.get('edit', fallback: 'Düzenle') : AppStrings.get('add_medication'), style: Theme.of(ctx).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
                 const SizedBox(height: 16),
                 TextField(
                   controller: nameCtrl,
@@ -273,17 +297,28 @@ void showAddMedicationDialog(BuildContext context, WidgetRef ref, String catId) 
                   child: Text(AppStrings.get('save'), style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
                   onPressed: () {
                     if (nameCtrl.text.trim().isEmpty || dosageCtrl.text.trim().isEmpty) return;
-                    ref.read(medicationListProvider.notifier).addMedication(
-                      catId: catId,
-                      name: nameCtrl.text.trim(),
-                      dosage: dosageCtrl.text.trim(),
-                      frequency: freqCtrl.text.trim(),
-                      startDate: startDate,
-                    );
+                    if (existing != null) {
+                      ref.read(medicationListProvider.notifier).updateMedication(
+                        existing.id,
+                        name: nameCtrl.text.trim(),
+                        dosage: dosageCtrl.text.trim(),
+                        frequency: freqCtrl.text.trim(),
+                        startDate: startDate,
+                      );
+                    } else {
+                      ref.read(medicationListProvider.notifier).addMedication(
+                        catId: catId,
+                        name: nameCtrl.text.trim(),
+                        dosage: dosageCtrl.text.trim(),
+                        frequency: freqCtrl.text.trim(),
+                        startDate: startDate,
+                      );
+                    }
                     Navigator.pop(ctx);
                   },
                 ),
               ],
+            ),
             ),
           );
         },

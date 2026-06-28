@@ -310,8 +310,8 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
                           boxShadow: [
                             BoxShadow(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2), blurRadius: 10, offset: const Offset(0, 4)),
                           ],
-                          image: _photoPath != null
-                              ? DecorationImage(image: FileImage(File(_photoPath!)), fit: BoxFit.cover)
+                          image: _photoPath != null && _photoPath!.isNotEmpty
+                              ? DecorationImage(image: ResizeImage(FileImage(File(_photoPath!)), width: 300), fit: BoxFit.cover)
                               : const DecorationImage(image: AssetImage('assets/images/cat_avatar.png'), fit: BoxFit.cover),
                         ),
                       ),
@@ -414,11 +414,22 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
                       ),
                     ),
                     const SizedBox(width: 16),
-                    Text(AppStrings.get('gender'), style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: Theme.of(context).colorScheme.onSurface)),
-                    const Spacer(),
-                    _buildGenderChip('Female', '♀', AppStrings.get('female')),
+                    Text(AppStrings.get('gender'), style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: Theme.of(context).colorScheme.onSurface), maxLines: 1),
                     const SizedBox(width: 8),
-                    _buildGenderChip('Male', '♂', AppStrings.get('male')),
+                    Expanded(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerRight,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            _buildGenderChip('Female', '♀', AppStrings.get('female')),
+                            const SizedBox(width: 8),
+                            _buildGenderChip('Male', '♂', AppStrings.get('male')),
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -543,7 +554,7 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
       onTap: () => setState(() => _gender = value),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(20),

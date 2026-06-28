@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 
 import '../../../shared/widgets/pastel_card.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../core/theme/app_theme.dart';
 
 class TrainingScreen extends ConsumerStatefulWidget {
   const TrainingScreen({super.key});
@@ -382,18 +383,23 @@ class _TrainingScreenState extends ConsumerState<TrainingScreen> {
       );
     }
 
+    final isModern = ref.watch(themeProvider) == AppThemeType.modern;
+
     return Scaffold(
       appBar: AppBar(
         title: Row(
+          mainAxisAlignment: isModern ? MainAxisAlignment.start : MainAxisAlignment.start,
           children: [
             Text(
-              '${AppStrings.get('training')} ',
+              isModern ? AppStrings.get('training').toUpperCase() : '${AppStrings.get('training')} ',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.w900,
                     color: Theme.of(context).colorScheme.onSurface,
+                    letterSpacing: isModern ? 1.5 : 0,
+                    fontSize: isModern ? 20 : 24,
                   ),
             ),
-            Icon(Icons.school_outlined, color: Theme.of(context).colorScheme.onSurface, size: 28),
+            if (!isModern) Icon(Icons.school_outlined, color: Theme.of(context).colorScheme.onSurface, size: 28),
           ],
         ),
         backgroundColor: Colors.transparent,
@@ -408,142 +414,154 @@ class _TrainingScreenState extends ConsumerState<TrainingScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // ─── Clicker Section ───
-              Text(
-                AppStrings.get('clicker_button'),
-                style: TextStyle(
-                  fontFamily: 'Nunito',
-                  fontWeight: FontWeight.w900,
-                  fontSize: 18,
-                  color: Theme.of(context).colorScheme.onSurface,
+              if (isModern)
+                _buildModernClickerSection()
+              else ...[
+                Text(
+                  AppStrings.get('clicker_button'),
+                  style: TextStyle(
+                    fontFamily: 'Nunito',
+                    fontWeight: FontWeight.w900,
+                    fontSize: 18,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
                 ),
-              ),
-              SizedBox(height: 16),
-              Row(
-                children: [
-                  GestureDetector(
-                    onTap: _onClickerTap,
-                    child: Container(
-                      width: 90,
-                      height: 90,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.secondary,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 4),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.5),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Center(
-                        child: Text(
-                          AppStrings.get('click'),
-                          style: TextStyle(
-                            fontFamily: 'Nunito',
-                            fontWeight: FontWeight.w900,
-                            fontSize: 20,
-                            color: Theme.of(context).colorScheme.onSurface,
+                SizedBox(height: 16),
+                Row(
+                  children: [
+                    GestureDetector(
+                      onTap: _onClickerTap,
+                      child: Container(
+                        width: 90,
+                        height: 90,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.secondary,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 4),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.5),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Center(
+                          child: Text(
+                            AppStrings.get('click'),
+                            style: TextStyle(
+                              fontFamily: 'Nunito',
+                              fontWeight: FontWeight.w900,
+                              fontSize: 20,
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 24),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '$_tapsToday ${AppStrings.get('taps')}',
-                        style: TextStyle(
-                          fontFamily: 'Nunito',
-                          fontWeight: FontWeight.w900,
-                          fontSize: 24,
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
-                      ),
-                      Text(
-                        AppStrings.get('today'),
-                        style: TextStyle(
-                          fontFamily: 'Nunito',
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                          fontWeight: FontWeight.w900,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 32),
-
-              // ─── Training Plan ───
-              Text(
-                AppStrings.get('cute_training_plan'),
-                style: TextStyle(
-                  fontFamily: 'Nunito',
-                  fontWeight: FontWeight.w900,
-                  fontSize: 18,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-              ),
-              SizedBox(height: 16),
-              SizedBox(
-                height: 180,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: [
-                    _buildTrainingPlanCard(AppStrings.get('sit'), 'sit', Icons.chair_alt_outlined, Theme.of(context).colorScheme.secondary),
-                    const SizedBox(width: 16),
-                    _buildTrainingPlanCard(AppStrings.get('come'), 'come', Icons.pets_outlined, Theme.of(context).colorScheme.primary),
-                    const SizedBox(width: 16),
-                    _buildTrainingPlanCard(AppStrings.get('high_five'), 'highfive', Icons.pan_tool_outlined, Theme.of(context).colorScheme.tertiary),
-                    const SizedBox(width: 16),
-                    _buildTrainingPlanCard(AppStrings.get('carrier'), 'carrier', Icons.inventory_2_outlined, Theme.of(context).colorScheme.primaryContainer),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 24),
-
-              // ─── Streak Card ───
-              PastelCard(
-                padding: const EdgeInsets.symmetric(vertical: 20),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    const SizedBox(width: 24),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(
-                          Icons.local_fire_department_outlined,
-                          color: _streak > 0 ? Colors.deepOrange : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
-                        ),
-                        const SizedBox(width: 8),
                         Text(
-                          '$_streak ${AppStrings.get('day_streak_label')}',
+                          '$_tapsToday ${AppStrings.get('taps')}',
                           style: TextStyle(
                             fontFamily: 'Nunito',
                             fontWeight: FontWeight.w900,
-                            fontSize: 20,
+                            fontSize: 24,
                             color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                        ),
+                        Text(
+                          AppStrings.get('today'),
+                          style: TextStyle(
+                            fontFamily: 'Nunito',
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                            fontWeight: FontWeight.w900,
+                            fontSize: 16,
                           ),
                         ),
                       ],
                     ),
-                    SizedBox(height: 4),
-                    Text(
-                      _streak > 0 ? AppStrings.get('keep_going') : AppStrings.get('tap_clicker_to_start'),
-                      style: TextStyle(
-                        fontFamily: 'Nunito',
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
                   ],
                 ),
-              ),
+              ],
+
+              const SizedBox(height: 32),
+
+              // ─── Training Plan ───
+              if (isModern)
+                _buildModernTrainingPlan()
+              else ...[
+                Text(
+                  AppStrings.get('cute_training_plan'),
+                  style: TextStyle(
+                    fontFamily: 'Nunito',
+                    fontWeight: FontWeight.w900,
+                    fontSize: 18,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+                SizedBox(height: 16),
+                SizedBox(
+                  height: 180,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    children: [
+                      _buildTrainingPlanCard(AppStrings.get('sit'), 'sit', Icons.chair_alt_outlined, Theme.of(context).colorScheme.secondary),
+                      const SizedBox(width: 16),
+                      _buildTrainingPlanCard(AppStrings.get('come'), 'come', Icons.pets_outlined, Theme.of(context).colorScheme.primary),
+                      const SizedBox(width: 16),
+                      _buildTrainingPlanCard(AppStrings.get('high_five'), 'highfive', Icons.pan_tool_outlined, Theme.of(context).colorScheme.tertiary),
+                      const SizedBox(width: 16),
+                      _buildTrainingPlanCard(AppStrings.get('carrier'), 'carrier', Icons.inventory_2_outlined, Theme.of(context).colorScheme.primaryContainer),
+                    ],
+                  ),
+                ),
+              ],
+
+              const SizedBox(height: 24),
+
+              // ─── Streak Card ───
+              if (isModern)
+                _buildModernStreakCard()
+              else ...[
+                PastelCard(
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.local_fire_department_outlined,
+                            color: _streak > 0 ? Colors.deepOrange : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            '$_streak ${AppStrings.get('day_streak_label')}',
+                            style: TextStyle(
+                              fontFamily: 'Nunito',
+                              fontWeight: FontWeight.w900,
+                              fontSize: 20,
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        _streak > 0 ? AppStrings.get('keep_going') : AppStrings.get('tap_clicker_to_start'),
+                        style: TextStyle(
+                          fontFamily: 'Nunito',
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
 
               const SizedBox(height: 32),
 
@@ -551,15 +569,15 @@ class _TrainingScreenState extends ConsumerState<TrainingScreen> {
               Row(
                 children: [
                   Text(
-                    '${AppStrings.get('guides')} ',
+                    isModern ? AppStrings.get('guides').toUpperCase() : '${AppStrings.get('guides')} ',
                     style: TextStyle(
-                      fontFamily: 'Nunito',
                       fontWeight: FontWeight.w900,
-                      fontSize: 18,
+                      fontSize: isModern ? 16 : 18,
+                      letterSpacing: isModern ? 1.0 : 0,
                       color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
-                  Icon(Icons.menu_book_outlined, size: 20, color: Theme.of(context).colorScheme.onSurface),
+                  if (!isModern) Icon(Icons.menu_book_outlined, size: 20, color: Theme.of(context).colorScheme.onSurface),
                 ],
               ),
               const SizedBox(height: 16),
@@ -568,6 +586,7 @@ class _TrainingScreenState extends ConsumerState<TrainingScreen> {
                 Icons.nights_stay_outlined,
                 Theme.of(context).colorScheme.tertiary,
                 AppStrings.get('night_crying_tips').split('|'),
+                isModern,
               ),
               const SizedBox(height: 12),
               _buildGuideCard(
@@ -575,6 +594,7 @@ class _TrainingScreenState extends ConsumerState<TrainingScreen> {
                 Icons.pets_outlined,
                 Theme.of(context).colorScheme.primary,
                 AppStrings.get('scratching_tips').split('|'),
+                isModern,
               ),
               const SizedBox(height: 12),
               _buildGuideCard(
@@ -582,6 +602,7 @@ class _TrainingScreenState extends ConsumerState<TrainingScreen> {
                 Icons.mood_bad_outlined,
                 Theme.of(context).colorScheme.primaryContainer,
                 AppStrings.get('biting_tips').split('|'),
+                isModern,
               ),
               const SizedBox(height: 100),
             ],
@@ -687,7 +708,42 @@ class _TrainingScreenState extends ConsumerState<TrainingScreen> {
     );
   }
 
-  Widget _buildGuideCard(String title, IconData icon, Color accentColor, List<String> tips) {
+  Widget _buildGuideCard(String title, IconData icon, Color accentColor, List<String> tips, bool isModern) {
+    if (isModern) {
+      final isDark = Theme.of(context).brightness == Brightness.dark;
+      final cardBg = isDark ? const Color(0xFF1E293B) : Colors.white;
+      final textColor = isDark ? Colors.white : const Color(0xFF1E293B);
+
+      return GestureDetector(
+        onTap: () => _showGuideBottomSheet(title, icon, accentColor, tips),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          decoration: BoxDecoration(
+            color: cardBg,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0), width: 1.5),
+          ),
+          child: Row(
+            children: [
+              Icon(icon, color: accentColor, size: 28),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title, style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: textColor)),
+                    const SizedBox(height: 2),
+                    Text(AppStrings.get('read_more'), style: TextStyle(color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B), fontSize: 13, fontWeight: FontWeight.w600)),
+                  ],
+                ),
+              ),
+              Icon(Icons.chevron_right, color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0), size: 24),
+            ],
+          ),
+        ),
+      );
+    }
+
     return PastelCard(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       onTap: () => _showGuideBottomSheet(title, icon, accentColor, tips),
@@ -733,6 +789,172 @@ class _TrainingScreenState extends ConsumerState<TrainingScreen> {
                     ),
                   ),
                 ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildModernClickerSection() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBg = isDark ? const Color(0xFF1E293B) : Colors.white;
+    final textColor = isDark ? Colors.white : const Color(0xFF1E293B);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          AppStrings.get('clicker_button').toUpperCase(),
+          style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B), letterSpacing: 1.0),
+        ),
+        const SizedBox(height: 12),
+        GestureDetector(
+          onTap: _onClickerTap,
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
+            decoration: BoxDecoration(
+              color: cardBg,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0), width: 1.5),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(Icons.touch_app_outlined, color: Theme.of(context).colorScheme.primary, size: 32),
+                ),
+                const SizedBox(width: 20),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(AppStrings.get('click'), style: TextStyle(fontWeight: FontWeight.w900, fontSize: 20, color: textColor)),
+                      const SizedBox(height: 4),
+                      Text('$_tapsToday ${AppStrings.get('taps')} ${AppStrings.get('today').toLowerCase()}', style: TextStyle(color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B), fontSize: 14, fontWeight: FontWeight.w600)),
+                    ],
+                  ),
+                ),
+                Icon(Icons.arrow_forward_ios_rounded, color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0), size: 20),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildModernTrainingPlan() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          AppStrings.get('cute_training_plan').toUpperCase(),
+          style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B), letterSpacing: 1.0),
+        ),
+        const SizedBox(height: 12),
+        GridView.count(
+          crossAxisCount: 2,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          mainAxisSpacing: 16,
+          crossAxisSpacing: 16,
+          childAspectRatio: 1.1,
+          children: [
+            _buildModernTrainingCard(AppStrings.get('sit'), 'sit', Icons.airline_seat_recline_normal, Colors.orange),
+            _buildModernTrainingCard(AppStrings.get('come'), 'come', Icons.directions_walk, Colors.blue),
+            _buildModernTrainingCard(AppStrings.get('high_five'), 'highfive', Icons.pan_tool_outlined, Colors.purple),
+            _buildModernTrainingCard(AppStrings.get('carrier'), 'carrier', Icons.inventory_2_outlined, Colors.teal),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildModernTrainingCard(String title, String key, IconData icon, Color color) {
+    final progress = _trainingProgress[key] ?? 0;
+    final fraction = progress / 100.0;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBg = isDark ? const Color(0xFF1E293B) : Colors.white;
+    final textColor = isDark ? Colors.white : const Color(0xFF1E293B);
+
+    return GestureDetector(
+      onTap: () => _showTrainingDialog(key, title, color),
+      child: Container(
+        decoration: BoxDecoration(
+          color: cardBg,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0), width: 1.5),
+        ),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Icon(icon, color: color, size: 28),
+                Text('$progress%', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: color)),
+              ],
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: textColor), maxLines: 1, overflow: TextOverflow.ellipsis),
+                const SizedBox(height: 8),
+                LinearProgressIndicator(
+                  value: fraction,
+                  backgroundColor: color.withValues(alpha: 0.1),
+                  valueColor: AlwaysStoppedAnimation<Color>(color),
+                  minHeight: 6,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildModernStreakCard() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBg = isDark ? const Color(0xFF1E293B) : Colors.white;
+    final textColor = isDark ? Colors.white : const Color(0xFF1E293B);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+      decoration: BoxDecoration(
+        color: cardBg,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0), width: 1.5),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: _streak > 0 ? Colors.deepOrange.withValues(alpha: 0.15) : (isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9)),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.local_fire_department_outlined, color: _streak > 0 ? Colors.deepOrange : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)), size: 28),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('$_streak ${AppStrings.get('day_streak_label')}', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: textColor)),
+                const SizedBox(height: 4),
+                Text(_streak > 0 ? AppStrings.get('keep_going') : AppStrings.get('tap_clicker_to_start'), style: TextStyle(color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B), fontSize: 13, fontWeight: FontWeight.w600)),
               ],
             ),
           ),

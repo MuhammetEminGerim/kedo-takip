@@ -131,24 +131,20 @@ class ScaffoldWithBottomNavBar extends ConsumerWidget {
     Color inactiveColor;
     bool showActiveUnderline;
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     switch (themeType) {
       case AppThemeType.modern:
-        navBg = Colors.white;
-        activeColor = const Color(0xFF1E293B);
-        inactiveColor = const Color(0xFF94A3B8);
+        navBg = isDark ? theme.colorScheme.surface : Colors.white;
+        activeColor = isDark ? theme.colorScheme.primary : const Color(0xFF1E293B);
+        inactiveColor = isDark ? theme.colorScheme.onSurface.withValues(alpha: 0.4) : const Color(0xFF94A3B8);
         showActiveUnderline = true;
-        break;
-      case AppThemeType.dark:
-        navBg = theme.colorScheme.surface;
-        activeColor = theme.colorScheme.primary;
-        inactiveColor = theme.colorScheme.onSurface.withValues(alpha: 0.4);
-        showActiveUnderline = false;
         break;
       case AppThemeType.playful:
       default:
-        navBg = const Color(0xFFFFECD6);
-        activeColor = const Color(0xFFC0A3E5);
-        inactiveColor = const Color(0xFF3E2723);
+        navBg = isDark ? theme.colorScheme.surface : const Color(0xFFFFECD6);
+        activeColor = isDark ? theme.colorScheme.primary : const Color(0xFFC0A3E5);
+        inactiveColor = isDark ? theme.colorScheme.onSurface.withValues(alpha: 0.4) : const Color(0xFF3E2723);
         showActiveUnderline = false;
         break;
     }
@@ -177,11 +173,11 @@ class ScaffoldWithBottomNavBar extends ConsumerWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildNavItem(context, 0, currentIndex, AppIcons.navHome, AppStrings.get('nav_home'), activeColor, inactiveColor, showActiveUnderline),
-                _buildNavItem(context, 1, currentIndex, AppIcons.navHealth, AppStrings.get('nav_health'), activeColor, inactiveColor, showActiveUnderline),
-                _buildNavItem(context, 2, currentIndex, AppIcons.navCare, AppStrings.get('nav_care'), activeColor, inactiveColor, showActiveUnderline),
-                _buildNavItem(context, 3, currentIndex, AppIcons.navStats, AppStrings.get('nav_stats'), activeColor, inactiveColor, showActiveUnderline),
-                _buildNavItem(context, 4, currentIndex, AppIcons.navAlbum, AppStrings.get('nav_album'), activeColor, inactiveColor, showActiveUnderline),
+                _buildNavItem(context, 0, currentIndex, ({Color? color, double? size}) => AppIcons.navHome(isModern: themeType == AppThemeType.modern, color: color, size: size ?? 28), AppStrings.get('nav_home'), activeColor, inactiveColor, showActiveUnderline),
+                _buildNavItem(context, 1, currentIndex, ({Color? color, double? size}) => AppIcons.navHealth(isModern: themeType == AppThemeType.modern, color: color, size: size ?? 28), AppStrings.get('nav_health'), activeColor, inactiveColor, showActiveUnderline),
+                _buildNavItem(context, 2, currentIndex, ({Color? color, double? size}) => AppIcons.navCare(isModern: themeType == AppThemeType.modern, color: color, size: size ?? 28), AppStrings.get('nav_care'), activeColor, inactiveColor, showActiveUnderline),
+                _buildNavItem(context, 3, currentIndex, ({Color? color, double? size}) => AppIcons.navStats(isModern: themeType == AppThemeType.modern, color: color, size: size ?? 28), AppStrings.get('nav_stats'), activeColor, inactiveColor, showActiveUnderline),
+                _buildNavItem(context, 4, currentIndex, ({Color? color, double? size}) => AppIcons.navAlbum(isModern: themeType == AppThemeType.modern, color: color, size: size ?? 28), AppStrings.get('nav_album'), activeColor, inactiveColor, showActiveUnderline),
               ],
             ),
           ),

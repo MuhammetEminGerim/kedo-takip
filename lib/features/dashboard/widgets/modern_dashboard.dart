@@ -177,7 +177,7 @@ class ModernDashboard extends ConsumerWidget {
                         width: isSelected ? 2.5 : 1.5,
                       ),
                       image: cat.photoPath != null && cat.photoPath!.isNotEmpty
-                          ? DecorationImage(image: FileImage(File(cat.photoPath!)), fit: BoxFit.cover)
+                          ? DecorationImage(image: ResizeImage(FileImage(File(cat.photoPath!)), width: 150), fit: BoxFit.cover)
                           : const DecorationImage(image: AssetImage('assets/images/cat_avatar.png'), fit: BoxFit.cover),
                     ),
                   ),
@@ -228,7 +228,7 @@ class ModernDashboard extends ConsumerWidget {
                     shape: BoxShape.circle,
                     border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
                     image: selectedCat.photoPath != null && selectedCat.photoPath!.isNotEmpty
-                        ? DecorationImage(image: FileImage(File(selectedCat.photoPath!)), fit: BoxFit.cover)
+                        ? DecorationImage(image: ResizeImage(FileImage(File(selectedCat.photoPath!)), width: 150), fit: BoxFit.cover)
                         : const DecorationImage(image: AssetImage('assets/images/cat_avatar.png'), fit: BoxFit.cover),
                   ),
                 ),
@@ -418,13 +418,25 @@ class ModernDashboard extends ConsumerWidget {
                       ),
                     ),
                     Expanded(
-                      child: Text(
-                        _getLogLabel(log.type, log.value ?? ''),
-                        style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                          color: Color(0xFF1E293B),
-                        ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            _getLogIcon(log.type),
+                            size: 16,
+                            color: const Color(0xFF1E293B),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              _getLogLabel(log.type, log.value ?? ''),
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                                color: Color(0xFF1E293B),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -440,13 +452,28 @@ class ModernDashboard extends ConsumerWidget {
     final isTr = AppStrings.locale == 'tr';
     switch (type) {
       case 'food':
-        return isTr ? '🍽️ Mama verildi' : '🍽️ Fed';
+        return isTr ? 'Mama verildi' : 'Fed';
       case 'water':
-        return isTr ? '💧 Su yenilendi' : '💧 Water Refill';
+        return isTr ? 'Su yenilendi' : 'Water Refill';
       case 'litter':
-        return isTr ? '🧹 Kum temizlendi' : '🧹 Litter Cleaned';
+        return isTr ? 'Kum temizlendi' : 'Litter Cleaned';
       default:
         return value;
+    }
+  }
+
+  IconData _getLogIcon(String type) {
+    switch (type) {
+      case 'food':
+        return Icons.restaurant_outlined;
+      case 'water':
+        return Icons.water_drop_outlined;
+      case 'litter':
+        return Icons.cleaning_services_outlined;
+      case 'weight':
+        return Icons.monitor_weight_outlined;
+      default:
+        return Icons.check;
     }
   }
 

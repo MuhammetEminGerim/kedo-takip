@@ -107,6 +107,7 @@ class _PawLogAppState extends ConsumerState<PawLogApp> {
     final router = ref.watch(routerProvider);
     // Watch theme and locale state to trigger rebuild on changes
     ref.watch(themeProvider);
+    final themeMode = ref.watch(themeModeProvider);
     ref.watch(localeProvider);
     final themeNotifier = ref.read(themeProvider.notifier);
 
@@ -115,6 +116,8 @@ class _PawLogAppState extends ConsumerState<PawLogApp> {
         title: 'PawLog',
         debugShowCheckedModeBanner: false,
         theme: themeNotifier.currentThemeData,
+        darkTheme: themeNotifier.currentDarkThemeData,
+        themeMode: themeMode,
         home: OnboardingScreen(
           onComplete: () {
             setState(() => _showOnboarding = false);
@@ -127,6 +130,8 @@ class _PawLogAppState extends ConsumerState<PawLogApp> {
       title: 'PawLog',
       debugShowCheckedModeBanner: false,
       theme: themeNotifier.currentThemeData,
+      darkTheme: themeNotifier.currentDarkThemeData,
+      themeMode: themeMode,
       routerConfig: router,
     );
   }

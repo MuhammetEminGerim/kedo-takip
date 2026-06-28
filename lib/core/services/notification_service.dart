@@ -87,7 +87,7 @@ class NotificationService {
           styleInformation: const BigTextStyleInformation(''),
         ),
       ),
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       matchDateTimeComponents: DateTimeComponents.time, // daily repeat
       payload: 'daily_$notificationId',
     );
@@ -126,7 +126,7 @@ class NotificationService {
           styleInformation: const BigTextStyleInformation(''),
         ),
       ),
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       payload: 'appointment_$notificationId',
     );
 

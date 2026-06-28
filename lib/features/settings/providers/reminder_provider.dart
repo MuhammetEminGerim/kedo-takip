@@ -100,6 +100,34 @@ class ReminderListNotifier extends Notifier<List<Reminder>> {
     }
   }
 
+  /// Update reminder full details
+  Future<void> updateReminderDetails(String reminderId, {
+    required String title,
+    required String catId,
+    required String catName,
+    required int hour,
+    required int minute,
+  }) async {
+    final box = ref.read(reminderBoxProvider);
+    final reminder = box.get(reminderId);
+    if (reminder == null) return;
+
+    await NotificationService.instance.cancelNotification(reminder.notificationId);
+
+    reminder.title = title;
+    reminder.catId = catId;
+    reminder.catName = catName;
+    reminder.hour = hour;
+    reminder.minute = minute;
+    
+    await reminder.save();
+    state = box.values.toList();
+
+    if (reminder.isEnabled) {
+      await _scheduleNotification(reminder);
+    }
+  }
+
   /// Delete a reminder
   Future<void> deleteReminder(String reminderId) async {
     final box = ref.read(reminderBoxProvider);

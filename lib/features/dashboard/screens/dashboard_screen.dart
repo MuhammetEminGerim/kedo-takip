@@ -147,7 +147,7 @@ class DashboardScreen extends ConsumerWidget {
                                   ? [BoxShadow(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3), blurRadius: 8, offset: const Offset(0, 2))]
                                   : [],
                               image: cat.photoPath != null && cat.photoPath!.isNotEmpty
-                                  ? DecorationImage(image: FileImage(File(cat.photoPath!)), fit: BoxFit.cover)
+                                  ? DecorationImage(image: ResizeImage(FileImage(File(cat.photoPath!)), width: 150), fit: BoxFit.cover)
                                   : const DecorationImage(image: AssetImage('assets/images/cat_avatar.png'), fit: BoxFit.cover),
                             ),
                           ),
@@ -187,7 +187,7 @@ class DashboardScreen extends ConsumerWidget {
                       BoxShadow(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2), blurRadius: 10, offset: const Offset(0, 4))
                     ],
                     image: selectedCat.photoPath != null && selectedCat.photoPath!.isNotEmpty
-                        ? DecorationImage(image: FileImage(File(selectedCat.photoPath!)), fit: BoxFit.cover)
+                        ? DecorationImage(image: ResizeImage(FileImage(File(selectedCat.photoPath!)), width: 250), fit: BoxFit.cover)
                         : const DecorationImage(image: AssetImage('assets/images/cat_avatar.png'), fit: BoxFit.cover),
                   ),
                 ),
@@ -293,50 +293,18 @@ class DashboardScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
           
-          // Stamp Album Action
-          GestureDetector(
-            onTap: () => context.push('/stamps'),
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.5), width: 2),
-                boxShadow: [
-                  BoxShadow(color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, 4))
-                ],
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primaryContainer,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(Icons.photo_album_outlined, color: Colors.white, size: 28),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          AppStrings.get('stamp_album'),
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Theme.of(context).colorScheme.onSurface),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Anılarını biriktir', // Can be localized later
-                          style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Icon(Icons.arrow_forward_ios, color: Theme.of(context).colorScheme.primaryContainer),
-                ],
-              ),
-            ),
+          // Water Tracking
+          KawaiiSummaryCard(
+            color: Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.5),
+            icon: AppIcons.water(),
+            title: AppStrings.get('water'),
+            valueBuilder: (ref) {
+              final logs = ref.watch(careLogListProvider);
+              final today = DateTime.now();
+              final todayLogs = logs.where((m) => m.type == 'water' && m.timestamp.day == today.day).toList();
+              if (todayLogs.isEmpty) return AppStrings.get('not_refilled_yet');
+              return '${AppStrings.get('refilled')}\n${AppStrings.get('last')} ${DateFormat.jm().format(todayLogs.last.timestamp)}';
+            },
           ),
           
           const SizedBox(height: 120), // Padding to ensure content is visible above floating nav bar
@@ -350,7 +318,7 @@ class DashboardScreen extends ConsumerWidget {
   ImageProvider _getCatImage(WidgetRef ref) {
     final cat = ref.read(selectedCatProvider);
     if (cat != null && cat.photoPath != null && cat.photoPath!.isNotEmpty) {
-      return FileImage(File(cat.photoPath!));
+      return ResizeImage(FileImage(File(cat.photoPath!)), width: 150);
     }
     return const AssetImage('assets/images/cat_avatar.png');
   }
@@ -455,7 +423,7 @@ class KawaiiSummaryCard extends ConsumerWidget {
   ImageProvider _getCatImage(WidgetRef ref) {
     final cat = ref.read(selectedCatProvider);
     if (cat != null && cat.photoPath != null && cat.photoPath!.isNotEmpty) {
-      return FileImage(File(cat.photoPath!));
+      return ResizeImage(FileImage(File(cat.photoPath!)), width: 150);
     }
     return const AssetImage('assets/images/cat_avatar.png');
   }

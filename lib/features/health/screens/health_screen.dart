@@ -8,6 +8,7 @@ import '../../../shared/widgets/pastel_card.dart';
 import '../providers/health_provider.dart';
 import '../widgets/add_health_record_dialogs.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/app_icons.dart';
 
 class HealthScreen extends ConsumerStatefulWidget {
   const HealthScreen({super.key});
@@ -66,25 +67,56 @@ class _HealthScreenState extends ConsumerState<HealthScreen> with SingleTickerPr
             ),
           ],
         ),
-        bottom: TabBar(
-          controller: _tabController,
-          labelColor: isModern ? const Color(0xFF1E293B) : Theme.of(context).colorScheme.primary,
-          unselectedLabelColor: isModern ? const Color(0xFF64748B) : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
-          indicatorColor: isModern ? const Color(0xFF1E293B) : Theme.of(context).colorScheme.primary,
-          indicatorWeight: isModern ? 2 : 4,
-          dividerColor: isModern ? const Color(0xFFE2E8F0) : Colors.transparent,
-          labelStyle: TextStyle(
-            fontWeight: isModern ? FontWeight.w800 : FontWeight.w800, 
-            fontFamily: isModern ? 'Inter' : 'Nunito', 
-            fontSize: isModern ? 13 : 14,
-            letterSpacing: isModern ? 0.5 : 0,
-          ),
-          labelPadding: const EdgeInsets.symmetric(horizontal: 4),
-          tabs: [
-            Tab(child: FittedBox(fit: BoxFit.scaleDown, child: Text(isModern ? AppStrings.get('tab_vaccines').toUpperCase() : AppStrings.get('tab_vaccines')))),
-            Tab(child: FittedBox(fit: BoxFit.scaleDown, child: Text(isModern ? AppStrings.get('tab_appointments').toUpperCase() : AppStrings.get('tab_appointments')))),
-            Tab(child: FittedBox(fit: BoxFit.scaleDown, child: Text(isModern ? AppStrings.get('tab_medications').toUpperCase() : AppStrings.get('tab_medications')))),
-          ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(60),
+          child: isModern 
+            ? Container(
+                margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: TabBar(
+                  controller: _tabController,
+                  indicator: BoxDecoration(
+                    color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF334155) : Colors.white,
+                    borderRadius: BorderRadius.circular(26),
+                    boxShadow: [
+                      BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 4, offset: const Offset(0, 2))
+                    ],
+                  ),
+                  indicatorSize: TabBarIndicatorSize.tab,
+                  dividerColor: Colors.transparent,
+                  labelColor: Theme.of(context).brightness == Brightness.dark ? Colors.white : const Color(0xFF1E293B),
+                  unselectedLabelColor: const Color(0xFF64748B),
+                  labelStyle: const TextStyle(fontWeight: FontWeight.w800, fontFamily: 'Inter', fontSize: 12, letterSpacing: 0.5),
+                  tabs: [
+                    Tab(child: Text(AppStrings.get('tab_vaccines').toUpperCase(), overflow: TextOverflow.ellipsis)),
+                    Tab(child: Text(AppStrings.get('tab_appointments').toUpperCase(), overflow: TextOverflow.ellipsis)),
+                    Tab(child: Text(AppStrings.get('tab_medications').toUpperCase(), overflow: TextOverflow.ellipsis)),
+                  ],
+                ),
+              )
+            : TabBar(
+                controller: _tabController,
+                labelColor: Theme.of(context).colorScheme.primary,
+                unselectedLabelColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                indicatorColor: Theme.of(context).colorScheme.primary,
+                indicatorWeight: 4,
+                dividerColor: Colors.transparent,
+                labelStyle: const TextStyle(
+                  fontWeight: FontWeight.w800, 
+                  fontFamily: 'Nunito', 
+                  fontSize: 14,
+                ),
+                labelPadding: const EdgeInsets.symmetric(horizontal: 4),
+                tabs: [
+                  Tab(child: FittedBox(fit: BoxFit.scaleDown, child: Text(AppStrings.get('tab_vaccines')))),
+                  Tab(child: FittedBox(fit: BoxFit.scaleDown, child: Text(AppStrings.get('tab_appointments')))),
+                  Tab(child: FittedBox(fit: BoxFit.scaleDown, child: Text(AppStrings.get('tab_medications')))),
+                ],
+              ),
         ),
       ),
       body: TabBarView(
@@ -108,7 +140,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> with SingleTickerPr
             }
           },
           backgroundColor: isModern ? const Color(0xFF1E293B) : Theme.of(context).colorScheme.primary,
-          child: const Icon(Icons.add, color: Colors.white, size: 32),
+          child: AppIcons.add(color: Colors.white, size: 32),
         ),
       ),
     );
@@ -143,6 +175,10 @@ class _VaccinesTab extends ConsumerWidget {
       );
     }
 
+    if (isModern) {
+      return _buildModernHealthTimeline(context, vaccines, 'vaccine', catId, ref);
+    }
+
     return ListView.builder(
       padding: const EdgeInsets.only(top: 24, left: 24, right: 24, bottom: 120),
       itemCount: vaccines.length,
@@ -152,19 +188,13 @@ class _VaccinesTab extends ConsumerWidget {
           padding: const EdgeInsets.only(bottom: 16),
           child: PastelCard(
             padding: EdgeInsets.zero,
-            child: isModern ? _buildModernItem(
-              context: context,
-              icon: Icons.vaccines_outlined,
-              title: v.name,
-              subtitle1: '${AppStrings.get('date_administered')}: ${DateFormat.yMMMd().format(v.dateAdministered)}',
-              subtitle2: v.nextDueDate != null ? '${AppStrings.get('next_due_date')}: ${DateFormat.yMMMd().format(v.nextDueDate!)}' : null,
-              onDelete: () => ref.read(vaccineListProvider.notifier).deleteVaccine(v.id),
-            ) : ListTile(
+            child: ListTile(
+              onTap: () => showAddVaccineDialog(context, ref, catId, existing: v),
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               leading: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(color: Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.3), shape: BoxShape.circle),
-                child: Icon(Icons.vaccines, color: Theme.of(context).colorScheme.secondaryContainer),
+                child: AppIcons.vaccine(color: Theme.of(context).colorScheme.secondaryContainer),
               ),
               title: Text(v.name, style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
               subtitle: Column(
@@ -177,7 +207,7 @@ class _VaccinesTab extends ConsumerWidget {
                 ],
               ),
               trailing: IconButton(
-                icon: const Icon(Icons.delete_outline, color: Colors.red),
+                icon: AppIcons.delete(color: Colors.red),
                 onPressed: () => ref.read(vaccineListProvider.notifier).deleteVaccine(v.id),
               ),
             ),
@@ -204,6 +234,10 @@ class _AppointmentsTab extends ConsumerWidget {
       );
     }
 
+    if (isModern) {
+      return _buildModernHealthTimeline(context, appts, 'appointment', catId, ref);
+    }
+
     return ListView.builder(
       padding: const EdgeInsets.only(top: 24, left: 24, right: 24, bottom: 120),
       itemCount: appts.length,
@@ -213,19 +247,13 @@ class _AppointmentsTab extends ConsumerWidget {
           padding: const EdgeInsets.only(bottom: 16),
           child: PastelCard(
             padding: EdgeInsets.zero,
-            child: isModern ? _buildModernItem(
-              context: context,
-              icon: Icons.calendar_month_outlined,
-              title: a.title,
-              subtitle1: DateFormat('MMM d, yyyy - HH:mm').format(a.date),
-              subtitle2: a.clinicName != null && a.clinicName!.isNotEmpty ? a.clinicName! : null,
-              onDelete: () => ref.read(appointmentListProvider.notifier).deleteAppointment(a.id),
-            ) : ListTile(
+            child: ListTile(
+              onTap: () => showAddAppointmentDialog(context, ref, catId, existing: a),
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               leading: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3), shape: BoxShape.circle),
-                child: Icon(Icons.calendar_month, color: Theme.of(context).colorScheme.primary),
+                child: AppIcons.calendar(color: Theme.of(context).colorScheme.primary),
               ),
               title: Text(a.title, style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
               subtitle: Column(
@@ -238,7 +266,7 @@ class _AppointmentsTab extends ConsumerWidget {
                 ],
               ),
               trailing: IconButton(
-                icon: const Icon(Icons.delete_outline, color: Colors.red),
+                icon: AppIcons.delete(color: Colors.red),
                 onPressed: () => ref.read(appointmentListProvider.notifier).deleteAppointment(a.id),
               ),
             ),
@@ -265,6 +293,10 @@ class _MedicationsTab extends ConsumerWidget {
       );
     }
 
+    if (isModern) {
+      return _buildModernHealthTimeline(context, meds, 'medication', catId, ref);
+    }
+
     return ListView.builder(
       padding: const EdgeInsets.only(top: 24, left: 24, right: 24, bottom: 120),
       itemCount: meds.length,
@@ -274,19 +306,13 @@ class _MedicationsTab extends ConsumerWidget {
           padding: const EdgeInsets.only(bottom: 16),
           child: PastelCard(
             padding: EdgeInsets.zero,
-            child: isModern ? _buildModernItem(
-              context: context,
-              icon: Icons.medication_outlined,
-              title: m.name,
-              subtitle1: '${AppStrings.get('dosage')}: ${m.dosage}',
-              subtitle2: m.frequency != null && m.frequency!.isNotEmpty ? '${AppStrings.get('frequency')}: ${m.frequency!}' : null,
-              onDelete: () => ref.read(medicationListProvider.notifier).deleteMedication(m.id),
-            ) : ListTile(
+            child: ListTile(
+              onTap: () => showAddMedicationDialog(context, ref, catId, existing: m),
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               leading: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.3), shape: BoxShape.circle),
-                child: Icon(Icons.medication, color: Theme.of(context).colorScheme.secondary),
+                child: AppIcons.medication(color: Theme.of(context).colorScheme.secondary),
               ),
               title: Text(m.name, style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
               subtitle: Column(
@@ -299,7 +325,7 @@ class _MedicationsTab extends ConsumerWidget {
                 ],
               ),
               trailing: IconButton(
-                icon: const Icon(Icons.delete_outline, color: Colors.red),
+                icon: AppIcons.delete(color: Colors.red),
                 onPressed: () => ref.read(medicationListProvider.notifier).deleteMedication(m.id),
               ),
             ),
@@ -310,40 +336,119 @@ class _MedicationsTab extends ConsumerWidget {
   }
 }
 
-Widget _buildModernItem({
-  required BuildContext context,
-  required IconData icon,
-  required String title,
-  required String subtitle1,
-  String? subtitle2,
-  required VoidCallback onDelete,
-}) {
-  return Padding(
-    padding: const EdgeInsets.all(20),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(icon, color: const Color(0xFF1E293B), size: 24),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildModernHealthTimeline(BuildContext context, List<dynamic> items, String type, String catId, WidgetRef ref) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? Colors.white : const Color(0xFF1E293B);
+
+    return ListView.builder(
+      padding: const EdgeInsets.fromLTRB(24, 24, 24, 120),
+      itemCount: items.length,
+      itemBuilder: (context, index) {
+        final item = items[index];
+        final isLast = index == items.length - 1;
+
+        Widget iconWidget;
+        String title;
+        String dateStr;
+        String? subtitle;
+        VoidCallback onDelete;
+        VoidCallback onTap;
+
+        if (type == 'vaccine') {
+          iconWidget = Icon(Icons.vaccines_outlined, color: textColor, size: 24);
+          title = item.name;
+          dateStr = DateFormat.yMMMd().format(item.dateAdministered);
+          subtitle = item.nextDueDate != null ? '${AppStrings.get('next_due_date')}: ${DateFormat.yMMMd().format(item.nextDueDate!)}' : null;
+          onDelete = () => ref.read(vaccineListProvider.notifier).deleteVaccine(item.id);
+          onTap = () => showAddVaccineDialog(context, ref, catId, existing: item);
+        } else if (type == 'appointment') {
+          iconWidget = Icon(Icons.calendar_month_outlined, color: textColor, size: 24);
+          title = item.title;
+          dateStr = DateFormat('MMM d, yyyy - HH:mm').format(item.date);
+          subtitle = item.clinicName;
+          onDelete = () => ref.read(appointmentListProvider.notifier).deleteAppointment(item.id);
+          onTap = () => showAddAppointmentDialog(context, ref, catId, existing: item);
+        } else {
+          iconWidget = Icon(Icons.medication_outlined, color: textColor, size: 24);
+          title = item.name;
+          dateStr = '${AppStrings.get('dosage')}: ${item.dosage}';
+          subtitle = item.frequency;
+          onDelete = () => ref.read(medicationListProvider.notifier).deleteMedication(item.id);
+          onTap = () => showAddMedicationDialog(context, ref, catId, existing: item);
+        }
+
+        return IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(title, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: Color(0xFF1E293B), letterSpacing: 0.5)),
-              const SizedBox(height: 4),
-              Text(subtitle1, style: const TextStyle(color: Color(0xFF64748B), fontSize: 13, fontWeight: FontWeight.w600)),
-              if (subtitle2 != null) ...[
-                const SizedBox(height: 2),
-                Text(subtitle2, style: const TextStyle(color: Color(0xFF64748B), fontSize: 13, fontWeight: FontWeight.w600)),
-              ]
+              SizedBox(
+                width: 32,
+                child: Column(
+                  children: [
+                    Container(
+                      width: 16,
+                      height: 16,
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Theme.of(context).scaffoldBackgroundColor, width: 3),
+                      ),
+                    ),
+                    if (!isLast)
+                      Expanded(
+                        child: Container(
+                          width: 2,
+                          color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 24),
+                  child: GestureDetector(
+                    onTap: onTap,
+                    child: Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0), width: 1.5),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          iconWidget,
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(title, style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: textColor, letterSpacing: 0.5)),
+                                const SizedBox(height: 4),
+                                Text(dateStr, style: TextStyle(color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B), fontSize: 13, fontWeight: FontWeight.w600)),
+                                if (subtitle != null && subtitle.isNotEmpty) ...[
+                                  const SizedBox(height: 2),
+                                  Text(subtitle, style: TextStyle(color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B), fontSize: 13, fontWeight: FontWeight.w600)),
+                                ]
+                              ],
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: onDelete,
+                            child: Icon(Icons.delete_outline, color: textColor.withValues(alpha: 0.3), size: 20),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
-        ),
-        GestureDetector(
-          onTap: onDelete,
-          child: const Icon(Icons.close, color: Color(0xFF94A3B8), size: 20),
-        )
-      ],
-    ),
-  );
-}
+        );
+      },
+    );
+  }

@@ -82,7 +82,7 @@ class _AddStampDialogState extends ConsumerState<AddStampDialog> {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom + 130, // Increased to avoid navbar
+        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
         top: 24, left: 24, right: 24,
       ),
       decoration: BoxDecoration(
@@ -162,8 +162,9 @@ class _AddStampDialogState extends ConsumerState<AddStampDialog> {
                   ),
                 );
               },
-              child: Container(
-                height: 200,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 250),
+                height: MediaQuery.of(context).viewInsets.bottom > 0 ? 150 : 400,
                 decoration: BoxDecoration(
                   color: Theme.of(context).scaffoldBackgroundColor,
                   borderRadius: BorderRadius.circular(16),
@@ -185,7 +186,7 @@ class _AddStampDialogState extends ConsumerState<AddStampDialog> {
               ),
             ),
             
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
             
             // Caption Input
             TextField(
@@ -198,7 +199,7 @@ class _AddStampDialogState extends ConsumerState<AddStampDialog> {
               ),
             ),
             
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
             
             // Save Button
             ElevatedButton(
